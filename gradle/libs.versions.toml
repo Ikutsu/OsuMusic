@@ -10,6 +10,9 @@ androidx-test-junit = "1.1.5"
 compose-plugin = "1.6.10"
 junit = "4.13.2"
 kotlin = "2.0.0"
+coil3 = "3.0.0-alpha06"
+ktor-client = "2.3.11"
+
 
 [libraries]
 # Testing
@@ -22,6 +25,14 @@ androidx-test-junit = { group = "androidx.test.ext", name = "junit", version.ref
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidx-core-ktx" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "androidx-espresso-core" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
+
+# Coil3
+coil-compose = { module = "io.coil-kt.coil3:coil-compose-core", version.ref = "coil3" }
+coil-ktor = { module = "io.coil-kt.coil3:coil-network-ktor", version.ref = "coil3" }
+
+# Ktor
+ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor-client" }
+ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor-client" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
