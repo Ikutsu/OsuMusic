@@ -1,7 +1,6 @@
 package core.presentation.component
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -60,22 +58,26 @@ fun SingleDiffBeatmap(
             modifier = Modifier.fillMaxSize()
         )
 
-        Surface(
-            color = Color.Transparent,
-            modifier = Modifier.background(
-                Brush.horizontalGradient(
-                    colorStops = arrayOf(
-                        0.0f to Color.Transparent,
-                        0.2f to Color.Black.copy(0.3f),
-                        1f to Color.Black.copy(0.6f)
+
+        Canvas(
+            modifier = Modifier.fillMaxSize(),
+            onDraw = {
+                drawRect(
+                    brush = Brush.horizontalGradient(
+                        colorStops = arrayOf(
+                            0f to Color.Black.copy(0.6f),
+                            0.8f to Color.Black.copy(0.3f),
+                            1f to Color.Transparent
+                        )
                     )
                 )
-            ),
-            content = {}
+            }
         )
 
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             DiffCircle(diff = diff)
