@@ -1,12 +1,8 @@
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import core.presentation.component.NavBar
 import core.presentation.component.NavItem
-import core.presentation.component.SingleDiffBeatmap
 import core.presentation.component.TitleTopBar
 import core.presentation.theme.OM_Background
 import org.jetbrains.compose.resources.painterResource
@@ -58,7 +54,6 @@ fun App() {
             },
             containerColor = OM_Background
         ) {
-            Column(Modifier.padding(it)){ SingleDiffBeatmap(3.5f) }
         }
     }
 }

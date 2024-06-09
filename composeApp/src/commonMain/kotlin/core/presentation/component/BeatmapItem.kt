@@ -117,8 +117,82 @@ fun SingleDiffBeatmap(
 }
 
 @Composable
-fun AllDiffBeatmap() {
-    
+fun AllDiffBeatmap(
+        diffs: List<Float>
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(72.dp)
+            .clip(OM_ShapeMedium)
+    ) {
+        AsyncImage(
+            model = ImageRequest.Builder(LocalPlatformContext.current)
+                .data("https://assets.ppy.sh/beatmaps/880938/covers/cover.jpg?1650682949=")
+                .build(),
+            contentDescription = "Beatmap cover",
+            imageLoader = ImageLoader(LocalPlatformContext.current),
+            contentScale = ContentScale.FillWidth,
+            modifier = Modifier.fillMaxSize()
+        )
+
+        Canvas(
+            modifier = Modifier.fillMaxSize(),
+            onDraw = {
+                drawRect(
+                    brush = Brush.horizontalGradient(
+                        colorStops = arrayOf(
+                            0f to Color.Black.copy(0.6f),
+                            0.8f to Color.Black.copy(0.3f),
+                            1f to Color.Transparent
+                        )
+                    )
+                )
+            }
+        )
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "Title",
+                fontFamily = FontFamily(Font(Res.font.torusbold)),
+                fontSize = 16.sp,
+                color = Color.White,
+                style = TextStyle(
+                    lineHeightStyle = LineHeightStyle(
+                        trim = LineHeightStyle.Trim.Both,
+                        alignment = LineHeightStyle.Alignment.Center
+                    )
+                )
+            )
+            Text(
+                text = "Artist",
+                fontFamily = FontFamily(Font(Res.font.torussemibold)),
+                fontSize = 12.sp,
+                color = Color.White,
+                style = TextStyle(
+                    lineHeightStyle = LineHeightStyle(
+                        trim = LineHeightStyle.Trim.Both,
+                        alignment = LineHeightStyle.Alignment.Center
+                    )
+                )
+            )
+            Spacer(Modifier.height(4.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                diffs.forEach {
+                    DiffCircle(it, 18)
+                }
+            }
+        }
+    }
 }
 
 @Composable
