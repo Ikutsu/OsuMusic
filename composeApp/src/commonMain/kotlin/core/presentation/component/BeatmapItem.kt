@@ -80,7 +80,7 @@ fun SingleDiffBeatmap(
                 .padding(horizontal = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            DiffCircle(diff = diff)
+            DiffCircle(diff , 24)
             Spacer(modifier = Modifier.width(8.dp))
             Column(
                 modifier = Modifier.fillMaxHeight(),
@@ -123,20 +123,21 @@ fun AllDiffBeatmap() {
 
 @Composable
 fun DiffCircle(
-    diff: Float
+    diff: Float,
+    size: Int
 ) {
     Canvas(
         modifier = Modifier
-            .size(24.dp)
+            .size(size.dp)
     ) {
         drawCircle(
             color = Color.White,
         )
         drawCircle(
             color = diff.getDiffColor(),
-            radius = 24f,
+            radius = size.toFloat(),
             style = Stroke(
-                6f
+                (size/4).toFloat()
             )
         )
     }
