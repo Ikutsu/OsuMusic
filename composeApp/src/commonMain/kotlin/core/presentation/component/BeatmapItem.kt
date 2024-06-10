@@ -23,7 +23,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -32,11 +31,9 @@ import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
 import core.presentation.theme.OM_ShapeMedium
+import core.presentation.util.OM_Bold
+import core.presentation.util.OM_SemiBold
 import core.presentation.util.getDiffColor
-import org.jetbrains.compose.resources.Font
-import osumusic.composeapp.generated.resources.Res
-import osumusic.composeapp.generated.resources.torusbold
-import osumusic.composeapp.generated.resources.torussemibold
 
 @Composable
 fun SingleDiffBeatmap(
@@ -88,7 +85,7 @@ fun SingleDiffBeatmap(
             ) {
                  Text(
                      text = "Title",
-                     fontFamily = FontFamily(Font(Res.font.torusbold)),
+                     fontFamily = OM_Bold,
                      fontSize = 16.sp,
                      color = Color.White,
                      style = TextStyle(
@@ -100,7 +97,7 @@ fun SingleDiffBeatmap(
                  )
                  Text(
                      text = "Artist",
-                     fontFamily = FontFamily(Font(Res.font.torussemibold)),
+                     fontFamily = OM_SemiBold,
                      fontSize = 12.sp,
                      color = Color.White,
                      style = TextStyle(
@@ -159,7 +156,7 @@ fun AllDiffBeatmap(
         ) {
             Text(
                 text = "Title",
-                fontFamily = FontFamily(Font(Res.font.torusbold)),
+                fontFamily = OM_Bold,
                 fontSize = 16.sp,
                 color = Color.White,
                 style = TextStyle(
@@ -171,7 +168,7 @@ fun AllDiffBeatmap(
             )
             Text(
                 text = "Artist",
-                fontFamily = FontFamily(Font(Res.font.torussemibold)),
+                fontFamily = OM_SemiBold,
                 fontSize = 12.sp,
                 color = Color.White,
                 style = TextStyle(
