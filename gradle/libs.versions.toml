@@ -12,7 +12,7 @@ junit = "4.13.2"
 kotlin = "2.0.0"
 coil3 = "3.0.0-alpha06"
 ktor-client = "2.3.11"
-
+haze = "0.7.1"
 
 [libraries]
 # Testing
@@ -33,6 +33,9 @@ coil-ktor = { module = "io.coil-kt.coil3:coil-network-ktor", version.ref = "coil
 # Ktor
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor-client" }
 ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor-client" }
+
+# Image Blur
+haze = { module = "dev.chrisbanes.haze:haze", version.ref = "haze" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
