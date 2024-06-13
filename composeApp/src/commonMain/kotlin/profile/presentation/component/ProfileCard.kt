@@ -32,7 +32,10 @@ import osumusic.composeapp.generated.resources.ic_userLock
 import osumusic.composeapp.generated.resources.loginBackground
 
 @Composable
-fun LoginCard(modifier: Modifier = Modifier) {
+fun LoginCard(
+    modifier: Modifier = Modifier,
+    onSignInClick: () -> Unit
+) {
     val hazeState = remember { HazeState() }
 
     Box(
@@ -75,7 +78,7 @@ fun LoginCard(modifier: Modifier = Modifier) {
             VSpacer(12.dp)
             OMButton(
                 text = "Sign in",
-                onClick = {}
+                onClick = onSignInClick
             )
         }
     }
