@@ -1,4 +1,4 @@
-package core.presentation.component
+package io.ikutsu.osumusic.core.presentation.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -14,8 +14,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import core.presentation.theme.OM_Secondary
-import core.presentation.theme.OM_ShapeMedium
+import io.ikutsu.osumusic.core.presentation.theme.OM_Secondary
+import io.ikutsu.osumusic.core.presentation.theme.OM_ShapeMedium
 
 @Composable
 fun OMIconButton(

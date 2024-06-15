@@ -1,3 +1,5 @@
+package io.ikutsu.osumusic
+
 import android.os.Build
 
 class AndroidPlatform : Platform {

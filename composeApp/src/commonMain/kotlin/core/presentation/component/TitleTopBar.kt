@@ -1,4 +1,4 @@
-package core.presentation.component
+package io.ikutsu.osumusic.core.presentation.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import core.presentation.util.OM_SemiBold
+import io.ikutsu.osumusic.core.presentation.util.OM_SemiBold
 import org.jetbrains.compose.resources.painterResource
 import osumusic.composeapp.generated.resources.Res
 import osumusic.composeapp.generated.resources.ic_settings

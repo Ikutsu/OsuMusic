@@ -1,6 +1,5 @@
 package io.ikutsu.osumusic
 
-import App
 import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.ComponentActivity

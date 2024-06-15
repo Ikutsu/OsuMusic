@@ -1,4 +1,4 @@
-package core.presentation.theme
+package io.ikutsu.osumusic.core.presentation.theme
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.dp

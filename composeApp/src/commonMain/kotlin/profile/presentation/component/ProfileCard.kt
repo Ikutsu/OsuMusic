@@ -1,4 +1,4 @@
-package profile.presentation.component
+package io.ikutsu.osumusic.profile.presentation.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -26,6 +26,10 @@ import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.HazeStyle
 import dev.chrisbanes.haze.haze
 import dev.chrisbanes.haze.hazeChild
+import io.ikutsu.osumusic.core.presentation.component.OMButton
+import io.ikutsu.osumusic.core.presentation.theme.OM_ShapeLarge
+import io.ikutsu.osumusic.core.presentation.util.OM_regular
+import io.ikutsu.osumusic.core.presentation.util.VSpacer
 import org.jetbrains.compose.resources.painterResource
 import osumusic.composeapp.generated.resources.Res
 import osumusic.composeapp.generated.resources.ic_userLock

@@ -1,3 +1,5 @@
+package io.ikutsu.osumusic
+
 import platform.UIKit.UIDevice
 
 class IOSPlatform: Platform {

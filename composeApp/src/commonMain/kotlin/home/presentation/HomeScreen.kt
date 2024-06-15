@@ -1,4 +1,4 @@
-package home.presentation
+package io.ikutsu.osumusic.home.presentation
 
 import androidx.compose.runtime.Composable
 

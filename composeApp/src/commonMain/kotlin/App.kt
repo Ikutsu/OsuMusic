@@ -1,10 +1,12 @@
+package io.ikutsu.osumusic
+
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import core.presentation.component.NavBar
-import core.presentation.component.NavItem
-import core.presentation.component.TitleTopBar
-import core.presentation.theme.OM_Background
+import io.ikutsu.osumusic.core.presentation.component.NavBar
+import io.ikutsu.osumusic.core.presentation.component.NavItem
+import io.ikutsu.osumusic.core.presentation.component.TitleTopBar
+import io.ikutsu.osumusic.core.presentation.theme.OM_Background
 import org.jetbrains.compose.resources.painterResource
 import osumusic.composeapp.generated.resources.Res
 import osumusic.composeapp.generated.resources.ic_home

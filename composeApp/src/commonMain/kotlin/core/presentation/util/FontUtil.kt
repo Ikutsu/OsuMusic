@@ -1,4 +1,4 @@
-package core.presentation.util
+package io.ikutsu.osumusic.core.presentation.util
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.font.FontFamily

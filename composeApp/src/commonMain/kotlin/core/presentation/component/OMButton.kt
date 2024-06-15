@@ -1,4 +1,4 @@
-package core.presentation.component
+package io.ikutsu.osumusic.core.presentation.component
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -10,8 +10,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import core.presentation.theme.OM_Container
-import core.presentation.util.OM_SemiBold
+import io.ikutsu.osumusic.core.presentation.theme.OM_Container
+import io.ikutsu.osumusic.core.presentation.util.OM_SemiBold
 
 @Composable
 fun OMButton(

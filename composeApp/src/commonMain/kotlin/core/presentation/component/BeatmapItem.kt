@@ -1,4 +1,4 @@
-package core.presentation.component
+package io.ikutsu.osumusic.core.presentation.component
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
@@ -30,10 +30,11 @@ import coil3.ImageLoader
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
-import core.presentation.theme.OM_ShapeMedium
-import core.presentation.util.OM_Bold
-import core.presentation.util.OM_SemiBold
-import core.presentation.util.getDiffColor
+import io.ikutsu.osumusic.core.presentation.theme.OM_ShapeMedium
+import io.ikutsu.osumusic.core.presentation.util.OM_Bold
+import io.ikutsu.osumusic.core.presentation.util.OM_SemiBold
+import io.ikutsu.osumusic.core.presentation.util.getDiffColor
+
 
 @Composable
 fun SingleDiffBeatmap(

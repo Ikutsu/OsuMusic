@@ -1,4 +1,4 @@
-package core.presentation.util
+package io.ikutsu.osumusic.core.presentation.util
 
 import androidx.compose.ui.graphics.Color
 
