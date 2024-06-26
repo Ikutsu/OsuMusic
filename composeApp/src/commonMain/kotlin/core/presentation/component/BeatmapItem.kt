@@ -26,7 +26,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil3.ImageLoader
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
@@ -34,6 +33,7 @@ import io.ikutsu.osumusic.core.presentation.theme.OM_ShapeMedium
 import io.ikutsu.osumusic.core.presentation.util.OM_Bold
 import io.ikutsu.osumusic.core.presentation.util.OM_SemiBold
 import io.ikutsu.osumusic.core.presentation.util.getDiffColor
+import org.koin.compose.koinInject
 
 
 @Composable
@@ -51,7 +51,7 @@ fun SingleDiffBeatmap(
                 .data("https://assets.ppy.sh/beatmaps/880938/covers/cover.jpg?1650682949=")
                 .build(),
             contentDescription = "Beatmap cover",
-            imageLoader = ImageLoader(LocalPlatformContext.current),
+            imageLoader = koinInject(),
             contentScale = ContentScale.FillWidth,
             modifier = Modifier.fillMaxSize()
         )
@@ -129,7 +129,7 @@ fun AllDiffBeatmap(
                 .data("https://assets.ppy.sh/beatmaps/880938/covers/cover.jpg?1650682949=")
                 .build(),
             contentDescription = "Beatmap cover",
-            imageLoader = ImageLoader(LocalPlatformContext.current),
+            imageLoader = koinInject(),
             contentScale = ContentScale.FillWidth,
             modifier = Modifier.fillMaxSize()
         )

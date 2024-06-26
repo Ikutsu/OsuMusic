@@ -1,5 +1,6 @@
 package io.ikutsu.osumusic.core.presentation.util
 
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 
 val difficultyColourSpectrum = listOf(
@@ -41,3 +42,44 @@ fun interpolateColor(startColor: Color, endColor: Color, fraction: Float): Color
     return Color(r, g, b)
 }
 
+enum class LevelTier {
+    Iron,
+    Bronze,
+    Silver,
+    Gold,
+    Platinum,
+    Rhodium,
+    Radiant,
+    Lustrous
+}
+
+fun LevelTier.forColour(): Brush {
+    return when (this) {
+        LevelTier.Iron -> Brush.verticalGradient(listOf(Color(0xFFBAB3AB)))
+        LevelTier.Bronze -> Brush.verticalGradient(listOf(Color(0xFFB88F7A), Color(0xFF855C47)))
+        LevelTier.Silver -> Brush.verticalGradient(listOf(Color(0xFFE0E0EB), Color(0xFFA3A3C2)))
+        LevelTier.Gold -> Brush.verticalGradient(listOf(Color(0xFFF0E4A8), Color(0xFFE0C952)))
+        LevelTier.Platinum -> Brush.verticalGradient(listOf(Color(0xFFA8F0EF), Color(0xFF52E0DF)))
+        LevelTier.Rhodium -> Brush.verticalGradient(listOf(Color(0xFFD9F8D3), Color(0xFFA0CF96)))
+        LevelTier.Radiant -> Brush.verticalGradient(listOf(Color(0xFF97DCFF), Color(0xFFED82FF)))
+        LevelTier.Lustrous -> Brush.verticalGradient(listOf(Color(0xFFFFE600), Color(0xFFED82FF)))
+    }
+}
+
+fun mapLevelToTierColour(level: Int): Brush {
+    var tier = LevelTier.Iron
+
+    if (level > 0) {
+        tier = LevelTier.entries[level / 20]
+    }
+
+    if (level >= 105) {
+        tier = LevelTier.Radiant
+    }
+
+    if (level >= 110) {
+        tier = LevelTier.Lustrous
+    }
+
+    return tier.forColour()
+}
