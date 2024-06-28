@@ -38,6 +38,9 @@ import org.koin.compose.koinInject
 
 @Composable
 fun SingleDiffBeatmap(
+    beatmapCover: String,
+    title: String,
+    artist: String,
     diff: Float
 ) {
     Box(
@@ -48,15 +51,13 @@ fun SingleDiffBeatmap(
     ) {
         AsyncImage(
             model = ImageRequest.Builder(LocalPlatformContext.current)
-                .data("https://assets.ppy.sh/beatmaps/880938/covers/cover.jpg?1650682949=")
+                .data(beatmapCover)
                 .build(),
             contentDescription = "Beatmap cover",
             imageLoader = koinInject(),
             contentScale = ContentScale.FillWidth,
             modifier = Modifier.fillMaxSize()
         )
-
-
         Canvas(
             modifier = Modifier.fillMaxSize(),
             onDraw = {
@@ -85,7 +86,7 @@ fun SingleDiffBeatmap(
                 verticalArrangement = Arrangement.Center
             ) {
                  Text(
-                     text = "Title",
+                     text = title,
                      fontFamily = OM_Bold,
                      fontSize = 16.sp,
                      color = Color.White,
@@ -97,7 +98,7 @@ fun SingleDiffBeatmap(
                      )
                  )
                  Text(
-                     text = "Artist",
+                     text = artist,
                      fontFamily = OM_SemiBold,
                      fontSize = 12.sp,
                      color = Color.White,
@@ -116,7 +117,10 @@ fun SingleDiffBeatmap(
 
 @Composable
 fun AllDiffBeatmap(
-        diffs: List<Float>
+    beatmapCover: String,
+    title: String,
+    artist: String,
+    diffs: List<Float>
 ) {
     Box(
         modifier = Modifier
@@ -126,7 +130,7 @@ fun AllDiffBeatmap(
     ) {
         AsyncImage(
             model = ImageRequest.Builder(LocalPlatformContext.current)
-                .data("https://assets.ppy.sh/beatmaps/880938/covers/cover.jpg?1650682949=")
+                .data(beatmapCover)
                 .build(),
             contentDescription = "Beatmap cover",
             imageLoader = koinInject(),
@@ -156,7 +160,7 @@ fun AllDiffBeatmap(
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "Title",
+                text = title,
                 fontFamily = OM_Bold,
                 fontSize = 16.sp,
                 color = Color.White,
@@ -168,7 +172,7 @@ fun AllDiffBeatmap(
                 )
             )
             Text(
-                text = "Artist",
+                text = artist,
                 fontFamily = OM_SemiBold,
                 fontSize = 12.sp,
                 color = Color.White,
