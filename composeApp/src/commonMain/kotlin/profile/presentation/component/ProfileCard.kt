@@ -24,12 +24,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -52,6 +50,7 @@ import dev.chrisbanes.haze.HazeStyle
 import dev.chrisbanes.haze.haze
 import dev.chrisbanes.haze.hazeChild
 import io.ikutsu.osumusic.core.presentation.component.OMButton
+import io.ikutsu.osumusic.core.presentation.component.ProgressIndicator
 import io.ikutsu.osumusic.core.presentation.theme.OM_ShapeLarge
 import io.ikutsu.osumusic.core.presentation.util.HSpacer
 import io.ikutsu.osumusic.core.presentation.util.OM_regular
@@ -63,7 +62,6 @@ import org.koin.compose.koinInject
 import osumusic.composeapp.generated.resources.Res
 import osumusic.composeapp.generated.resources.ic_userLock
 import osumusic.composeapp.generated.resources.loginBackground
-import kotlin.math.abs
 
 enum class GameMode(val value: String, val icon: ImageVector) {
     STD("osu", OMIcon.Standard),
@@ -310,8 +308,12 @@ fun LevelProgress(
         Column(
             modifier = Modifier.weight(1f)
         ) {
-            LevelProgressIndicator(
-                progress = { progress / 100f }
+            ProgressIndicator(
+                progress = { progress / 100f },
+                height = 3.dp,
+                trackColor = Color(0xFF1C1719),
+                indicatorColor = Color(0xFFFF66AB),
+                strokeCap = StrokeCap.Round,
             )
             Text(
                 text = "$progress%",
@@ -352,62 +354,6 @@ fun LevelProgress(
                 modifier = Modifier.offset(0.dp, (-1).dp),
             )
         }
-    }
-}
-
-@Composable
-private fun LevelProgressIndicator(
-    progress: () -> Float,
-    modifier: Modifier = Modifier,
-) {
-    val coercedProgress = { progress().coerceIn(0f, 1f) }
-    Canvas(
-        modifier = modifier.fillMaxWidth().height(3.dp),
-    ) {
-        val strokeWidth = size.height
-        drawIndicator(
-            color = Color(0xFF1C1719),
-            startAt = 0f,
-            endAt = 1f,
-            strokeWidth = strokeWidth
-        )
-        drawIndicator(
-            color = Color(0xFFFF66AB),
-            startAt = 0f,
-            endAt = coercedProgress(),
-            strokeWidth = strokeWidth
-        )
-    }
-}
-
-private fun DrawScope.drawIndicator(
-    color: Color,
-    startAt: Float,
-    endAt: Float,
-    strokeWidth: Float,
-) {
-    val width = size.width
-    val height = size.height
-
-    val yOffset = height / 2
-
-    val lineStart = width * startAt
-    val lineEnd = width * endAt
-
-    val strokeCapOffset = strokeWidth / 2
-    val coerceRange = strokeCapOffset..(width - strokeCapOffset)
-    val adjustedBarStart = lineStart.coerceIn(coerceRange)
-    val adjustedBarEnd = lineEnd.coerceIn(coerceRange)
-
-    if (abs(endAt - startAt) > 0) {
-        // Progress line
-        drawLine(
-            color,
-            Offset(adjustedBarStart, yOffset),
-            Offset(adjustedBarEnd, yOffset),
-            strokeWidth,
-            StrokeCap.Round,
-        )
     }
 }
 
