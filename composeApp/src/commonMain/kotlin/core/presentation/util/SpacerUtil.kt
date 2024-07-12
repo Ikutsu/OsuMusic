@@ -20,11 +20,11 @@ fun HSpacer(size: Dp) {
 }
 
 @Composable
-fun ColumnScope.WSpacer(size: Dp) {
-    Spacer(modifier = Modifier.weight(1f))
+fun ColumnScope.WSpacer(weight: Float = 1f) {
+    Spacer(modifier = Modifier.weight(weight))
 }
 
 @Composable
-fun RowScope.WSpacer(size: Dp) {
-    Spacer(modifier = Modifier.weight(1f))
+fun RowScope.WSpacer(weight: Float = 1f) {
+    Spacer(modifier = Modifier.weight(weight))
 }
