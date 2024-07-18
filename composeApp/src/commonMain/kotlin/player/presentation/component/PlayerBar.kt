@@ -1,7 +1,6 @@
 package io.ikutsu.osumusic.player.presentation.component
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,17 +27,17 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
+import core.presentation.res.OMIcon
+import core.presentation.res.omicon.Backward
+import core.presentation.res.omicon.Forward
+import core.presentation.res.omicon.Pause
+import core.presentation.res.omicon.Play
 import io.ikutsu.osumusic.core.presentation.component.ProgressIndicator
 import io.ikutsu.osumusic.core.presentation.theme.OM_ShapeMedium
 import io.ikutsu.osumusic.core.presentation.util.OM_Bold
 import io.ikutsu.osumusic.core.presentation.util.OM_SemiBold
-import org.jetbrains.compose.resources.painterResource
+import io.ikutsu.osumusic.core.presentation.util.noRippleClickable
 import org.koin.compose.koinInject
-import osumusic.composeapp.generated.resources.Res
-import osumusic.composeapp.generated.resources.ic_backward
-import osumusic.composeapp.generated.resources.ic_forward
-import osumusic.composeapp.generated.resources.ic_pause
-import osumusic.composeapp.generated.resources.ic_play
 
 @Composable
 fun PlayerBar(
@@ -120,24 +119,22 @@ fun PlayerBar(
                 )
             }
             Icon(
-                painter = painterResource(Res.drawable.ic_backward),
+                imageVector = OMIcon.Backward,
                 contentDescription = "Backward",
                 tint = Color.White,
-                modifier = Modifier.size(24.dp).clickable { onBackward() }
+                modifier = Modifier.size(24.dp).noRippleClickable { onBackward() }
             )
             Icon(
-                painter = if (isPlaying) painterResource(Res.drawable.ic_pause) else painterResource(
-                    Res.drawable.ic_play
-                ),
+                imageVector = if (isPlaying) OMIcon.Pause else OMIcon.Play,
                 contentDescription = "Forward",
                 tint = Color.White,
-                modifier = Modifier.size(36.dp).clickable { onPlayPause() }
+                modifier = Modifier.size(36.dp).noRippleClickable { onPlayPause() }
             )
             Icon(
-                painter = painterResource(Res.drawable.ic_forward),
+                imageVector = OMIcon.Forward,
                 contentDescription = "Forward",
                 tint = Color.White,
-                modifier = Modifier.size(24.dp).clickable { onForward() }
+                modifier = Modifier.size(24.dp).noRippleClickable { onForward() }
             )
         }
     }
