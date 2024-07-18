@@ -38,6 +38,12 @@ import io.ikutsu.osumusic.core.presentation.util.OM_SemiBold
 
 private typealias TabPosition = Dp
 
+private enum class TabRowID {
+    TabIndicator,
+    Spacer,
+    Tab
+}
+
 @Composable
 fun OMTabRow(
     selectedTabIndex: Int,
@@ -57,11 +63,11 @@ fun OMTabRow(
         SubcomposeLayout(
             modifier = Modifier.fillMaxWidth()
         ) { constraints ->
-            val tabMeasurables = subcompose(2, tabs)
+            val tabMeasurables = subcompose(TabRowID.Tab, tabs)
             val tabCount = tabMeasurables.size
 
             val spacerCount = tabCount - 1
-            val spacerMeasurables = subcompose(1) {
+            val spacerMeasurables = subcompose(TabRowID.Spacer) {
                 repeat(spacerCount) {
                     HSpacer(spacerWidth)
                 }
@@ -90,7 +96,7 @@ fun OMTabRow(
             }
 
             layout(constraints.maxWidth, tabHeight) {
-                subcompose(0) {
+                subcompose(TabRowID.TabIndicator) {
                     OMTabIndicator(selectedTabIndex, tabPositions)
                 }.fastForEach {
                     it.measure(
