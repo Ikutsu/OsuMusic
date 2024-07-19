@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -28,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -340,6 +342,14 @@ fun PlayerBottomSheet(
     sheetState: SheetState,
     scope: CoroutineScope
 ) {
+    val listState = rememberLazyListState()
+
+    LaunchedEffect(sheetState.targetValue) {
+        if (sheetState.targetValue == SheetValue.Expanded) {
+            listState.scrollToItem(0)
+        }
+    }
+
     Column(
         modifier = Modifier.fillMaxHeight(0.6f).fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -366,7 +376,9 @@ fun PlayerBottomSheet(
         VSpacer(8.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding())
         LazyColumn(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            contentPadding = WindowInsets.navigationBars.asPaddingValues(),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            state = listState
         ) {
             item {
                 PlaylistBeatMapItem(

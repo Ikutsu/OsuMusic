@@ -194,7 +194,6 @@ private fun Track(
         trackHeight.toPx()
     }
 
-    println(trackHeightPx)
     Canvas(
         modifier = modifier
             .fillMaxWidth()
