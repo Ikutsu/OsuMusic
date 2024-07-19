@@ -146,7 +146,7 @@ fun PlayerScreen(
             Box(
                 Modifier
                     .padding(top = 8.dp)
-                    .size(64.dp,4.dp)
+                    .size(64.dp, 4.dp)
                     .clip(OM_ShapeFull)
                     .background(Color(0xFFD9D9D9))
             )
@@ -167,7 +167,6 @@ fun PlayerScreen(
                 PlayerContent(
                     beatmapBackground = "https://assets.ppy.sh/beatmaps/1205919/covers/raw.jpg"
                 )
-                VSpacer(48.dp)
                 PlayerInfo(
                     title = "UNION!!",
                     artist = "765 MILLION ALLSTARS",
@@ -175,7 +174,7 @@ fun PlayerScreen(
                     progressInLong = 150000,
                     songLength = 300000
                 )
-                VSpacer(48.dp)
+                WSpacer()
                 PlayerControl(
                     onShuffle = { },
                     onBackward = { },
@@ -186,7 +185,7 @@ fun PlayerScreen(
                     isPlaying = true,
                     isLoved = true
                 )
-                VSpacer(48.dp)
+                WSpacer()
             }
             if (sheetState.targetValue == SheetValue.Expanded || showSheetDim.value) {
                 Box(
@@ -224,25 +223,23 @@ fun ColumnScope.PlayerContent(
             }
         },
     )
-    VSpacer(48.dp)
-    Column(
-        modifier = Modifier.fillMaxWidth().weight(1f),
-        verticalArrangement = Arrangement.Bottom
-    ) {
-        AsyncImage(
-            model = ImageRequest.Builder(LocalPlatformContext.current)
-                .data(beatmapBackground)
-                .build(),
-            contentDescription = "Beatmap Background",
-            imageLoader = koinInject(),
-            contentScale = ContentScale.FillWidth,
-            modifier = Modifier.fillMaxWidth().clip(OM_ShapeLarge)
-        )
-    }
+    VSpacer(16.dp)
+    WSpacer()
+    AsyncImage(
+        model = ImageRequest.Builder(LocalPlatformContext.current)
+            .data(beatmapBackground)
+            .build(),
+        contentDescription = "Beatmap Background",
+        imageLoader = koinInject(),
+        contentScale = ContentScale.FillWidth,
+        modifier = Modifier.fillMaxWidth().wrapContentSize().clip(OM_ShapeLarge)
+    )
+    VSpacer(16.dp)
+    WSpacer()
 }
 
 @Composable
-fun PlayerInfo(
+fun ColumnScope.PlayerInfo(
     title: String,
     artist: String,
     progress: Float,
@@ -261,7 +258,7 @@ fun PlayerInfo(
         fontSize = 16.sp,
         color = Color.White
     )
-    VSpacer(48.dp)
+    WSpacer()
     OMSlider(
         value = progress,
         onValueChange = { },
