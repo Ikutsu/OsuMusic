@@ -2,7 +2,6 @@ package io.ikutsu.osumusic.core.presentation.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -15,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.ikutsu.osumusic.core.presentation.util.OM_SemiBold
+import io.ikutsu.osumusic.core.presentation.util.WSpacer
 import org.jetbrains.compose.resources.painterResource
 import osumusic.composeapp.generated.resources.Res
 import osumusic.composeapp.generated.resources.ic_settings
@@ -46,7 +46,7 @@ fun TitleTopBar(
             fontSize = 32.sp,
             color = Color.White
         )
-        Spacer(Modifier.weight(1f))
+        WSpacer()
         if (showSetting) {
             OMIconButton(
                 onClick = onSettingClick,

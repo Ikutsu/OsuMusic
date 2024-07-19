@@ -6,14 +6,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,6 +35,7 @@ import io.ikutsu.osumusic.core.presentation.theme.OM_ShapeMedium
 import io.ikutsu.osumusic.core.presentation.util.HSpacer
 import io.ikutsu.osumusic.core.presentation.util.OM_Bold
 import io.ikutsu.osumusic.core.presentation.util.OM_SemiBold
+import io.ikutsu.osumusic.core.presentation.util.VSpacer
 import io.ikutsu.osumusic.core.presentation.util.getDiffColor
 import org.koin.compose.koinInject
 
@@ -85,7 +84,7 @@ fun SingleDiffBeatmap(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             DiffCircle(diff , 24)
-            Spacer(modifier = Modifier.width(8.dp))
+            HSpacer(8.dp)
             Column(
                 modifier = Modifier.fillMaxHeight(),
                 verticalArrangement = Arrangement.Center
@@ -188,7 +187,7 @@ fun AllDiffBeatmap(
                     )
                 )
             )
-            Spacer(Modifier.height(4.dp))
+            VSpacer(4.dp)
             Row(
                 modifier = Modifier
                     .fillMaxWidth(),
