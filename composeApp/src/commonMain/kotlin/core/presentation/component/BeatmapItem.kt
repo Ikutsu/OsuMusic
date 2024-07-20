@@ -202,7 +202,7 @@ fun AllDiffBeatmap(
 }
 
 @Composable
-fun PlaylistBeatMapItem(
+fun PlaylistQueueItem(
     onClick: () -> Unit,
     isPlaying: Boolean,
     beatmapCover: String,

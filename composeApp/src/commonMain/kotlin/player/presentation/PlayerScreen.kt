@@ -56,7 +56,7 @@ import io.ikutsu.osumusic.core.presentation.component.OMIconButton
 import io.ikutsu.osumusic.core.presentation.component.OMSlider
 import io.ikutsu.osumusic.core.presentation.component.OMTab
 import io.ikutsu.osumusic.core.presentation.component.OMTabRow
-import io.ikutsu.osumusic.core.presentation.component.PlaylistBeatMapItem
+import io.ikutsu.osumusic.core.presentation.component.PlaylistQueueItem
 import io.ikutsu.osumusic.core.presentation.theme.OM_Background
 import io.ikutsu.osumusic.core.presentation.theme.OM_Primary
 import io.ikutsu.osumusic.core.presentation.theme.OM_ShapeFull
@@ -378,7 +378,7 @@ fun PlayerBottomSheet(
             state = listState
         ) {
             item {
-                PlaylistBeatMapItem(
+                PlaylistQueueItem(
                     onClick = {},
                     isPlaying = true,
                     beatmapCover = "https://assets.ppy.sh/beatmaps/1205919/covers/raw.jpg",
@@ -389,7 +389,7 @@ fun PlayerBottomSheet(
 
             }
             items(10) {
-                PlaylistBeatMapItem(
+                PlaylistQueueItem(
                     onClick = {},
                     isPlaying = false,
                     beatmapCover = "https://assets.ppy.sh/beatmaps/1205919/covers/raw.jpg",
