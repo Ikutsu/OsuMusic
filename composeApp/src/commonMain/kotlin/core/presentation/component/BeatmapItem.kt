@@ -93,7 +93,6 @@ fun SingleDiffBeatmap(
                      text = title,
                      fontFamily = OM_Bold,
                      fontSize = 16.sp,
-                     color = Color.White,
                      style = TextStyle(
                          lineHeightStyle = LineHeightStyle(
                              trim = LineHeightStyle.Trim.Both,
@@ -105,7 +104,6 @@ fun SingleDiffBeatmap(
                      text = artist,
                      fontFamily = OM_SemiBold,
                      fontSize = 12.sp,
-                     color = Color.White,
                      style = TextStyle(
                          lineHeightStyle = LineHeightStyle(
                              trim = LineHeightStyle.Trim.Both,
@@ -167,7 +165,6 @@ fun AllDiffBeatmap(
                 text = title,
                 fontFamily = OM_Bold,
                 fontSize = 16.sp,
-                color = Color.White,
                 style = TextStyle(
                     lineHeightStyle = LineHeightStyle(
                         trim = LineHeightStyle.Trim.Both,
@@ -179,7 +176,6 @@ fun AllDiffBeatmap(
                 text = artist,
                 fontFamily = OM_SemiBold,
                 fontSize = 12.sp,
-                color = Color.White,
                 style = TextStyle(
                     lineHeightStyle = LineHeightStyle(
                         trim = LineHeightStyle.Trim.Both,
@@ -257,7 +253,6 @@ fun PlaylistQueueItem(
                     text = title,
                     fontFamily = OM_Bold,
                     fontSize = 16.sp,
-                    color = Color.White,
                     style = TextStyle(
                         lineHeightStyle = LineHeightStyle(
                             trim = LineHeightStyle.Trim.Both,
@@ -269,7 +264,6 @@ fun PlaylistQueueItem(
                     text = artist,
                     fontFamily = OM_SemiBold,
                     fontSize = 12.sp,
-                    color = Color.White,
                     style = TextStyle(
                         lineHeightStyle = LineHeightStyle(
                             trim = LineHeightStyle.Trim.Both,
@@ -283,7 +277,6 @@ fun PlaylistQueueItem(
                 Icon(
                     imageVector = OMIcon.Waveform,
                     contentDescription = "Waveform",
-                    tint = Color.White,
                     modifier = Modifier.height(24.dp)
                 )
                 HSpacer(8.dp)

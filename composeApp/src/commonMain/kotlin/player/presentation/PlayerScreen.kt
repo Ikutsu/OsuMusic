@@ -249,14 +249,12 @@ fun ColumnScope.PlayerInfo(
     Text(
         text = title,
         fontFamily = OM_Bold,
-        fontSize = 24.sp,
-        color = Color.White
+        fontSize = 24.sp
     )
     Text(
         text = artist,
         fontFamily = OM_SemiBold,
-        fontSize = 16.sp,
-        color = Color.White
+        fontSize = 16.sp
     )
     WSpacer()
     OMSlider(
@@ -271,15 +269,13 @@ fun ColumnScope.PlayerInfo(
         Text(
             text = progressInLong.formatMilliseconds(),
             fontFamily = OM_SemiBold,
-            fontSize = 16.sp,
-            color = Color.White
+            fontSize = 16.sp
         )
         WSpacer()
         Text(
             text = songLength.formatMilliseconds(),
             fontFamily = OM_SemiBold,
-            fontSize = 16.sp,
-            color = Color.White
+            fontSize = 16.sp
         )
     }
 }
@@ -309,19 +305,16 @@ fun PlayerControl(
         Icon(
             imageVector = OMIcon.Backward,
             contentDescription = "Backward",
-            tint = Color.White,
             modifier = Modifier.size(36.dp).noRippleClickable { onBackward() }
         )
         Icon(
             imageVector = if (isPlaying) OMIcon.Pause else OMIcon.Play,
             contentDescription = "Play",
-            tint = Color.White,
             modifier = Modifier.size(48.dp).noRippleClickable { onPlayPause() }
         )
         Icon(
             imageVector = OMIcon.Forward,
             contentDescription = "Forward",
-            tint = Color.White,
             modifier = Modifier.size(36.dp).noRippleClickable { onForward() }
         )
         Icon(
@@ -366,8 +359,7 @@ fun PlayerBottomSheet(
             Text(
                 text = "Playlist",
                 fontFamily = OM_SemiBold,
-                fontSize = 20.sp,
-                color = Color.White
+                fontSize = 20.sp
             )
         }
         VSpacer(8.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding())

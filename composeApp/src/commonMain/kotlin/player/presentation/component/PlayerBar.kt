@@ -97,7 +97,6 @@ fun PlayerBar(
                     text = title,
                     fontFamily = OM_Bold,
                     fontSize = 16.sp,
-                    color = Color.White,
                     style = TextStyle(
                         lineHeightStyle = LineHeightStyle(
                             trim = LineHeightStyle.Trim.Both,
@@ -109,7 +108,6 @@ fun PlayerBar(
                     text = artist,
                     fontFamily = OM_SemiBold,
                     fontSize = 12.sp,
-                    color = Color.White,
                     style = TextStyle(
                         lineHeightStyle = LineHeightStyle(
                             trim = LineHeightStyle.Trim.Both,
@@ -121,19 +119,16 @@ fun PlayerBar(
             Icon(
                 imageVector = OMIcon.Backward,
                 contentDescription = "Backward",
-                tint = Color.White,
                 modifier = Modifier.size(24.dp).noRippleClickable { onBackward() }
             )
             Icon(
                 imageVector = if (isPlaying) OMIcon.Pause else OMIcon.Play,
                 contentDescription = "Forward",
-                tint = Color.White,
                 modifier = Modifier.size(36.dp).noRippleClickable { onPlayPause() }
             )
             Icon(
                 imageVector = OMIcon.Forward,
                 contentDescription = "Forward",
-                tint = Color.White,
                 modifier = Modifier.size(24.dp).noRippleClickable { onForward() }
             )
         }

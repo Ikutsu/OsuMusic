@@ -104,15 +104,13 @@ fun LoginCard(
             Icon(
                 painter = painterResource(Res.drawable.ic_userLock),
                 contentDescription = null,
-                modifier = Modifier.size(32.dp),
-                tint = Color.White
+                modifier = Modifier.size(32.dp)
             )
             VSpacer(4.dp)
             Text(
                 text = "Sign in to view your profile",
                 fontFamily = OM_regular,
-                fontSize = 16.sp,
-                color = Color.White
+                fontSize = 16.sp
             )
             VSpacer(12.dp)
             OMButton(
@@ -282,8 +280,7 @@ fun UserInfo(
         Text(
             text = username,
             fontFamily = OM_regular,
-            fontSize = 24.sp,
-            color = Color.White
+            fontSize = 24.sp
         )
         VSpacer(6.dp)
         Image(
@@ -319,7 +316,6 @@ fun LevelProgress(
                 text = "$progress%",
                 fontFamily = OM_regular,
                 fontSize = 12.sp,
-                color = Color.White,
                 modifier = Modifier.align(Alignment.End),
                 style = TextStyle(
                     lineHeightStyle = LineHeightStyle(
@@ -350,7 +346,6 @@ fun LevelProgress(
                 text = level.toString(),
                 fontFamily = OM_regular,
                 fontSize = 13.sp,
-                color = Color.White,
                 modifier = Modifier.offset(0.dp, (-1).dp),
             )
         }
@@ -383,7 +378,6 @@ private fun StatsItem(
             text = title,
             fontFamily = OM_regular,
             fontSize = titleSize,
-            color = Color.White,
             style = TextStyle(
                 lineHeightStyle = LineHeightStyle(
                     trim = LineHeightStyle.Trim.Both,
@@ -395,7 +389,6 @@ private fun StatsItem(
             text = content,
             fontFamily = OM_regular,
             fontSize = contentSize,
-            color = Color.White,
             style = TextStyle(
                 lineHeightStyle = LineHeightStyle(
                     trim = LineHeightStyle.Trim.Both,

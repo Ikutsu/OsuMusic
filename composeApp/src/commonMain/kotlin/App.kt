@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import io.ikutsu.osumusic.core.presentation.component.NavBar
 import io.ikutsu.osumusic.core.presentation.component.NavItem
 import io.ikutsu.osumusic.core.presentation.component.TitleTopBar
+import io.ikutsu.osumusic.core.presentation.theme.OMTheme
 import io.ikutsu.osumusic.core.presentation.theme.OM_Background
 import org.jetbrains.compose.resources.painterResource
 import osumusic.composeapp.generated.resources.Res
@@ -16,46 +17,48 @@ import osumusic.composeapp.generated.resources.ic_search
 @Composable
 fun App() {
     MaterialTheme {
-        Scaffold(
-            topBar = {
-                TitleTopBar(
-                    title = "Home",
-                    showSetting = true,
-                    onSettingClick = {
+        OMTheme {
+            Scaffold(
+                topBar = {
+                    TitleTopBar(
+                        title = "Home",
+                        showSetting = true,
+                        onSettingClick = {
 
+                        }
+                    )
+                },
+                bottomBar = {
+                    NavBar {
+                        NavItem(
+                            icon = painterResource(Res.drawable.ic_home),
+                            contentDescription = "Home",
+                            onClick = {
+
+                            },
+                            select = true
+                        )
+                        NavItem(
+                            icon = painterResource(Res.drawable.ic_search),
+                            contentDescription = "Search",
+                            onClick = {
+
+                            },
+                            select = false
+                        )
+                        NavItem(
+                            icon = painterResource(Res.drawable.ic_player),
+                            contentDescription = "Profile",
+                            onClick = {
+
+                            },
+                            select = false
+                        )
                     }
-                )
-            },
-            bottomBar = {
-                NavBar {
-                    NavItem(
-                        icon = painterResource(Res.drawable.ic_home),
-                        contentDescription = "Home",
-                        onClick = {
-
-                        },
-                        select = true
-                    )
-                    NavItem(
-                        icon = painterResource(Res.drawable.ic_search),
-                        contentDescription = "Search",
-                        onClick = {
-
-                        },
-                        select = false
-                    )
-                    NavItem(
-                        icon = painterResource(Res.drawable.ic_player),
-                        contentDescription = "Profile",
-                        onClick = {
-
-                        },
-                        select = false
-                    )
-                }
-            },
-            containerColor = OM_Background
-        ) {
+                },
+                containerColor = OM_Background
+            ) {
+            }
         }
     }
 }

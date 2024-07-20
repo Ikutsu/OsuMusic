@@ -81,7 +81,6 @@ fun PlaylistCardItem(
                 text = playlistName,
                 fontFamily = OM_SemiBold,
                 fontSize = 16.dp.sp,
-                color = Color.White,
                 style = TextStyle(
                     lineHeightStyle = LineHeightStyle(
                         trim = LineHeightStyle.Trim.Both,
@@ -102,7 +101,6 @@ fun PlaylistCardItem(
                     }
                 },
                 fontSize = 12.dp.sp,
-                color = Color.White,
                 modifier = Modifier
                     .clip(OM_ShapeFull)
                     .drawBehind {

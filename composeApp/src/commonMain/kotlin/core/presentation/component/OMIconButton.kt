@@ -10,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -42,7 +41,6 @@ fun OMIconButton(
         Icon(
             painter = painter,
             contentDescription = contentDescription,
-            tint = Color.White,
             modifier = Modifier.size(contentSize)
         )
     }
