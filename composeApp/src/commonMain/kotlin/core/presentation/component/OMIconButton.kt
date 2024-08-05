@@ -10,7 +10,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.ikutsu.osumusic.core.presentation.theme.OM_Secondary
@@ -40,6 +42,36 @@ fun OMIconButton(
     ) {
         Icon(
             painter = painter,
+            contentDescription = contentDescription,
+            modifier = Modifier.size(contentSize)
+        )
+    }
+}
+
+@Composable
+fun OMIconButton(
+    onClick: () -> Unit = {},
+    enabled: Boolean = true,
+    vector: ImageVector,
+    contentDescription: String,
+    containerSize: Dp = 48.dp,
+    contentSize: Dp = 24.dp,
+    containerColor: Color = OM_Secondary,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .size(containerSize)
+            .clip(OM_ShapeMedium)
+            .background(containerColor)
+            .clickable(
+                onClick = onClick,
+                enabled = enabled
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            imageVector = vector,
             contentDescription = contentDescription,
             modifier = Modifier.size(contentSize)
         )
