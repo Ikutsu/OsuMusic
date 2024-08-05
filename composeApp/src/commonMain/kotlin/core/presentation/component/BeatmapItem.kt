@@ -42,6 +42,7 @@ import org.koin.compose.koinInject
 
 @Composable
 fun SingleDiffBeatmap(
+    onClick: () -> Unit,
     beatmapCover: String,
     title: String,
     artist: String,
@@ -52,6 +53,7 @@ fun SingleDiffBeatmap(
             .fillMaxWidth()
             .height(48.dp)
             .clip(OM_ShapeMedium)
+            .clickable { onClick() }
     ) {
         AsyncImage(
             model = ImageRequest.Builder(LocalPlatformContext.current)
@@ -119,6 +121,7 @@ fun SingleDiffBeatmap(
 
 @Composable
 fun AllDiffBeatmap(
+    onClick: () -> Unit,
     beatmapCover: String,
     title: String,
     artist: String,
@@ -129,6 +132,7 @@ fun AllDiffBeatmap(
             .fillMaxWidth()
             .height(72.dp)
             .clip(OM_ShapeMedium)
+            .clickable { onClick() }
     ) {
         AsyncImage(
             model = ImageRequest.Builder(LocalPlatformContext.current)
