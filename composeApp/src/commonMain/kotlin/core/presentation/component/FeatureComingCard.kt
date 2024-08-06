@@ -3,6 +3,8 @@ package io.ikutsu.osumusic.core.presentation.component
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -20,7 +22,7 @@ import io.ikutsu.osumusic.core.presentation.util.sp
 
 @Composable
 fun FeatureComingCard(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier.fillMaxWidth().height(224.dp)
 ) {
     Column(
         modifier = modifier.background(Color.Gray.copy(alpha = 0.1f), shape = OM_ShapeLarge),
