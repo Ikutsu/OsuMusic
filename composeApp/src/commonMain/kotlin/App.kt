@@ -1,63 +1,63 @@
 package io.ikutsu.osumusic
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideIn
+import androidx.compose.animation.slideOut
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import io.ikutsu.osumusic.core.presentation.component.NavBar
-import io.ikutsu.osumusic.core.presentation.component.NavItem
-import io.ikutsu.osumusic.core.presentation.component.TitleTopBar
+import androidx.compose.ui.unit.IntOffset
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import io.ikutsu.osumusic.core.presentation.theme.OMTheme
-import io.ikutsu.osumusic.core.presentation.theme.OM_Background
-import org.jetbrains.compose.resources.painterResource
-import osumusic.composeapp.generated.resources.Res
-import osumusic.composeapp.generated.resources.ic_home
-import osumusic.composeapp.generated.resources.ic_player
-import osumusic.composeapp.generated.resources.ic_search
+import io.ikutsu.osumusic.player.presentation.PlayerScreen
 
 @Composable
 fun App() {
+    val navController = rememberNavController()
+
     MaterialTheme {
         OMTheme {
-            Scaffold(
-                topBar = {
-                    TitleTopBar(
-                        title = "Home",
-                        showSetting = true,
-                        onSettingClick = {
-
+            NavHost(
+                startDestination = "main",
+                navController = navController,
+            ) {
+                composable("main") {
+                    MainScreen(
+                        onPlayerBarClick = {
+                            navController.navigate("player")
                         }
                     )
-                },
-                bottomBar = {
-                    NavBar {
-                        NavItem(
-                            icon = painterResource(Res.drawable.ic_home),
-                            contentDescription = "Home",
-                            onClick = {
-
-                            },
-                            select = true
-                        )
-                        NavItem(
-                            icon = painterResource(Res.drawable.ic_search),
-                            contentDescription = "Search",
-                            onClick = {
-
-                            },
-                            select = false
-                        )
-                        NavItem(
-                            icon = painterResource(Res.drawable.ic_player),
-                            contentDescription = "Profile",
-                            onClick = {
-
-                            },
-                            select = false
-                        )
+                }
+                composable(
+                    route = "player",
+                    enterTransition = {
+                        slideIn(
+                            animationSpec = tween(300),
+                            initialOffset = { IntOffset(0, it.height) }
+                        ) + fadeIn(tween(300))
+                    },
+                    popEnterTransition = {
+                        fadeIn(tween(300))
+                    },
+                    exitTransition = {
+                        fadeOut(tween(300))
+                    },
+                    popExitTransition = {
+                        slideOut(
+                            animationSpec = tween(300),
+                            targetOffset = { IntOffset(0, it.height) }
+                        ) + fadeOut(tween(300))
                     }
-                },
-                containerColor = OM_Background
-            ) {
+                ) {
+                    PlayerScreen(
+                        onBackClick = {
+                            navController.navigateUp()
+                        }
+                    )
+                }
             }
         }
     }

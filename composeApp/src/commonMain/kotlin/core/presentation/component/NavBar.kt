@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -58,7 +57,7 @@ fun NavBar(
 }
 
 @Composable
-fun RowScope.NavItem(
+fun NavItem(
     modifier: Modifier = Modifier,
     select: Boolean,
     onClick: () -> Unit,
@@ -78,7 +77,7 @@ fun RowScope.NavItem(
             modifier = modifier.size(24.dp),
             tint = if (select) Color.White else Color.Gray
         )
-        Column(
+        Box(
             modifier = Modifier
                 .width(16.dp)
                 .height(2.dp)
@@ -87,9 +86,6 @@ fun RowScope.NavItem(
                     color = if (select) Color.White else Color.Transparent,
                     shape = OM_ShapeFull
                 )
-
-        ) {
-
-        }
+        )
     }
 }

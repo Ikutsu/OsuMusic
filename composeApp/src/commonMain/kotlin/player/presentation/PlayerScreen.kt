@@ -83,10 +83,14 @@ enum class DisplayOptionTab(val title: String) {
     Storyboard("Storyboard"),
 }
 
+// Reserve for navigation-compose 2.8.0
+//@Serializable
+//object Player
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlayerScreen(
-
+    onBackClick: () -> Unit
 ) {
     val sheetState = rememberStandardBottomSheetState()
     val scaffoldState = rememberBottomSheetScaffoldState(
@@ -117,7 +121,9 @@ fun PlayerScreen(
                     verticalArrangement = Arrangement.Center
                 ) {
                     OMIconButton(
-                        onClick = { },
+                        onClick = {
+                            onBackClick()
+                        },
                         painter = painterResource(Res.drawable.ic_prevCircle),
                         contentDescription = "Back",
                     )

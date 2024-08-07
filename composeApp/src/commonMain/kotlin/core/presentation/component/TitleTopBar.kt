@@ -29,7 +29,7 @@ fun TitleTopBar(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(vertical = 8.dp)
             .statusBarsPadding(),
         verticalAlignment = Alignment.CenterVertically
     ) {
