@@ -1,20 +1,20 @@
 [versions]
-agp = "8.2.0"
+agp = "8.2.2"
 android-compileSdk = "34"
 android-minSdk = "24"
 android-targetSdk = "34"
-androidx-activityCompose = "1.9.0"
+androidx-activityCompose = "1.9.1"
 androidx-core-ktx = "1.13.1"
-androidx-espresso-core = "3.5.1"
-androidx-test-junit = "1.1.5"
-compose-plugin = "1.6.10"
+androidx-espresso-core = "3.6.1"
+androidx-test-junit = "1.2.1"
+compose-plugin = "1.7.0-alpha02"
 junit = "4.13.2"
-kotlin = "2.0.0"
-coil3 = "3.0.0-alpha06"
+kotlin = "2.0.20-RC"
+coil3 = "3.0.0-alpha09"
 kotlinxSerializationJson = "1.7.1"
-ktor-client = "2.3.11"
-haze = "0.7.1"
-koin = "3.6.0-Beta4"
+ktor-client = "3.0.0-beta-2"
+haze = "0.7.3"
+koin = "4.0.0-RC1"
 navigation = "2.7.0-alpha07"
 
 [libraries]
@@ -34,7 +34,7 @@ compose-navigation = { group = "org.jetbrains.androidx.navigation", name = "navi
 
 # Coil3
 coil-compose = { module = "io.coil-kt.coil3:coil-compose-core", version.ref = "coil3" }
-coil-ktor = { module = "io.coil-kt.coil3:coil-network-ktor", version.ref = "coil3" }
+coil-ktor = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coil3" }
 
 # Ktor
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
