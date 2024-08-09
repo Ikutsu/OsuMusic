@@ -10,7 +10,7 @@
         android:label="@string/app_name"
         android:windowSoftInputMode="adjustResize"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true"
+        android:supportsRtl="false"
         android:theme="@style/Theme.OM">
         <activity
             android:exported="true"
