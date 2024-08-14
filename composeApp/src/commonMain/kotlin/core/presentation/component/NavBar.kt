@@ -37,8 +37,9 @@ fun NavBar(
         modifier = modifier.background(
             Brush.verticalGradient(
                 colorStops = arrayOf(
-                    0.0f to Color.Transparent,
-                    1f to Color.Black.copy(0.7f)
+                    0f to Color.Black.copy(0.5f),
+                    0.5f to Color.Black.copy(0.9f),
+                    1f to Color.Black
                 )
             )
         )

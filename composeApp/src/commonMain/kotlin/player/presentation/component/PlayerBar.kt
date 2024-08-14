@@ -70,7 +70,8 @@ fun PlayerBar(
                     brush = Brush.verticalGradient(
                         colorStops = arrayOf(
                             0f to Color.Transparent,
-                            1f to Color.Black.copy(0.6f)
+                            0.5f to Color.Black.copy(0.6f),
+                            1f to Color.Black.copy(0.8f)
                         )
                     )
                 )
