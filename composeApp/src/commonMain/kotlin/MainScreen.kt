@@ -27,8 +27,10 @@ import io.ikutsu.osumusic.home.presentation.HomeScreen
 import io.ikutsu.osumusic.player.presentation.component.PlayerBar
 import io.ikutsu.osumusic.profile.presentation.ProfileScreen
 import io.ikutsu.osumusic.search.presentation.SearchScreen
+import io.ikutsu.osumusic.search.presentation.SearchViewModel
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
+import org.koin.compose.viewmodel.koinViewModel
 import osumusic.composeapp.generated.resources.Res
 import osumusic.composeapp.generated.resources.ic_home
 import osumusic.composeapp.generated.resources.ic_player
@@ -64,6 +66,7 @@ fun MainScreen(
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentDestination = navBackStackEntry?.destination
+        val searchViewModel: SearchViewModel = koinViewModel()
 
         NavHost(
             startDestination = "home",
@@ -79,7 +82,9 @@ fun MainScreen(
                 HomeScreen()
             }
             composable("search") {
-                SearchScreen()
+                SearchScreen(
+                    viewmodel = searchViewModel
+                )
             }
             composable("profile") {
                 ProfileScreen()
@@ -109,7 +114,6 @@ fun MainScreen(
             HSpacer(8.dp)
             NavBar {
                 BottomNavigationItem.forEach { screen ->
-                    println(currentDestination?.route)
                     NavItem(
                         select = currentDestination?.route == screen.route,
                         onClick = {

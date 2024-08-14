@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,6 +26,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.LineHeightStyle
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
@@ -100,7 +103,9 @@ fun SingleDiffBeatmap(
                              trim = LineHeightStyle.Trim.Both,
                              alignment = LineHeightStyle.Alignment.Center
                          )
-                     )
+                     ),
+                     maxLines = 1,
+                     overflow = TextOverflow.Ellipsis
                  )
                  Text(
                      text = artist,
@@ -111,7 +116,9 @@ fun SingleDiffBeatmap(
                              trim = LineHeightStyle.Trim.Both,
                              alignment = LineHeightStyle.Alignment.Center
                          )
-                     )
+                     ),
+                     maxLines = 1,
+                     overflow = TextOverflow.Ellipsis
                  )
             }
         }
@@ -174,7 +181,9 @@ fun AllDiffBeatmap(
                         trim = LineHeightStyle.Trim.Both,
                         alignment = LineHeightStyle.Alignment.Center
                     )
-                )
+                ),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
             Text(
                 text = artist,
@@ -185,15 +194,18 @@ fun AllDiffBeatmap(
                         trim = LineHeightStyle.Trim.Both,
                         alignment = LineHeightStyle.Alignment.Center
                     )
-                )
+                ),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
             VSpacer(4.dp)
-            Row(
+            LazyRow(
                 modifier = Modifier
                     .fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                userScrollEnabled = false
             ) {
-                diffs.forEach {
+                items(diffs) {
                     DiffCircle(it, 18)
                 }
             }
