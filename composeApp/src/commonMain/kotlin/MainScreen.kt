@@ -16,10 +16,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
 import io.ikutsu.osumusic.core.presentation.component.NavBar
 import io.ikutsu.osumusic.core.presentation.component.NavItem
 import io.ikutsu.osumusic.core.presentation.theme.OM_Background
@@ -56,9 +56,9 @@ private val BottomNavigationItem = listOf(
 
 @Composable
 fun MainScreen(
+    navController: NavHostController,
     onPlayerBarClick: () -> Unit
 ) {
-    val navController = rememberNavController()
 
     Box(
         modifier = Modifier

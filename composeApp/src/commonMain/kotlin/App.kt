@@ -16,18 +16,20 @@ import io.ikutsu.osumusic.player.presentation.PlayerScreen
 
 @Composable
 fun App() {
-    val navController = rememberNavController()
+    val appNavController = rememberNavController()
+    val mainNavController = rememberNavController()
 
     MaterialTheme {
         OMTheme {
             NavHost(
                 startDestination = "main",
-                navController = navController,
+                navController = appNavController,
             ) {
                 composable("main") {
                     MainScreen(
+                        navController = mainNavController,
                         onPlayerBarClick = {
-                            navController.navigate("player")
+                            appNavController.navigate("player")
                         }
                     )
                 }
@@ -54,7 +56,7 @@ fun App() {
                 ) {
                     PlayerScreen(
                         onBackClick = {
-                            navController.navigateUp()
+                            appNavController.navigateUp()
                         }
                     )
                 }
