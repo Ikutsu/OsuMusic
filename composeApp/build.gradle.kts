@@ -35,6 +35,8 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.androidx.splash)
             implementation(libs.ktor.client.okhttp)
+            implementation(libs.koin.android)
+            implementation(libs.koin.androidx.compose)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -57,7 +59,7 @@ kotlin {
             implementation(libs.haze)
 
             implementation(project.dependencies.platform(libs.koin.bom))
-            implementation(libs.koin.core)
+            api(libs.koin.core)
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
 
