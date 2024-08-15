@@ -10,12 +10,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
-class SearchViewModel: ViewModel(), KoinComponent {
-
-    private val searchRepository: SearchRepository by inject()
+class SearchViewModel(
+    private val searchRepository: SearchRepository
+): ViewModel() {
 
     private val _uiState = MutableStateFlow(SearchUiState())
     val uiState = _uiState.asStateFlow()
@@ -62,8 +60,7 @@ class SearchViewModel: ViewModel(), KoinComponent {
             _uiState.update {
                 it.copy(
                     searchText = "",
-                    searchContent = SearchUiContent.HISTORY,
-                    displaySearchText = "Search history"
+                    searchContent = SearchUiContent.HISTORY
                 )
             }
         }

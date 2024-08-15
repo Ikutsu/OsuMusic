@@ -118,7 +118,7 @@ fun SearchScreen(
                 ) { targetState ->
                     Column{
                         Text(
-                            text = state.value.displaySearchText,
+                            text = if (targetState == SearchUiContent.RESULT) state.value.displaySearchText else "Search history",
                             fontFamily = OM_SemiBold,
                             fontSize = 24.dp.sp
                         )
