@@ -39,17 +39,11 @@ class SayobotBeatmapSearchApi(
             withContext(Dispatchers.IO) {
                 httpClient.get {
                     url(SAYOBOT_API_DETAIL)
-                    parameter("s", "$beatmapSetId")
+                    parameter("K", "$beatmapSetId")
                     contentType(ContentType.Application.Json)
                 }.let {
-                    Json.decodeFromString<SayobotBeatmapSetDetailResponse>(replaceQuotes(it.bodyAsText()))
+                    Json.decodeFromString<SayobotBeatmapSetDetailResponse>(it.bodyAsText())
                 }
             }
         }
-}
-
-fun replaceQuotes(input: String): String {
-    return input.replace(Regex("(?<![:,{])\"(?![:,}])")) {
-        "\\\""
-    }
 }

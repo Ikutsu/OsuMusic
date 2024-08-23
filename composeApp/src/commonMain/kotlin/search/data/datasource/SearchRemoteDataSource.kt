@@ -1,3 +1,4 @@
+
 package io.ikutsu.osumusic.search.data.datasource
 
 import io.ikutsu.osumusic.core.data.getBeatmapCoverUrl
@@ -27,8 +28,8 @@ class SearchRemoteDataSource(
                     }.map {
                         val diffs = sayoApi.getBeatmapSetDetail(
                             it.sid
-                        ).getOrThrow().data.map {
-                            diff -> diff.star.toFloat()
+                        ).getOrThrow().data.bidData.map {
+                            diff -> diff.star
                         }
 
                         AllDiffBeatmapState(
