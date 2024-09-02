@@ -40,7 +40,10 @@ import io.ikutsu.osumusic.core.presentation.util.OM_Bold
 import io.ikutsu.osumusic.core.presentation.util.OM_SemiBold
 import io.ikutsu.osumusic.core.presentation.util.VSpacer
 import io.ikutsu.osumusic.core.presentation.util.getDiffColor
+import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
+import osumusic.composeapp.generated.resources.Res
+import osumusic.composeapp.generated.resources.loginBackground
 
 
 @Composable
@@ -62,6 +65,8 @@ fun SingleDiffBeatmap(
             model = ImageRequest.Builder(LocalPlatformContext.current)
                 .data(beatmapCover)
                 .build(),
+            placeholder = painterResource(Res.drawable.loginBackground),
+            error = painterResource(Res.drawable.loginBackground),
             contentDescription = "Beatmap cover",
             imageLoader = koinInject(),
             contentScale = ContentScale.FillWidth,
@@ -145,6 +150,8 @@ fun AllDiffBeatmap(
             model = ImageRequest.Builder(LocalPlatformContext.current)
                 .data(beatmapCover)
                 .build(),
+            placeholder = painterResource(Res.drawable.loginBackground),
+            error = painterResource(Res.drawable.loginBackground),
             contentDescription = "Beatmap cover",
             imageLoader = koinInject(),
             contentScale = ContentScale.FillWidth,
@@ -233,6 +240,8 @@ fun PlaylistQueueItem(
             model = ImageRequest.Builder(LocalPlatformContext.current)
                 .data(beatmapCover)
                 .build(),
+            placeholder = painterResource(Res.drawable.loginBackground),
+            error = painterResource(Res.drawable.loginBackground),
             contentDescription = "Beatmap cover",
             imageLoader = koinInject(),
             contentScale = ContentScale.FillWidth,

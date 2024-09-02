@@ -140,7 +140,7 @@ fun SearchScreen(
                                 }
                             ) {
                                 AllDiffBeatmap(
-                                    onClick = { },
+                                    onClick = { viewmodel.onSearchItemClick(it) },
                                     beatmapCover = it.coverUrl,
                                     title = it.title,
                                     artist = it.artist,

@@ -13,11 +13,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.ikutsu.osumusic.core.presentation.theme.OMTheme
 import io.ikutsu.osumusic.player.presentation.PlayerScreen
+import io.ikutsu.osumusic.player.presentation.PlayerViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun App() {
     val appNavController = rememberNavController()
     val mainNavController = rememberNavController()
+    val playerViewModel: PlayerViewModel = koinViewModel()
 
     MaterialTheme {
         OMTheme {
@@ -28,6 +31,7 @@ fun App() {
                 composable("main") {
                     MainScreen(
                         navController = mainNavController,
+                        playerViewModel = playerViewModel,
                         onPlayerBarClick = {
                             appNavController.navigate("player")
                         }
@@ -55,6 +59,7 @@ fun App() {
                     }
                 ) {
                     PlayerScreen(
+                       viewModel = playerViewModel,
                         onBackClick = {
                             appNavController.navigateUp()
                         }

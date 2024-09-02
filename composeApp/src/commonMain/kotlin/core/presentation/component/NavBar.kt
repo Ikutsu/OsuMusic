@@ -20,7 +20,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.dp
@@ -33,16 +32,7 @@ fun NavBar(
     content: @Composable RowScope.() -> Unit
 ) {
     Surface(
-        color = Color.Transparent,
-        modifier = modifier.background(
-            Brush.verticalGradient(
-                colorStops = arrayOf(
-                    0f to Color.Black.copy(0.5f),
-                    0.5f to Color.Black.copy(0.9f),
-                    1f to Color.Black
-                )
-            )
-        )
+        color = Color.Transparent
     ) {
         Row(
             modifier = modifier

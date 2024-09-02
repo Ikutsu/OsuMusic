@@ -2,6 +2,11 @@ package io.ikutsu.osumusic.search.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import io.ikutsu.osumusic.core.data.getBeatmapBackgroundUrl
+import io.ikutsu.osumusic.core.domain.DiffBeatmapState
+import io.ikutsu.osumusic.core.domain.Music
+import io.ikutsu.osumusic.player.player.OMPlayerController
+import io.ikutsu.osumusic.player.player.OMPlayerEvent
 import io.ikutsu.osumusic.search.data.datasource.ApiType
 import io.ikutsu.osumusic.search.data.repository.SearchRepository
 import kotlinx.coroutines.Dispatchers
@@ -12,8 +17,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class SearchViewModel(
-    private val searchRepository: SearchRepository
-): ViewModel() {
+    private val searchRepository: SearchRepository,
+    private val playerController: OMPlayerController
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SearchUiState())
     val uiState = _uiState.asStateFlow()
@@ -63,6 +69,29 @@ class SearchViewModel(
                     searchContent = SearchUiContent.HISTORY
                 )
             }
+        }
+    }
+
+    fun onSearchItemClick(
+        beatmapState: DiffBeatmapState
+    ) {
+        viewModelScope.launch {
+            playerController.addPlayerItem(
+                listOf(
+                    Music(
+                        title = beatmapState.title,
+                        artist = beatmapState.artist,
+                        creator = beatmapState.creator,
+                        diff = beatmapState.diff.first(),
+                        coverUrl = beatmapState.coverUrl,
+                        backgroundUrl = getBeatmapBackgroundUrl(beatmapState.beatmapId),
+                        source = beatmapState.audioUrl
+                    )
+                )
+            )
+            playerController.onPlayerEvent(
+                OMPlayerEvent.PlayPause
+            )
         }
     }
 }

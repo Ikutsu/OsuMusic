@@ -62,7 +62,7 @@ fun HomeScreen(
                     beatmapCover = beatmap.coverUrl,
                     title = beatmap.title,
                     artist = beatmap.artist,
-                    diff = beatmap.diff
+                    diff = beatmap.diff.first()
                 )
                 if (index < state.recentPlayedList.size - 1) {
                     VSpacer(8.dp)

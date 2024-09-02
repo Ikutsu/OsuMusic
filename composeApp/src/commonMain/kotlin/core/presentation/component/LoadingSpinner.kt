@@ -77,3 +77,30 @@ fun LoadingSpinner(
         )
     }
 }
+
+@Composable
+fun NoBackgroundLoadingSpinner(
+    size: Dp = 96.dp
+) {
+    val infiniteTransition = rememberInfiniteTransition()
+    val angle by infiniteTransition.animateFloat(
+        initialValue = 45f,
+        targetValue = 405f,
+        animationSpec = InfiniteRepeatableSpec(
+            animation = keyframes {
+                45f at 0 using EaseInOutQuad
+                225f at 900 using EaseInOutQuad
+                405f at 1800 using EaseInOutQuad
+                durationMillis = 1800
+            }
+        )
+    )
+
+    Icon(
+        imageVector = OMIcon.CircleSpinner,
+        contentDescription = null,
+        modifier = Modifier
+            .rotate(angle)
+            .size(size)
+    )
+}

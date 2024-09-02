@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -30,6 +31,7 @@ import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,8 +41,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
@@ -52,11 +56,13 @@ import core.presentation.res.omicon.Heartsolid
 import core.presentation.res.omicon.Pause
 import core.presentation.res.omicon.Play
 import core.presentation.res.omicon.Shuffle
+import io.ikutsu.osumusic.core.presentation.component.FeatureComingCard
+import io.ikutsu.osumusic.core.presentation.component.LoadingSpinner
+import io.ikutsu.osumusic.core.presentation.component.NoBackgroundLoadingSpinner
 import io.ikutsu.osumusic.core.presentation.component.OMIconButton
 import io.ikutsu.osumusic.core.presentation.component.OMSlider
 import io.ikutsu.osumusic.core.presentation.component.OMTab
 import io.ikutsu.osumusic.core.presentation.component.OMTabRow
-import io.ikutsu.osumusic.core.presentation.component.PlaylistQueueItem
 import io.ikutsu.osumusic.core.presentation.theme.OM_Background
 import io.ikutsu.osumusic.core.presentation.theme.OM_Primary
 import io.ikutsu.osumusic.core.presentation.theme.OM_ShapeFull
@@ -68,14 +74,14 @@ import io.ikutsu.osumusic.core.presentation.util.VSpacer
 import io.ikutsu.osumusic.core.presentation.util.WSpacer
 import io.ikutsu.osumusic.core.presentation.util.formatMilliseconds
 import io.ikutsu.osumusic.core.presentation.util.noRippleClickable
+import io.ikutsu.osumusic.player.player.OMPlayerState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import osumusic.composeapp.generated.resources.Res
 import osumusic.composeapp.generated.resources.ic_prevCircle
-
-// TODO: Lot of hardcoded values, refactor to use state when writing the actual implementation
+import osumusic.composeapp.generated.resources.loginBackground
 
 enum class DisplayOptionTab(val title: String) {
     Background("Background"),
@@ -90,8 +96,11 @@ enum class DisplayOptionTab(val title: String) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlayerScreen(
+    viewModel: PlayerViewModel,
     onBackClick: () -> Unit
 ) {
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
+
     val sheetState = rememberStandardBottomSheetState()
     val scaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = sheetState
@@ -167,28 +176,27 @@ fun PlayerScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(it)
-                    .padding(start = 16.dp, end = 16.dp, top = 16.dp),
+                    .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 PlayerContent(
-                    beatmapBackground = "https://assets.ppy.sh/beatmaps/1205919/covers/raw.jpg"
+                    beatmapBackground = uiState.value.currentMusic?.backgroundUrl ?: ""
                 )
                 PlayerInfo(
-                    title = "UNION!!",
-                    artist = "765 MILLION ALLSTARS",
-                    progress = 0.5f,
-                    progressInLong = 150000,
-                    songLength = 300000
+                    state = uiState,
+                    onProgressChange = { viewModel.onProgressChange(it) },
+                    onProgressChangeFinished = { viewModel.onSeekTo() }
                 )
                 WSpacer()
                 PlayerControl(
                     onShuffle = { },
-                    onBackward = { },
-                    onPlayPause = { },
-                    onForward = { },
+                    onBackward = { viewModel.onPreviousClick() },
+                    onPlayPause = { viewModel.onPlayPauseClick() },
+                    onForward = { viewModel.onNextClick() },
                     onLove = { },
                     isShuffle = false,
-                    isPlaying = true,
+                    isLoading = uiState.value.playerState == OMPlayerState.Buffering,
+                    isPlaying = uiState.value.playerState == OMPlayerState.Playing,
                     isLoved = true
                 )
                 WSpacer()
@@ -212,60 +220,74 @@ fun PlayerScreen(
 }
 
 @Composable
-fun ColumnScope.PlayerContent(
+fun PlayerContent(
     beatmapBackground: String
 ) {
-    val selectedTabIndex = remember { mutableStateOf(0) } // Refactor this to ui state
+    val isImageLoading = remember { mutableStateOf(false) }
     OMTabRow(
-        selectedTabIndex = selectedTabIndex.value,
+        selectedTabIndex = 0,
         tabs = {
             DisplayOptionTab.entries.forEachIndexed { index, displayOptionTab ->
                 OMTab(
                     text = displayOptionTab.title,
                     onClick = {
-                        selectedTabIndex.value = index
+//                                    selectedTabIndex.value = index
                     }
                 )
             }
         },
     )
     VSpacer(16.dp)
-    WSpacer()
-    AsyncImage(
-        model = ImageRequest.Builder(LocalPlatformContext.current)
-            .data(beatmapBackground)
-            .build(),
-        contentDescription = "Beatmap Background",
-        imageLoader = koinInject(),
-        contentScale = ContentScale.FillWidth,
-        modifier = Modifier.fillMaxWidth().wrapContentSize().clip(OM_ShapeLarge)
-    )
+    Box(
+        modifier = Modifier.fillMaxWidth().aspectRatio(1f),
+        contentAlignment = Alignment.Center
+    ) {
+        AsyncImage(
+            model = ImageRequest.Builder(LocalPlatformContext.current)
+                .data(beatmapBackground)
+                .build(),
+            placeholder = painterResource(Res.drawable.loginBackground),
+            error = painterResource(Res.drawable.loginBackground),
+            onLoading = { isImageLoading.value = true },
+            onSuccess = { isImageLoading.value = false },
+            onError = { isImageLoading.value = false },
+            contentDescription = "Beatmap Background",
+            imageLoader = koinInject(),
+            contentScale = ContentScale.FillWidth,
+            modifier = Modifier.fillMaxWidth().clip(OM_ShapeLarge)
+        )
+        if (isImageLoading.value) {
+            LoadingSpinner(size = 64.dp)
+        }
+    }
     VSpacer(16.dp)
-    WSpacer()
 }
 
 @Composable
 fun ColumnScope.PlayerInfo(
-    title: String,
-    artist: String,
-    progress: Float,
-    progressInLong: Long,
-    songLength: Long,
+    state: State<PlayerUiState>,
+    onProgressChange: (Float) -> Unit,
+    onProgressChangeFinished: (() -> Unit),
 ) {
     Text(
-        text = title,
+        text = state.value.currentMusic?.title ?: "Unknown",
         fontFamily = OM_Bold,
-        fontSize = 24.sp
+        fontSize = 24.sp,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis
     )
     Text(
-        text = artist,
+        text = state.value.currentMusic?.artist ?: "Unknown",
         fontFamily = OM_SemiBold,
-        fontSize = 16.sp
+        fontSize = 16.sp,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis
     )
     WSpacer()
     OMSlider(
-        value = progress,
-        onValueChange = { },
+        value = state.value.currentProgress,
+        onValueChange = { onProgressChange(it) },
+        onValueChangeFinished = { onProgressChangeFinished() },
         valueRange = 0f..1f,
         modifier = Modifier.fillMaxWidth()
     )
@@ -273,13 +295,13 @@ fun ColumnScope.PlayerInfo(
         modifier = Modifier.fillMaxWidth()
     ) {
         Text(
-            text = progressInLong.formatMilliseconds(),
+            text = state.value.currentProgressInLong.formatMilliseconds(),
             fontFamily = OM_SemiBold,
             fontSize = 16.sp
         )
         WSpacer()
         Text(
-            text = songLength.formatMilliseconds(),
+            text = state.value.duration.formatMilliseconds(),
             fontFamily = OM_SemiBold,
             fontSize = 16.sp
         )
@@ -294,6 +316,7 @@ fun PlayerControl(
     onForward: () -> Unit,
     onLove: () -> Unit,
     isShuffle: Boolean,
+    isLoading: Boolean,
     isPlaying: Boolean,
     isLoved: Boolean
 ) {
@@ -313,11 +336,15 @@ fun PlayerControl(
             contentDescription = "Backward",
             modifier = Modifier.size(36.dp).noRippleClickable { onBackward() }
         )
-        Icon(
-            imageVector = if (isPlaying) OMIcon.Pause else OMIcon.Play,
-            contentDescription = "Play",
-            modifier = Modifier.size(48.dp).noRippleClickable { onPlayPause() }
-        )
+        if (isLoading) {
+            NoBackgroundLoadingSpinner(size = 48.dp)
+        } else {
+            Icon(
+                imageVector = if (isPlaying) OMIcon.Pause else OMIcon.Play,
+                contentDescription = "Play",
+                modifier = Modifier.size(48.dp).noRippleClickable { onPlayPause() }
+            )
+        }
         Icon(
             imageVector = OMIcon.Forward,
             contentDescription = "Forward",
@@ -376,26 +403,19 @@ fun PlayerBottomSheet(
             state = listState
         ) {
             item {
-                PlaylistQueueItem(
-                    onClick = {},
-                    isPlaying = true,
-                    beatmapCover = "https://assets.ppy.sh/beatmaps/1205919/covers/raw.jpg",
-                    title = "UNION!!",
-                    artist = "765 MILLION ALLSTARS",
-                    diff = 5f
-                )
-
+                FeatureComingCard()
             }
-            items(10) {
-                PlaylistQueueItem(
-                    onClick = {},
-                    isPlaying = false,
-                    beatmapCover = "https://assets.ppy.sh/beatmaps/1205919/covers/raw.jpg",
-                    title = "UNION!!",
-                    artist = "765 MILLION ALLSTARS",
-                    diff = 5f
-                )
-            }
+//            item {
+//                PlaylistQueueItem(
+//                    onClick = {},
+//                    isPlaying = true,
+//                    beatmapCover = "https://assets.ppy.sh/beatmaps/1205919/covers/raw.jpg",
+//                    title = "UNION!!",
+//                    artist = "765 MILLION ALLSTARS",
+//                    diff = 5f
+//                )
+//
+//            }
         }
     }
 }

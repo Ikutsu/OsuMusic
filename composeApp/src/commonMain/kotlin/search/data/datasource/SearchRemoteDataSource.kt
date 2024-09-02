@@ -2,7 +2,8 @@
 package io.ikutsu.osumusic.search.data.datasource
 
 import io.ikutsu.osumusic.core.data.getBeatmapCoverUrl
-import io.ikutsu.osumusic.core.domain.AllDiffBeatmapState
+import io.ikutsu.osumusic.core.data.getBeatmapFileUrl
+import io.ikutsu.osumusic.core.domain.DiffBeatmapState
 import io.ikutsu.osumusic.search.data.api.SayobotBeatmapListRequest
 import io.ikutsu.osumusic.search.data.api.SayobotBeatmapSearchApi
 import io.ktor.serialization.JsonConvertException
@@ -13,7 +14,7 @@ class SearchRemoteDataSource(
     suspend fun search(
         apiType: ApiType,
         query: String
-    ): Result<List<AllDiffBeatmapState>> {
+    ): Result<List<DiffBeatmapState>> {
         when (apiType) {
             ApiType.SAYOBOT -> {
                 val response = sayoApi.search(
@@ -26,18 +27,22 @@ class SearchRemoteDataSource(
                     res.data!!.sortedByDescending {
                         it.playCount
                     }.map {
-                        val diffs = sayoApi.getBeatmapSetDetail(
+                        val beatmapSetDetail = sayoApi.getBeatmapSetDetail(
                             it.sid
-                        ).getOrThrow().data.bidData.map {
-                            diff -> diff.star
-                        }
+                        ).getOrNull()
 
-                        AllDiffBeatmapState(
+                        val diffs = beatmapSetDetail?.data?.bidData?.map { diff -> diff.star }
+
+                        val audioFile = beatmapSetDetail?.data?.bidData?.first()?.audio
+
+                        DiffBeatmapState(
                             beatmapId = it.sid,
+                            audioUrl = getBeatmapFileUrl(it.sid, audioFile.orEmpty()),
                             coverUrl = getBeatmapCoverUrl(it.sid),
                             title = it.titleUnicode.ifBlank { it.title },
                             artist = it.artistUnicode.ifBlank { it.artist },
-                            diff = diffs
+                            creator = it.creator,
+                            diff = diffs.orEmpty()
                         )
                     }
                 }.recover {
