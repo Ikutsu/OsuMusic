@@ -8,14 +8,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentSize
@@ -187,7 +188,7 @@ fun PlayerScreen(
                     onProgressChange = { viewModel.onProgressChange(it) },
                     onProgressChangeFinished = { viewModel.onSeekTo() }
                 )
-                WSpacer()
+                Spacer(modifier = Modifier.requiredHeight(24.dp))
                 PlayerControl(
                     onShuffle = { },
                     onBackward = { viewModel.onPreviousClick() },
@@ -199,7 +200,7 @@ fun PlayerScreen(
                     isPlaying = uiState.value.playerState == OMPlayerState.Playing,
                     isLoved = true
                 )
-                WSpacer()
+                Spacer(modifier = Modifier.requiredHeight(24.dp))
             }
             if (sheetState.targetValue == SheetValue.Expanded || showSheetDim.value) {
                 Box(
@@ -220,7 +221,7 @@ fun PlayerScreen(
 }
 
 @Composable
-fun PlayerContent(
+fun ColumnScope.PlayerContent(
     beatmapBackground: String
 ) {
     val isImageLoading = remember { mutableStateOf(false) }
@@ -239,7 +240,7 @@ fun PlayerContent(
     )
     VSpacer(16.dp)
     Box(
-        modifier = Modifier.fillMaxWidth().aspectRatio(1f),
+        modifier = Modifier.fillMaxWidth().weight(1f),
         contentAlignment = Alignment.Center
     ) {
         AsyncImage(
@@ -264,7 +265,7 @@ fun PlayerContent(
 }
 
 @Composable
-fun ColumnScope.PlayerInfo(
+fun PlayerInfo(
     state: State<PlayerUiState>,
     onProgressChange: (Float) -> Unit,
     onProgressChangeFinished: (() -> Unit),
@@ -283,7 +284,7 @@ fun ColumnScope.PlayerInfo(
         maxLines = 1,
         overflow = TextOverflow.Ellipsis
     )
-    WSpacer()
+    Spacer(modifier = Modifier.requiredHeight(24.dp))
     OMSlider(
         value = state.value.currentProgress,
         onValueChange = { onProgressChange(it) },
@@ -321,7 +322,7 @@ fun PlayerControl(
     isLoved: Boolean
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().requiredHeight(48.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceAround
     ) {
