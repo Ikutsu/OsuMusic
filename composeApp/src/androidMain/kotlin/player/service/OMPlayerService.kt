@@ -6,8 +6,10 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.annotation.OptIn
 import androidx.media3.common.util.UnstableApi
+import androidx.media3.session.DefaultMediaNotificationProvider
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
+import io.ikutsu.osumusic.R
 import org.koin.android.ext.android.inject
 
 class OMPlayerService: MediaSessionService() {
@@ -19,6 +21,9 @@ class OMPlayerService: MediaSessionService() {
     @OptIn(UnstableApi::class)
     override fun onCreate() {
         super.onCreate()
+        val notificationProvider = DefaultMediaNotificationProvider(this)
+        notificationProvider.setSmallIcon(R.drawable.ic_notification)
+        this.setMediaNotificationProvider(notificationProvider)
         setListener(SessionServiceListener())
     }
 
