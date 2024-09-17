@@ -8,6 +8,7 @@ import io.ikutsu.osumusic.player.player.OMPlayerEvent
 import io.ikutsu.osumusic.player.player.OMPlayerListener
 import io.ikutsu.osumusic.player.player.OMPlayerState
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,6 +22,8 @@ class PlayerViewModel(
 
     private val _uiState: MutableStateFlow<PlayerUiState> = MutableStateFlow(PlayerUiState())
     val uiState = _uiState.asStateFlow()
+
+    private var updateProgressJob: Job? = null
 
     init {
         registerListener()
@@ -46,18 +49,22 @@ class PlayerViewModel(
 
                 override fun currentPlayerState(state: OMPlayerState) {
                     viewModelScope.launch(Dispatchers.Main) {
+                        println("currentPlayerState: $state")
                         _uiState.update {
                             it.copy(playerState = state)
                         }
+                        updateProgressJob?.cancel()
                         if (state == OMPlayerState.Playing) {
-                            while (true) { // TODO: Need to debounce
-                                delay(1.seconds)
-                                val position = controller.getCurrentPosition()
-                                _uiState.update {
-                                    it.copy(
-                                        currentProgressInLong = position,
-                                        currentProgress = if (position == 0L) 0f else position.toFloat() / it.duration.toFloat()
-                                    )
+                            updateProgressJob = viewModelScope.launch {
+                                while (true) {
+                                    delay(1.seconds)
+                                    val position = controller.getCurrentPosition()
+                                    _uiState.update {
+                                        it.copy(
+                                            currentProgressInLong = position,
+                                            currentProgress = if (position == 0L) 0f else position.toFloat() / it.duration.toFloat()
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -98,5 +105,9 @@ class PlayerViewModel(
 
     fun onSeekTo() {
         controller.onPlayerEvent(OMPlayerEvent.SeekTo(_uiState.value.currentProgress))
+    }
+
+    override fun onCleared() {
+        controller.release()
     }
 }
