@@ -13,7 +13,5 @@ expect class OMPlayerController {
         selectedAudioIndex: Int = -1
     )
 
-    fun getCurrentPosition(): Long
-
     fun release()
 }

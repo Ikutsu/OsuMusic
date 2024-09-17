@@ -3,6 +3,8 @@ package io.ikutsu.osumusic.player.player
 import android.content.ComponentName
 import android.content.Context
 import android.net.Uri
+import android.os.Handler
+import android.os.Looper
 import androidx.annotation.OptIn
 import androidx.core.bundle.bundleOf
 import androidx.media3.common.MediaItem
@@ -25,6 +27,7 @@ actual class OMPlayerController(context: Context) {
     private var controllerFuture: ListenableFuture<MediaController>
     private val controller: MediaController?
         get() = if (controllerFuture.isDone) controllerFuture.get() else null
+    val handler = Handler(Looper.getMainLooper())
 
     init {
         val sessionToken =
@@ -62,6 +65,12 @@ actual class OMPlayerController(context: Context) {
                 }
 
 
+            })
+            handler.post(object : Runnable {
+                override fun run() {
+                    listener.onProgress(controller?.currentPosition ?: 0)
+                    handler.postDelayed(this, 1000)
+                }
             })
         }, MoreExecutors.directExecutor())
     }
@@ -123,8 +132,6 @@ actual class OMPlayerController(context: Context) {
             }
         }
     }
-
-    actual fun getCurrentPosition() = controller?.currentPosition ?: 0
 
     actual fun release() {
         MediaController.releaseFuture(controllerFuture)

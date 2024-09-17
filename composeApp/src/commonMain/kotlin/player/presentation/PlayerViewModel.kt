@@ -9,12 +9,10 @@ import io.ikutsu.osumusic.player.player.OMPlayerListener
 import io.ikutsu.osumusic.player.player.OMPlayerState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlin.time.Duration.Companion.seconds
 
 class PlayerViewModel(
     private val controller: OMPlayerController
@@ -36,7 +34,16 @@ class PlayerViewModel(
                 }
 
                 override fun onProgress(progress: Long) {
-
+                    if (_uiState.value.playerState == OMPlayerState.Playing) {
+                        updateProgressJob = viewModelScope.launch {
+                            _uiState.update {
+                                it.copy(
+                                    currentProgressInLong = progress,
+                                    currentProgress = if (progress == 0L) 0f else progress.toFloat() / it.duration.toFloat()
+                                )
+                            }
+                        }
+                    }
                 }
 
                 override fun totalDuration(duration: Long) {
@@ -54,20 +61,6 @@ class PlayerViewModel(
                             it.copy(playerState = state)
                         }
                         updateProgressJob?.cancel()
-                        if (state == OMPlayerState.Playing) {
-                            updateProgressJob = viewModelScope.launch {
-                                while (true) {
-                                    delay(1.seconds)
-                                    val position = controller.getCurrentPosition()
-                                    _uiState.update {
-                                        it.copy(
-                                            currentProgressInLong = position,
-                                            currentProgress = if (position == 0L) 0f else position.toFloat() / it.duration.toFloat()
-                                        )
-                                    }
-                                }
-                            }
-                        }
                     }
                 }
 
@@ -108,6 +101,7 @@ class PlayerViewModel(
     }
 
     override fun onCleared() {
+        updateProgressJob?.cancel()
         controller.release()
     }
 }
