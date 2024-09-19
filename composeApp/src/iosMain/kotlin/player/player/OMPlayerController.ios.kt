@@ -42,7 +42,6 @@ actual class OMPlayerController {
     private var playerItem: AVPlayerItem? = null
     private var listeners: OMPlayerListener? = null
     private var timeObserver: Any? = null
-    private var progress: Long = 0
 
     init {
         setUpAudioSession()
@@ -64,8 +63,7 @@ actual class OMPlayerController {
             CMTimeMakeWithSeconds(1.0, NSEC_PER_SEC.toInt()),
             null
         ) { time ->
-            progress = CMTimeGetSeconds(time).times(1000).toLong()
-
+            listeners?.onProgress(CMTimeGetSeconds(time).times(1000).toLong())
         }
         player.addObserver(
             observer = timeControlObserver,
@@ -82,7 +80,7 @@ actual class OMPlayerController {
 
     @OptIn(ExperimentalForeignApi::class)
     actual fun addPlayerItem(musics: List<Music>) {
-        progress = 0
+        listeners?.onProgress(0L)
         player.pause()
         listeners?.currentPlayerState(OMPlayerState.Buffering)
         removeCurrentItemObservers()
@@ -163,10 +161,6 @@ actual class OMPlayerController {
                 preferredTimescale = 1
             )
         )
-    }
-
-    actual fun getCurrentPosition(): Long {
-        return progress
     }
 
     actual fun release() {
