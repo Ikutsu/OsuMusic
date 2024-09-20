@@ -29,6 +29,7 @@ import platform.CoreMedia.CMTimeGetSeconds
 import platform.CoreMedia.CMTimeMakeWithSeconds
 import platform.Foundation.NSKeyValueObservingOptionNew
 import platform.Foundation.NSURL.Companion.URLWithString
+import platform.Foundation.NSURLErrorDomain
 import platform.Foundation.addObserver
 import platform.Foundation.removeObserver
 import platform.darwin.NSEC_PER_SEC
@@ -83,8 +84,8 @@ actual class OMPlayerController {
         listeners?.onProgress(0L)
         player.pause()
         listeners?.currentPlayerState(OMPlayerState.Buffering)
-        removeCurrentItemObservers()
         listeners?.currentMusic(musics.first())
+        removeCurrentItemObservers()
         val url = URLWithString(musics.first().source)
         player.addObserver(
             observer = playerItemObserver,
@@ -208,11 +209,11 @@ actual class OMPlayerController {
             context: COpaquePointer?
         ) {
             playerItem = player.currentItem
-            if (player.currentItem?.playbackBufferEmpty == true) {
-                listeners?.currentPlayerState(OMPlayerState.Buffering)
-            } else if (player.currentItem?.playbackLikelyToKeepUp == true) {
-                listeners?.currentPlayerState(OMPlayerState.Playing)
-            }
+//            if (player.currentItem?.playbackBufferEmpty == true) {
+//                listeners?.currentPlayerState(OMPlayerState.Buffering)
+//            } else if (player.currentItem?.playbackLikelyToKeepUp == true) {
+//                listeners?.currentPlayerState(OMPlayerState.Playing)
+//            }
 
             // Now playing
         }
@@ -235,7 +236,16 @@ actual class OMPlayerController {
                     listeners?.totalDuration(CMTimeGetSeconds(playerItem!!.duration).toLong().times(1000))
                     seekToInitialTime()
                 }
-                AVPlayerStatusFailed -> OMPlayerState.Error
+                AVPlayerStatusFailed -> {
+                    println("PlayerItem: ${player.currentItem?.error()}")
+                    val errorMsg = when (playerItem?.error?.domain) {
+                        null -> return
+                        NSURLErrorDomain -> "Source unavailable"
+                        else -> playerItem?.error?.localizedFailureReason
+                    }
+                    listeners?.onError(errorMsg ?: "Player error")
+                    listeners?.currentPlayerState(OMPlayerState.Error)
+                }
                 else -> return
             }
         }
@@ -252,7 +262,11 @@ actual class OMPlayerController {
         ) {
             when (player.timeControlStatus) {
                 AVPlayerTimeControlStatusPlaying -> listeners?.currentPlayerState(OMPlayerState.Playing)
-                AVPlayerTimeControlStatusWaitingToPlayAtSpecifiedRate -> listeners?.currentPlayerState(OMPlayerState.Buffering)
+                AVPlayerTimeControlStatusWaitingToPlayAtSpecifiedRate -> {
+                    if (player.currentItem?.error == null) {
+                        listeners?.currentPlayerState(OMPlayerState.Buffering)
+                    }
+                }
                 else -> return
             }
         }
