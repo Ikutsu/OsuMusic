@@ -38,22 +38,18 @@ actual class OMPlayerController(context: Context) {
     actual fun registerListener(listener: OMPlayerListener) {
         controllerFuture.addListener({
             controller?.addListener(object : Player.Listener {
-                override fun onPlayerError(error: PlaybackException) {
-                    super.onPlayerError(error)
-                    listener.onError()
-                }
-
                 override fun onEvents(player: Player, events: Player.Events) {
                     super.onEvents(player, events)
                     with(player) {
                         listener.currentPlayerState(
                             when (playbackState) {
-                                STATE_IDLE -> OMPlayerState.Stopped
+                                STATE_IDLE -> return
                                 STATE_BUFFERING -> OMPlayerState.Buffering
                                 STATE_ENDED -> OMPlayerState.Stopped
                                 else -> if (isPlaying) OMPlayerState.Playing else OMPlayerState.Paused
                             }
                         )
+
                         listener.currentMusic(currentMediaItem?.toMusic())
                         listener.totalDuration(duration.coerceAtLeast(0L))
                     }
@@ -61,7 +57,15 @@ actual class OMPlayerController(context: Context) {
 
                 override fun onPlayerErrorChanged(error: PlaybackException?) {
                     super.onPlayerErrorChanged(error)
-                    listener.onError()
+                    val errorMsg = when(error?.errorCode) {
+                        null -> return
+                        PlaybackException.ERROR_CODE_IO_BAD_HTTP_STATUS -> "Source unavailable"
+                        PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED -> "Network connection failed"
+                        PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_TIMEOUT -> "Network connection timeout"
+                        else -> "Player error"
+                    }
+                    listener.currentPlayerState(OMPlayerState.Error)
+                    listener.onError(errorMsg)
                 }
 
 

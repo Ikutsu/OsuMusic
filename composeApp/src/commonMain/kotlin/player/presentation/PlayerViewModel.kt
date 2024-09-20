@@ -9,6 +9,7 @@ import io.ikutsu.osumusic.player.player.OMPlayerListener
 import io.ikutsu.osumusic.player.player.OMPlayerState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -30,11 +31,23 @@ class PlayerViewModel(
     private fun registerListener() {
         controller.registerListener(
             object : OMPlayerListener {
-                override fun onError() {
+                override fun onError(message: String) {
+                    viewModelScope.launch {
+                        _uiState.update {
+                            it.copy(
+                                isError = true,
+                                errorMessage = message
+                            )
+                        }
+                        delay(3000)
+                        _uiState.update {
+                            it.copy(isError = false)
+                        }
+                    }
                 }
 
                 override fun onProgress(progress: Long) {
-                    if (_uiState.value.playerState == OMPlayerState.Playing) {
+                    if (_uiState.value.playerState == OMPlayerState.Playing || _uiState.value.playerState == OMPlayerState.Buffering) {
                         updateProgressJob = viewModelScope.launch {
                             _uiState.update {
                                 it.copy(

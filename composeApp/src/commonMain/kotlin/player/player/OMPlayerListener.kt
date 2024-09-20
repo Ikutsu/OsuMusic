@@ -7,5 +7,5 @@ interface OMPlayerListener {
     fun totalDuration(duration: Long)
     fun currentPlayerState(state: OMPlayerState)
     fun currentMusic(music: Music?)
-    fun onError()
+    fun onError(message: String)
 }
