@@ -51,6 +51,7 @@ import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
 import core.presentation.res.OMIcon
 import core.presentation.res.omicon.Backward
+import core.presentation.res.omicon.Error
 import core.presentation.res.omicon.Forward
 import core.presentation.res.omicon.Heart
 import core.presentation.res.omicon.Heartsolid
@@ -197,6 +198,7 @@ fun PlayerScreen(
                     onLove = { },
                     isShuffle = false,
                     isLoading = uiState.value.playerState == OMPlayerState.Buffering,
+                    isError = uiState.value.playerState == OMPlayerState.Error,
                     isPlaying = uiState.value.playerState == OMPlayerState.Playing,
                     isLoved = true
                 )
@@ -319,6 +321,7 @@ fun PlayerControl(
     isShuffle: Boolean,
     isLoading: Boolean,
     isPlaying: Boolean,
+    isError: Boolean,
     isLoved: Boolean
 ) {
     Row(
@@ -337,14 +340,24 @@ fun PlayerControl(
             contentDescription = "Backward",
             modifier = Modifier.size(36.dp).noRippleClickable { onBackward() }
         )
-        if (isLoading) {
-            NoBackgroundLoadingSpinner(size = 48.dp)
-        } else {
-            Icon(
-                imageVector = if (isPlaying) OMIcon.Pause else OMIcon.Play,
-                contentDescription = "Play",
-                modifier = Modifier.size(48.dp).noRippleClickable { onPlayPause() }
-            )
+        when {
+            isLoading -> {
+                NoBackgroundLoadingSpinner(size = 48.dp)
+            }
+            isError -> {
+                Icon(
+                    imageVector = OMIcon.Error,
+                    contentDescription = "Error",
+                    modifier = Modifier.size(48.dp)
+                )
+            }
+            else -> {
+                Icon(
+                    imageVector = if (isPlaying) OMIcon.Pause else OMIcon.Play,
+                    contentDescription = "Play",
+                    modifier = Modifier.size(48.dp).noRippleClickable { onPlayPause() }
+                )
+            }
         }
         Icon(
             imageVector = OMIcon.Forward,

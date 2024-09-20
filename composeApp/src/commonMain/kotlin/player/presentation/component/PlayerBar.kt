@@ -28,6 +28,7 @@ import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
 import core.presentation.res.OMIcon
 import core.presentation.res.omicon.Backward
+import core.presentation.res.omicon.Error
 import core.presentation.res.omicon.Forward
 import core.presentation.res.omicon.Pause
 import core.presentation.res.omicon.Play
@@ -115,14 +116,24 @@ fun PlayerBar(
                 contentDescription = "Backward",
                 modifier = Modifier.size(24.dp).noRippleClickable { onBackward() }
             )
-            if (state.value.playerState == OMPlayerState.Buffering) {
-                NoBackgroundLoadingSpinner(size = 36.dp)
-            } else {
-                Icon(
-                    imageVector = if (state.value.playerState == OMPlayerState.Playing) OMIcon.Pause else OMIcon.Play,
-                    contentDescription = "Forward",
-                    modifier = Modifier.size(36.dp).noRippleClickable { onPlayPause() }
-                )
+            when (state.value.playerState) {
+                OMPlayerState.Buffering -> {
+                    NoBackgroundLoadingSpinner(size = 36.dp)
+                }
+                OMPlayerState.Error -> {
+                    Icon(
+                        imageVector = OMIcon.Error,
+                        contentDescription = "Error",
+                        modifier = Modifier.size(36.dp)
+                    )
+                }
+                else -> {
+                    Icon(
+                        imageVector = if (state.value.playerState == OMPlayerState.Playing) OMIcon.Pause else OMIcon.Play,
+                        contentDescription = "Play/Pause",
+                        modifier = Modifier.size(36.dp).noRippleClickable { onPlayPause() }
+                    )
+                }
             }
             Icon(
                 imageVector = OMIcon.Forward,

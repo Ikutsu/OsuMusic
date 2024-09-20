@@ -9,4 +9,6 @@ data class PlayerUiState(
     val currentProgress: Float = 0f,
     val currentProgressInLong: Long = 0L,
     val duration: Long = 0L,
+    val isError: Boolean = false,
+    val errorMessage: String? = ""
 )
