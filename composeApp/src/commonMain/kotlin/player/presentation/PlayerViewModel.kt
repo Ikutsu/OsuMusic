@@ -68,7 +68,7 @@ class PlayerViewModel(
                 }
 
                 override fun currentPlayerState(state: OMPlayerState) {
-                    viewModelScope.launch(Dispatchers.Main) {
+                    viewModelScope.launch {
                         println("currentPlayerState: $state")
                         _uiState.update {
                             it.copy(playerState = state)

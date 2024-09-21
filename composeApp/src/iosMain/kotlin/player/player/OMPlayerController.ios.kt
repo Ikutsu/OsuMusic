@@ -5,13 +5,27 @@ import kotlinx.cinterop.COpaquePointer
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.AVFAudio.AVAudioSession
 import platform.AVFAudio.AVAudioSessionCategoryPlayback
+import platform.AVFAudio.AVAudioSessionInterruptionNotification
+import platform.AVFAudio.AVAudioSessionInterruptionOptionShouldResume
+import platform.AVFAudio.AVAudioSessionInterruptionOptions
+import platform.AVFAudio.AVAudioSessionInterruptionType
+import platform.AVFAudio.AVAudioSessionInterruptionTypeBegan
+import platform.AVFAudio.AVAudioSessionInterruptionTypeEnded
+import platform.AVFAudio.AVAudioSessionInterruptionTypeKey
+import platform.AVFAudio.AVAudioSessionRouteChangeNotification
+import platform.AVFAudio.AVAudioSessionRouteChangeReason
+import platform.AVFAudio.AVAudioSessionRouteChangeReasonKey
+import platform.AVFAudio.AVAudioSessionRouteChangeReasonNewDeviceAvailable
+import platform.AVFAudio.AVAudioSessionRouteChangeReasonOldDeviceUnavailable
 import platform.AVFAudio.AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation
 import platform.AVFAudio.setActive
 import platform.AVFoundation.AVPlayer
 import platform.AVFoundation.AVPlayerItem
+import platform.AVFoundation.AVPlayerItemDidPlayToEndTimeNotification
 import platform.AVFoundation.AVPlayerStatusFailed
 import platform.AVFoundation.AVPlayerStatusReadyToPlay
 import platform.AVFoundation.AVPlayerStatusUnknown
+import platform.AVFoundation.AVPlayerTimeControlStatusPaused
 import platform.AVFoundation.AVPlayerTimeControlStatusPlaying
 import platform.AVFoundation.AVPlayerTimeControlStatusWaitingToPlayAtSpecifiedRate
 import platform.AVFoundation.addPeriodicTimeObserverForInterval
@@ -28,12 +42,15 @@ import platform.AVFoundation.timeControlStatus
 import platform.CoreMedia.CMTimeGetSeconds
 import platform.CoreMedia.CMTimeMakeWithSeconds
 import platform.Foundation.NSKeyValueObservingOptionNew
+import platform.Foundation.NSNotificationCenter
+import platform.Foundation.NSOperationQueue
 import platform.Foundation.NSURL.Companion.URLWithString
 import platform.Foundation.NSURLErrorDomain
 import platform.Foundation.addObserver
 import platform.Foundation.removeObserver
 import platform.darwin.NSEC_PER_SEC
 import platform.darwin.NSObject
+import platform.darwin.dispatch_get_main_queue
 import platform.foundation.NSKeyValueObservingProtocol
 
 @OptIn(ExperimentalForeignApi::class)
@@ -43,6 +60,8 @@ actual class OMPlayerController {
     private var playerItem: AVPlayerItem? = null
     private var listeners: OMPlayerListener? = null
     private var timeObserver: Any? = null
+    private var sessionInterruptionObserver: Any? = null
+    private var sessionRouteChangeObserver: Any? = null
 
     init {
         setUpAudioSession()
@@ -62,7 +81,7 @@ actual class OMPlayerController {
         player = AVPlayer()
         timeObserver = player.addPeriodicTimeObserverForInterval(
             CMTimeMakeWithSeconds(1.0, NSEC_PER_SEC.toInt()),
-            null
+            dispatch_get_main_queue()
         ) { time ->
             listeners?.onProgress(CMTimeGetSeconds(time).times(1000).toLong())
         }
@@ -74,8 +93,68 @@ actual class OMPlayerController {
         )
     }
 
+    private fun setupNotificationObservers() {
+        sessionInterruptionObserver()
+        sessionRouteChangeObserver()
+    }
+
+    private fun sessionInterruptionObserver() {
+        sessionInterruptionObserver = NSNotificationCenter.defaultCenter.addObserverForName(
+            name = AVAudioSessionInterruptionNotification,
+            `object` = audioSession,
+            queue = NSOperationQueue.mainQueue
+        ) { notification ->
+            if (notification?.userInfo == null) return@addObserverForName
+            val interruptionType = notification.userInfo!![AVAudioSessionInterruptionTypeKey] as? AVAudioSessionInterruptionType
+            when (interruptionType) {
+                AVAudioSessionInterruptionTypeBegan -> {
+                    pause()
+                }
+                AVAudioSessionInterruptionTypeEnded -> {
+                    val options = notification.userInfo!![AVAudioSessionInterruptionTypeKey] as? AVAudioSessionInterruptionOptions
+                    if (options == AVAudioSessionInterruptionOptionShouldResume) {
+                        play()
+                    }
+                }
+                else -> return@addObserverForName
+            }
+        }
+    }
+
+    private fun sessionRouteChangeObserver() {
+        sessionRouteChangeObserver = NSNotificationCenter.defaultCenter.addObserverForName(
+            name = AVAudioSessionRouteChangeNotification,
+            `object` = audioSession,
+            queue = NSOperationQueue.mainQueue
+        ) { notification ->
+            if (notification?.userInfo == null) return@addObserverForName
+            val changeReason = notification.userInfo!![AVAudioSessionRouteChangeReasonKey] as? AVAudioSessionRouteChangeReason
+            when (changeReason) {
+                AVAudioSessionRouteChangeReasonNewDeviceAvailable -> {
+                    play()
+                }
+                AVAudioSessionRouteChangeReasonOldDeviceUnavailable -> {
+                    pause()
+                }
+                else -> return@addObserverForName
+            }
+        }
+    }
+
+    private fun removeAudioSessionObservers() {
+        if (sessionInterruptionObserver != null) {
+            NSNotificationCenter.defaultCenter.removeObserver(sessionInterruptionObserver!!)
+            sessionInterruptionObserver = null
+        }
+        if (sessionRouteChangeObserver != null) {
+            NSNotificationCenter.defaultCenter.removeObserver(sessionRouteChangeObserver!!)
+            sessionRouteChangeObserver = null
+        }
+    }
+
     actual fun registerListener(listener: OMPlayerListener) {
         setupPlayer()
+        setupNotificationObservers()
         this.listeners = listener
     }
 
@@ -106,12 +185,18 @@ actual class OMPlayerController {
 //                listeners?.totalDuration(CMTimeGetSeconds(asset.progress).toLong())
 //            }
         }
+        NSNotificationCenter.defaultCenter.addObserverForName(
+            name = AVPlayerItemDidPlayToEndTimeNotification,
+            `object` = player.currentItem,
+            queue = NSOperationQueue.mainQueue,
+        ) {
+            listeners?.currentPlayerState(OMPlayerState.Stopped)
+        }
     }
 
     private fun play() {
         activateAudioSession()
         player.play()
-        listeners?.currentPlayerState(OMPlayerState.Playing)
     }
 
     private fun pause() {
@@ -119,8 +204,6 @@ actual class OMPlayerController {
         listeners?.currentPlayerState(OMPlayerState.Paused)
         deactivateAudioSession()
     }
-
-
 
     @OptIn(ExperimentalForeignApi::class)
     actual fun onPlayerEvent(
@@ -174,6 +257,7 @@ actual class OMPlayerController {
         deactivateAudioSession()
         player.removeObserver(playerItemObserver, "currentItem")
         player.removeObserver(timeControlObserver, "timeControlStatus")
+        removeAudioSessionObservers()
     }
 
     private fun activateAudioSession() {
@@ -199,6 +283,7 @@ actual class OMPlayerController {
 
     private fun removeCurrentItemObservers() {
         player.currentItem?.removeObserver(itemStatusObserver, "status")
+        NSNotificationCenter.defaultCenter.removeObserver(this, AVPlayerItemDidPlayToEndTimeNotification, player.currentItem)
     }
 
     private val playerItemObserver: NSObject = object : NSObject(), NSKeyValueObservingProtocol {
@@ -209,11 +294,6 @@ actual class OMPlayerController {
             context: COpaquePointer?
         ) {
             playerItem = player.currentItem
-//            if (player.currentItem?.playbackBufferEmpty == true) {
-//                listeners?.currentPlayerState(OMPlayerState.Buffering)
-//            } else if (player.currentItem?.playbackLikelyToKeepUp == true) {
-//                listeners?.currentPlayerState(OMPlayerState.Playing)
-//            }
 
             // Now playing
         }
@@ -237,7 +317,6 @@ actual class OMPlayerController {
                     seekToInitialTime()
                 }
                 AVPlayerStatusFailed -> {
-                    println("PlayerItem: ${player.currentItem?.error()}")
                     val errorMsg = when (playerItem?.error?.domain) {
                         null -> return
                         NSURLErrorDomain -> "Source unavailable"
