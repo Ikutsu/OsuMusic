@@ -157,7 +157,9 @@ fun MainScreen(
                     NavItem(
                         select = currentDestination?.route == screen.route,
                         onClick = {
-                            navController.navigate(screen.route)
+                            if (currentDestination?.route != screen.route) {
+                                navController.navigate(screen.route)
+                            }
                         },
                         icon = painterResource(screen.resource),
                         contentDescription = screen.route,
