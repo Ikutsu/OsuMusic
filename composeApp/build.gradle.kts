@@ -1,5 +1,6 @@
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -87,21 +88,49 @@ android {
     sourceSets["main"].res.srcDirs("src/androidMain/res")
     sourceSets["main"].resources.srcDirs("src/commonMain/resources")
 
+    var storeFile: File? = null
+    var storePass: String? = null
+    var keyAlias: String? = null
+    var keyPass: String? = null
+    project.rootProject.file("local.properties").also {
+        if (!it.isFile) return@also
+        val properties = Properties()
+        properties.load(it.inputStream())
+        val storeFilePath = properties.getProperty("store_file")
+        storeFile = if (storeFilePath.isNullOrEmpty()) null else file(storeFilePath)
+        storePass = properties.getProperty("store_pass")
+        keyAlias = properties.getProperty("key_alias")
+        keyPass = properties.getProperty("key_pass")
+    }
+
     defaultConfig {
         applicationId = "io.ikutsu.osumusic"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
-        versionName = "1.0"
+        versionName = "0.1.0"
     }
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    signingConfigs {
+        create("release") {
+            this.storeFile = storeFile
+            this.storePassword = storePass
+            this.keyAlias = keyAlias
+            this.keyPassword = keyPass
+        }
+    }
     buildTypes {
+        getByName("debug") {
+            isDebuggable = true
+        }
         getByName("release") {
-            isMinifyEnabled = false
+            isDebuggable = false
+            isMinifyEnabled = true
+            this.signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {
