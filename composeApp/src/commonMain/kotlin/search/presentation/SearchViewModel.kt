@@ -11,6 +11,7 @@ import io.ikutsu.osumusic.search.data.datasource.ApiType
 import io.ikutsu.osumusic.search.data.repository.SearchRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -24,6 +25,8 @@ class SearchViewModel(
     private val _uiState = MutableStateFlow(SearchUiState())
     val uiState = _uiState.asStateFlow()
 
+    private var queryJob: Job? = null
+
     fun onTextFieldChange(text: String) {
         viewModelScope.launch {
             if (text.isBlank()) {
@@ -36,7 +39,8 @@ class SearchViewModel(
     }
 
     fun onSearch() {
-        viewModelScope.launch(Dispatchers.IO) {
+        cancelQueryJob()
+        queryJob = viewModelScope.launch(Dispatchers.IO) {
             if (_uiState.value.searchText.isNotBlank()) {
                 _uiState.update {
                     it.copy(
@@ -63,13 +67,20 @@ class SearchViewModel(
 
     fun onClearSearch() {
         viewModelScope.launch {
+            cancelQueryJob()
             _uiState.update {
                 it.copy(
+                    isLoading = false,
                     searchText = "",
                     searchContent = SearchUiContent.HISTORY
                 )
             }
         }
+    }
+
+    private fun cancelQueryJob() {
+        queryJob?.cancel()
+        queryJob = null
     }
 
     fun onSearchItemClick(
