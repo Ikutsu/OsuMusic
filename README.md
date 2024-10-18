@@ -1,6 +1,12 @@
-<p align="center"><img src="./assets/logo.svg" width="200"></p>
-<h1 align="center"><b>OsuMusic!</b></h1>
-<h3 align="center">A music player made for osu! player</h3>
+<div align=center>
+  
+<img src="./assets/logo.svg" width="200">
+  
+# OsuMusic!
+### A music player made for osu! player
+[English](https://github.com/Ikutsu/OsuMusic/blob/master/README.md) / [中文文档](https://github.com/Ikutsu/OsuMusic/blob/master/README_zh.md)
+
+</div>
 
 ## About
 OsuMusic is a Kotlin Multiplatform music player that plays beatmaps from OSU!
