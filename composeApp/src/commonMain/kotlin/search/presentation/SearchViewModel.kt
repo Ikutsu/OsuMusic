@@ -60,6 +60,14 @@ class SearchViewModel(
                             displaySearchText = if (data.isEmpty()) "No result found" else "Search result for \"${it.searchText}\""
                         )
                     }
+                }.onFailure { error ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            searchResult = emptyList(),
+                            displaySearchText = "Error: ${error.message}"
+                        )
+                    }
                 }
             }
         }

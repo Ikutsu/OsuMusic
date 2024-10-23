@@ -23,7 +23,7 @@ class SearchRemoteDataSource(
                     )
                 )
 
-                return response.map { res ->
+                return response.mapCatching { res ->
                     res.data!!.sortedByDescending {
                         it.playCount
                     }.map {
@@ -45,7 +45,7 @@ class SearchRemoteDataSource(
                             diff = diffs.orEmpty()
                         )
                     }
-                }.recover {
+                }.recoverCatching {
                     if (it is JsonConvertException) {
                         emptyList()
                     } else {
