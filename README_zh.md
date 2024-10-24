@@ -20,9 +20,10 @@ OsuMusic 是一个基于 Kotlin Multiplatform 打造的铺面音乐播放器。
 - 播放列表（开发中）
 
 ## 截图
-|   |安卓|   |
-|---|---|---|
+|  |  |  |
+| :------: | :------: | :------: |
 | ![SearchScreen](https://github.com/Ikutsu/OsuMusic/blob/master/assets/SearchScreen.png) | ![SearchPlayerBar](https://github.com/Ikutsu/OsuMusic/blob/master/assets/SearchPlayerBar.png) | ![PlayerScreen](https://github.com/Ikutsu/OsuMusic/blob/master/assets/PlayerScreen.png) |
+| ![SearchScreenI](https://github.com/Ikutsu/OsuMusic/blob/master/assets/SearchScreenI.png) | ![SearchPlayerBarI](https://github.com/Ikutsu/OsuMusic/blob/master/assets/SearchPlayerBarI.png) | ![PlayerScreenI](https://github.com/Ikutsu/OsuMusic/blob/master/assets/PlayerScreenI.png) |
 
 ## 构建
 要构建和运行应用，你需要：
