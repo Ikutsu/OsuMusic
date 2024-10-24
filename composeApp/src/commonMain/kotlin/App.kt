@@ -6,6 +6,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideIn
 import androidx.compose.animation.slideOut
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -18,6 +19,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.ikutsu.osumusic.core.presentation.component.ErrorSnackBar
 import io.ikutsu.osumusic.core.presentation.theme.OMTheme
+import io.ikutsu.osumusic.core.presentation.theme.OM_Background
 import io.ikutsu.osumusic.core.presentation.util.bottomBarPadding
 import io.ikutsu.osumusic.player.presentation.PlayerScreen
 import io.ikutsu.osumusic.player.presentation.PlayerViewModel
@@ -30,58 +32,60 @@ fun App() {
     val playerViewModel: PlayerViewModel = koinViewModel()
     val playerUiState = playerViewModel.uiState.collectAsStateWithLifecycle()
 
-    MaterialTheme {
-        OMTheme {
-            Box {
-                NavHost(
-                    startDestination = "main",
-                    navController = appNavController,
-                ) {
-                    composable("main") {
-                        MainScreen(
-                            navController = mainNavController,
-                            playerViewModel = playerViewModel,
-                            onPlayerBarClick = {
-                                appNavController.navigate("player")
-                            }
-                        )
-                    }
-                    composable(
-                        route = "player",
-                        enterTransition = {
-                            slideIn(
-                                animationSpec = tween(300),
-                                initialOffset = { IntOffset(0, it.height) }
-                            ) + fadeIn(tween(300))
-                        },
-                        popEnterTransition = {
-                            fadeIn(tween(300))
-                        },
-                        exitTransition = {
-                            fadeOut(tween(300))
-                        },
-                        popExitTransition = {
-                            slideOut(
-                                animationSpec = tween(300),
-                                targetOffset = { IntOffset(0, it.height) }
-                            ) + fadeOut(tween(300))
-                        }
+    Box(modifier = Modifier.background(OM_Background)) {
+        MaterialTheme {
+            OMTheme {
+                Box {
+                    NavHost(
+                        startDestination = "main",
+                        navController = appNavController,
                     ) {
-                        PlayerScreen(
-                            viewModel = playerViewModel,
-                            onBackClick = {
-                                appNavController.navigateUp()
+                        composable("main") {
+                            MainScreen(
+                                navController = mainNavController,
+                                playerViewModel = playerViewModel,
+                                onPlayerBarClick = {
+                                    appNavController.navigate("player")
+                                }
+                            )
+                        }
+                        composable(
+                            route = "player",
+                            enterTransition = {
+                                slideIn(
+                                    animationSpec = tween(300),
+                                    initialOffset = { IntOffset(0, it.height) }
+                                ) + fadeIn(tween(300))
+                            },
+                            popEnterTransition = {
+                                fadeIn(tween(300))
+                            },
+                            exitTransition = {
+                                fadeOut(tween(300))
+                            },
+                            popExitTransition = {
+                                slideOut(
+                                    animationSpec = tween(300),
+                                    targetOffset = { IntOffset(0, it.height) }
+                                ) + fadeOut(tween(300))
                             }
-                        )
+                        ) {
+                            PlayerScreen(
+                                viewModel = playerViewModel,
+                                onBackClick = {
+                                    appNavController.navigateUp()
+                                }
+                            )
+                        }
                     }
-                }
-                AnimatedVisibility(
-                    visible = playerUiState.value.isError,
-                    enter = fadeIn(),
-                    exit = fadeOut(),
-                    modifier = Modifier.bottomBarPadding().align(Alignment.BottomCenter)
-                ) {
-                    ErrorSnackBar(errorMessage = playerUiState.value.errorMessage ?: "Unknown error")
+                    AnimatedVisibility(
+                        visible = playerUiState.value.isError,
+                        enter = fadeIn(),
+                        exit = fadeOut(),
+                        modifier = Modifier.bottomBarPadding().align(Alignment.BottomCenter)
+                    ) {
+                        ErrorSnackBar(errorMessage = playerUiState.value.errorMessage ?: "Unknown error")
+                    }
                 }
             }
         }
