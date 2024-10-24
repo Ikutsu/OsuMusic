@@ -20,9 +20,10 @@ OsuMusic is a Kotlin Multiplatform music player that plays beatmaps from OSU!
 - Playlist (WIP)
 
 ## Screenshots
-|   |A n d r o i d|   |
-|---|---|---|
+|  |  |  |
+| :------: | :------: | :------: |
 | ![SearchScreen](https://github.com/Ikutsu/OsuMusic/blob/master/assets/SearchScreen.png) | ![SearchPlayerBar](https://github.com/Ikutsu/OsuMusic/blob/master/assets/SearchPlayerBar.png) | ![PlayerScreen](https://github.com/Ikutsu/OsuMusic/blob/master/assets/PlayerScreen.png) |
+| ![SearchScreenI](https://github.com/Ikutsu/OsuMusic/blob/master/assets/SearchScreenI.png) | ![SearchPlayerBarI](https://github.com/Ikutsu/OsuMusic/blob/master/assets/SearchPlayerBarI.png) | ![PlayerScreenI](https://github.com/Ikutsu/OsuMusic/blob/master/assets/PlayerScreenI.png) |
 
 ## Building
 To build and run the app, you need:
