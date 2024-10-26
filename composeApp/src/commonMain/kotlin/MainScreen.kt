@@ -68,7 +68,8 @@ private val BottomNavigationItem = listOf(
 fun MainScreen(
     navController: NavHostController,
     playerViewModel: PlayerViewModel,
-    onPlayerBarClick: () -> Unit
+    onPlayerBarClick: () -> Unit,
+    onSettingClick: () -> Unit
 ) {
 
     Box(
@@ -94,15 +95,16 @@ fun MainScreen(
             },
         ) {
             composable("home") {
-                HomeScreen()
+                HomeScreen(onSettingClick = onSettingClick)
             }
             composable("search") {
                 SearchScreen(
-                    viewmodel = searchViewModel
+                    viewmodel = searchViewModel,
+                    onSettingClick = onSettingClick
                 )
             }
             composable("profile") {
-                ProfileScreen()
+                ProfileScreen(onSettingClick = onSettingClick)
             }
         }
 

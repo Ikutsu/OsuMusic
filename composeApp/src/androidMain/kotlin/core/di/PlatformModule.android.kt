@@ -7,6 +7,8 @@ import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
+import com.russhwolf.settings.ObservableSettings
+import com.russhwolf.settings.SharedPreferencesSettings
 import io.ikutsu.osumusic.MainActivity
 import io.ikutsu.osumusic.player.player.OMPlayerController
 import org.koin.android.ext.koin.androidContext
@@ -51,4 +53,5 @@ actual val platformModule: Module = module {
     }
 
     singleOf(::OMPlayerController)
+    single { SharedPreferencesSettings.Factory(androidContext()).create() } bind ObservableSettings::class
 }

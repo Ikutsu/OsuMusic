@@ -24,7 +24,8 @@ import io.ikutsu.osumusic.core.presentation.util.sp
 
 @Composable
 fun HomeScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onSettingClick: () -> Unit
 ) {
     val state = HomeUiState()
 
@@ -35,9 +36,7 @@ fun HomeScreen(
         TitleTopBar(
             title = "Home",
             showSetting = true,
-            onSettingClick = {
-
-            }
+            onSettingClick = onSettingClick
         )
         LazyColumn(
             modifier = modifier

@@ -38,6 +38,7 @@ import io.ikutsu.osumusic.search.presentation.component.SearchBar
 @Composable
 fun SearchScreen(
     viewmodel: SearchViewModel,
+    onSettingClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val state = viewmodel.uiState.collectAsStateWithLifecycle()
@@ -56,9 +57,7 @@ fun SearchScreen(
         TitleTopBar(
             title = "Search",
             showSetting = true,
-            onSettingClick = {
-
-            }
+            onSettingClick = onSettingClick
         )
         SearchBar(
             textFieldValue = state.value.searchText,

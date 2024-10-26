@@ -1,7 +1,7 @@
 package io.ikutsu.osumusic.search.data.repository
 
+import io.ikutsu.osumusic.core.data.BeatmapSource
 import io.ikutsu.osumusic.core.domain.DiffBeatmapState
-import io.ikutsu.osumusic.search.data.datasource.ApiType
 import io.ikutsu.osumusic.search.data.datasource.SearchRemoteDataSource
 
 class SearchRepository(
@@ -11,7 +11,7 @@ class SearchRepository(
     private var lastQuery: String = ""
     private var latestSearch: Result<List<DiffBeatmapState>> = Result.success(emptyList())
 
-    suspend fun search(apiType: ApiType, query: String): Result<List<DiffBeatmapState>> {
+    suspend fun search(apiType: BeatmapSource, query: String): Result<List<DiffBeatmapState>> {
         return if (query == lastQuery) {
             latestSearch
         } else {

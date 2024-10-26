@@ -12,10 +12,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.ikutsu.osumusic.core.presentation.util.HSpacer
 import io.ikutsu.osumusic.core.presentation.util.OM_SemiBold
 import io.ikutsu.osumusic.core.presentation.util.WSpacer
 import org.jetbrains.compose.resources.painterResource
 import osumusic.composeapp.generated.resources.Res
+import osumusic.composeapp.generated.resources.ic_prevCircle
 import osumusic.composeapp.generated.resources.ic_settings
 import osumusic.composeapp.generated.resources.logo
 
@@ -54,6 +56,34 @@ fun TitleTopBar(
             )
         }
     }
+}
 
-
+@Composable
+fun TitleBackTopBar(
+    title: String,
+    onBackClick: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+            .statusBarsPadding(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        OMIconButton(
+            onClick = {
+                onBackClick()
+            },
+            painter = painterResource(Res.drawable.ic_prevCircle),
+            contentDescription = "Back",
+            containerSize = 40.dp
+        )
+        HSpacer(8.dp)
+        Text(
+            text = title,
+            modifier = Modifier.weight(1f),
+            fontFamily = OM_SemiBold,
+            fontSize = 32.sp
+        )
+    }
 }

@@ -1,6 +1,7 @@
 
 package io.ikutsu.osumusic.search.data.datasource
 
+import io.ikutsu.osumusic.core.data.BeatmapSource
 import io.ikutsu.osumusic.core.data.getBeatmapCoverUrl
 import io.ikutsu.osumusic.core.data.getBeatmapFileUrl
 import io.ikutsu.osumusic.core.domain.DiffBeatmapState
@@ -12,11 +13,11 @@ class SearchRemoteDataSource(
     private val sayoApi: SayobotBeatmapSearchApi
 ) {
     suspend fun search(
-        apiType: ApiType,
+        apiType: BeatmapSource,
         query: String
     ): Result<List<DiffBeatmapState>> {
         when (apiType) {
-            ApiType.SAYOBOT -> {
+            BeatmapSource.SAYOBOT -> {
                 val response = sayoApi.search(
                     SayobotBeatmapListRequest(
                         keyword = query
@@ -55,8 +56,4 @@ class SearchRemoteDataSource(
             }
         }
     }
-}
-
-enum class ApiType {
-    SAYOBOT
 }

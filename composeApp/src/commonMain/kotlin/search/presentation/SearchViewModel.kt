@@ -2,12 +2,15 @@ package io.ikutsu.osumusic.search.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.russhwolf.settings.ExperimentalSettingsApi
+import com.russhwolf.settings.coroutines.FlowSettings
+import io.ikutsu.osumusic.core.data.BeatmapSource
+import io.ikutsu.osumusic.core.data.Constants
 import io.ikutsu.osumusic.core.data.getBeatmapBackgroundUrl
 import io.ikutsu.osumusic.core.domain.DiffBeatmapState
 import io.ikutsu.osumusic.core.domain.Music
 import io.ikutsu.osumusic.player.player.OMPlayerController
 import io.ikutsu.osumusic.player.player.OMPlayerEvent
-import io.ikutsu.osumusic.search.data.datasource.ApiType
 import io.ikutsu.osumusic.search.data.repository.SearchRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -17,9 +20,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalSettingsApi::class)
 class SearchViewModel(
     private val searchRepository: SearchRepository,
-    private val playerController: OMPlayerController
+    private val playerController: OMPlayerController,
+    private val settingStorage: FlowSettings
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SearchUiState())
@@ -50,7 +55,7 @@ class SearchViewModel(
                 }
 
                 searchRepository.search(
-                    apiType = ApiType.SAYOBOT,
+                    apiType = BeatmapSource.valueOf(settingStorage.getStringOrNull(Constants.Setting.BEATMAP_SOURCE) ?: BeatmapSource.SAYOBOT.name),
                     query = _uiState.value.searchText
                 ).onSuccess { data ->
                     _uiState.update {

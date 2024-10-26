@@ -29,6 +29,7 @@ import io.ikutsu.osumusic.profile.presentation.component.LoginCard
 
 @Composable
 fun ProfileScreen(
+    onSettingClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState()
@@ -41,9 +42,7 @@ fun ProfileScreen(
         TitleTopBar(
             title = "Profile",
             showSetting = true,
-            onSettingClick = {
-
-            }
+            onSettingClick = onSettingClick
         )
         Column(
             modifier = modifier.verticalScroll(scrollState).bottomBarPadding(),

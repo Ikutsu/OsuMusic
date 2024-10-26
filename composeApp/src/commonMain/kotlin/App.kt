@@ -23,6 +23,8 @@ import io.ikutsu.osumusic.core.presentation.theme.OM_Background
 import io.ikutsu.osumusic.core.presentation.util.bottomBarPadding
 import io.ikutsu.osumusic.player.presentation.PlayerScreen
 import io.ikutsu.osumusic.player.presentation.PlayerViewModel
+import io.ikutsu.osumusic.setting.presentation.SettingScreen
+import io.ikutsu.osumusic.setting.presentation.SettingViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -31,6 +33,7 @@ fun App() {
     val mainNavController = rememberNavController()
     val playerViewModel: PlayerViewModel = koinViewModel()
     val playerUiState = playerViewModel.uiState.collectAsStateWithLifecycle()
+    val settingViewModel: SettingViewModel = koinViewModel()
 
     Box(modifier = Modifier.background(OM_Background)) {
         MaterialTheme {
@@ -46,6 +49,9 @@ fun App() {
                                 playerViewModel = playerViewModel,
                                 onPlayerBarClick = {
                                     appNavController.navigate("player")
+                                },
+                                onSettingClick = {
+                                    appNavController.navigate("setting")
                                 }
                             )
                         }
@@ -72,6 +78,40 @@ fun App() {
                         ) {
                             PlayerScreen(
                                 viewModel = playerViewModel,
+                                onBackClick = {
+                                    appNavController.navigateUp()
+                                }
+                            )
+                        }
+                        composable(
+                            route = "setting",
+                            enterTransition = {
+                                slideIn(
+                                    animationSpec = tween(300),
+                                    initialOffset = { IntOffset(it.width, 0) }
+                                ) + fadeIn(tween(300))
+                            },
+                            popEnterTransition = {
+                                slideIn(
+                                    animationSpec = tween(300),
+                                    initialOffset = { IntOffset(it.width, 0) }
+                                ) + fadeIn(tween(300))
+                            },
+                            exitTransition = {
+                                slideOut(
+                                    animationSpec = tween(300),
+                                    targetOffset = { IntOffset(it.width, 0) }
+                                ) + fadeOut(tween(300))
+                            },
+                            popExitTransition = {
+                                slideOut(
+                                    animationSpec = tween(300),
+                                    targetOffset = { IntOffset(it.width, 0) }
+                                ) + fadeOut(tween(300))
+                            }
+                        ) {
+                            SettingScreen(
+                                viewModel = settingViewModel,
                                 onBackClick = {
                                     appNavController.navigateUp()
                                 }
