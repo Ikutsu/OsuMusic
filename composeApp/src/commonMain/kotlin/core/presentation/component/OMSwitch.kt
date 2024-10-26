@@ -39,8 +39,8 @@ fun OMSwitch(
     )
     Box(
         modifier = Modifier
-            .requiredWidth(54.dp)
-            .requiredHeight(16.dp),
+            .requiredWidth(61.dp)
+            .requiredHeight(18.dp),
         contentAlignment = Alignment.Center
     ) {
         Box(
