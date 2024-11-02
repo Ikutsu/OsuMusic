@@ -39,6 +39,7 @@ import io.ikutsu.osumusic.core.presentation.util.HSpacer
 import io.ikutsu.osumusic.core.presentation.util.OM_Bold
 import io.ikutsu.osumusic.core.presentation.util.OM_SemiBold
 import io.ikutsu.osumusic.core.presentation.util.VSpacer
+import io.ikutsu.osumusic.core.presentation.util.debouncedClickable
 import io.ikutsu.osumusic.core.presentation.util.getDiffColor
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
@@ -144,7 +145,9 @@ fun AllDiffBeatmap(
             .fillMaxWidth()
             .height(72.dp)
             .clip(OM_ShapeMedium)
-            .clickable { onClick() }
+            .debouncedClickable(500) {
+                onClick()
+            }
     ) {
         AsyncImage(
             model = ImageRequest.Builder(LocalPlatformContext.current)

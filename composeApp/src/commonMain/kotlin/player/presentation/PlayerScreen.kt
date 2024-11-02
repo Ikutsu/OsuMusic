@@ -2,7 +2,6 @@ package io.ikutsu.osumusic.player.presentation
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -74,6 +73,7 @@ import io.ikutsu.osumusic.core.presentation.util.OM_Bold
 import io.ikutsu.osumusic.core.presentation.util.OM_SemiBold
 import io.ikutsu.osumusic.core.presentation.util.VSpacer
 import io.ikutsu.osumusic.core.presentation.util.WSpacer
+import io.ikutsu.osumusic.core.presentation.util.debouncedClickable
 import io.ikutsu.osumusic.core.presentation.util.formatMilliseconds
 import io.ikutsu.osumusic.core.presentation.util.noRippleClickable
 import io.ikutsu.osumusic.player.player.OMPlayerState
@@ -395,7 +395,7 @@ fun PlayerBottomSheet(
         Column(
             modifier = Modifier
                 .clip(OM_ShapeMedium)
-                .clickable {
+                .debouncedClickable {
                     scope.launch {
                         sheetState.expand()
                     }

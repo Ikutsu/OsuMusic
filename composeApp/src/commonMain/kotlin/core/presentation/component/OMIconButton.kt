@@ -1,7 +1,6 @@
 package io.ikutsu.osumusic.core.presentation.component
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
@@ -16,6 +15,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.ikutsu.osumusic.core.presentation.theme.OM_Secondary
 import io.ikutsu.osumusic.core.presentation.theme.OM_ShapeMedium
+import io.ikutsu.osumusic.core.presentation.util.debouncedClickable
 
 @Composable
 fun OMIconButton(
@@ -32,7 +32,7 @@ fun OMIconButton(
             .size(containerSize)
             .clip(OM_ShapeMedium)
             .background(OM_Secondary)
-            .clickable(
+            .debouncedClickable(
                 onClick = onClick,
                 enabled = enabled
             ),
@@ -62,7 +62,7 @@ fun OMIconButton(
             .size(containerSize)
             .clip(OM_ShapeMedium)
             .background(containerColor)
-            .clickable(
+            .debouncedClickable(
                 onClick = onClick,
                 enabled = enabled
             ),

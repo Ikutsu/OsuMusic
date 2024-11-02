@@ -33,7 +33,7 @@ import io.ikutsu.osumusic.core.presentation.component.NavBar
 import io.ikutsu.osumusic.core.presentation.component.NavItem
 import io.ikutsu.osumusic.core.presentation.theme.OM_Background
 import io.ikutsu.osumusic.core.presentation.util.HSpacer
-import io.ikutsu.osumusic.core.presentation.util.noRippleClickable
+import io.ikutsu.osumusic.core.presentation.util.debouncedClickable
 import io.ikutsu.osumusic.home.presentation.HomeScreen
 import io.ikutsu.osumusic.player.presentation.PlayerViewModel
 import io.ikutsu.osumusic.player.presentation.component.PlayerBar
@@ -124,13 +124,13 @@ fun MainScreen(
                     MutableTransitionState(initialState = false)
                 }.apply { targetState = playerUiState.value.currentMusic != null },
                 enter = slideInVertically(
-                        animationSpec = tween(300),
-                        initialOffsetY = { with(density) { 80.dp.roundToPx() } }
-                ) + expandVertically( expandFrom = Alignment.Bottom ),
+                    animationSpec = tween(300),
+                    initialOffsetY = { with(density) { 80.dp.roundToPx() } }
+                ) + expandVertically(expandFrom = Alignment.Bottom),
                 exit = slideOutVertically(
                     animationSpec = tween(300),
                     targetOffsetY = { with(density) { 80.dp.roundToPx() } }
-                ) + shrinkVertically( shrinkTowards = Alignment.Bottom )
+                ) + shrinkVertically(shrinkTowards = Alignment.Bottom)
             ) {
                 PlayerBar(
                     state = playerUiState,
@@ -143,14 +143,19 @@ fun MainScreen(
                     onPlayPause = {
                         playerViewModel.onPlayPauseClick()
                     },
-                    modifier = Modifier.background(
-                        Brush.verticalGradient(
-                            colorStops = arrayOf(
-                                0f to Color.Transparent,
-                                1f to Color.Black.copy(0.5f)
+                    modifier = Modifier
+                        .background(
+                            Brush.verticalGradient(
+                                colorStops = arrayOf(
+                                    0f to Color.Transparent,
+                                    1f to Color.Black.copy(0.5f)
+                                )
                             )
                         )
-                    ).padding(horizontal = 8.dp).noRippleClickable { onPlayerBarClick() }
+                        .padding(horizontal = 8.dp)
+                        .debouncedClickable(ripple = false) {
+                            onPlayerBarClick()
+                        }
                 )
             }
             HSpacer(8.dp)
