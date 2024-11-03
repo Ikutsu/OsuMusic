@@ -2,15 +2,19 @@
 package io.ikutsu.osumusic.search.data.datasource
 
 import io.ikutsu.osumusic.core.data.BeatmapSource
+import io.ikutsu.osumusic.core.data.OsuDirect
 import io.ikutsu.osumusic.core.data.getBeatmapCoverUrl
 import io.ikutsu.osumusic.core.data.getBeatmapFileUrl
 import io.ikutsu.osumusic.core.domain.DiffBeatmapState
+import io.ikutsu.osumusic.search.data.api.OsuDirectBeatmapListRequest
+import io.ikutsu.osumusic.search.data.api.OsuDirectBeatmapSearchApi
 import io.ikutsu.osumusic.search.data.api.SayobotBeatmapListRequest
 import io.ikutsu.osumusic.search.data.api.SayobotBeatmapSearchApi
 import io.ktor.serialization.JsonConvertException
 
 class SearchRemoteDataSource(
-    private val sayoApi: SayobotBeatmapSearchApi
+    private val sayoApi: SayobotBeatmapSearchApi,
+    private val osuDirectApi: OsuDirectBeatmapSearchApi
 ) {
     suspend fun search(
         apiType: BeatmapSource,
@@ -51,6 +55,27 @@ class SearchRemoteDataSource(
                         emptyList()
                     } else {
                         throw it
+                    }
+                }
+            }
+            BeatmapSource.OSU_DIRECT -> {
+                val response = osuDirectApi.search(
+                    OsuDirectBeatmapListRequest(
+                        query = query
+                    )
+                )
+
+                return response.mapCatching { res ->
+                    res.beatmapSets.map {
+                        DiffBeatmapState(
+                            beatmapId = it.id,
+                            audioUrl = OsuDirect.getAudioUrl(it.beatmaps.first().id.toString()),
+                            coverUrl = it.covers.cover,
+                            title = it.title,
+                            artist = it.artist,
+                            creator = it.creator,
+                            diff = it.beatmaps.map { diff -> diff.difficultyRating.toFloat() }
+                        )
                     }
                 }
             }

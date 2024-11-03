@@ -7,5 +7,6 @@ object Constants {
 }
 
 enum class BeatmapSource(val value: String) {
-    SAYOBOT("Sayobot")
+    SAYOBOT("Sayobot"),
+    OSU_DIRECT("OsuDirect")
 }
