@@ -42,6 +42,15 @@ fun SettingScreen(
             onBackClick = { onBackClick() }
         )
         SettingGroup(
+            title = "Appreance"
+        ) {
+            SettingSwitch(
+                title = "Show metadata in original language",
+                checked = uiState.value.showInOriginalLang,
+                onCheckedChange = { viewModel.setShowInOriginal(it) }
+            )
+        }
+        SettingGroup(
             title = "Playback"
         ) {
             SettingDropDown(

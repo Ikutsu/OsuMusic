@@ -22,7 +22,6 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.ikutsu.osumusic.core.presentation.component.AllDiffBeatmap
-import io.ikutsu.osumusic.core.presentation.component.FeatureComingCard
 import io.ikutsu.osumusic.core.presentation.component.LoadingSpinner
 import io.ikutsu.osumusic.core.presentation.component.TitleTopBar
 import io.ikutsu.osumusic.core.presentation.util.OM_SemiBold
@@ -136,8 +135,8 @@ fun SearchScreen(
                                 AllDiffBeatmap(
                                     onClick = { viewmodel.onSearchItemClick(it) },
                                     beatmapCover = it.coverUrl,
-                                    title = it.title,
-                                    artist = it.artist,
+                                    title = if (state.value.isUnicode) it.titleUnicode else it.title,
+                                    artist = if (state.value.isUnicode) it.artistUnicode else it.artist,
                                     diffs = it.diff
                                 )
                             }

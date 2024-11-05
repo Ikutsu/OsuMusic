@@ -5,7 +5,9 @@ data class DiffBeatmapState(
     val audioUrl: String,
     val coverUrl: String,
     val title: String,
+    val titleUnicode: String,
     val artist: String,
+    val artistUnicode: String,
     val creator: String,
     val diff: List<Float>
 )

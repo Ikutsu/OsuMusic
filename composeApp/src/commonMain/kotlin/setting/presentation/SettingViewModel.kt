@@ -11,6 +11,7 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -32,10 +33,16 @@ class SettingViewModel(
                     beatmapSourceOptions = BeatmapSource.entries.map { it.value }
                 )
             }
-            settingStorage.getStringOrNullFlow(Constants.Setting.BEATMAP_SOURCE).collect { beatmapSource ->
+            combine(
+                settingStorage.getStringOrNullFlow(Constants.Setting.BEATMAP_SOURCE),
+                settingStorage.getBooleanOrNullFlow(Constants.Setting.SHOW_IN_ORIGINAL_LANG)
+            ) { beatmapSource, showInOriginalLang ->
+                Pair(beatmapSource, showInOriginalLang)
+            }.collect { (beatmapSource, showInOriginalLang) ->
                 _uiState.update {
                     it.copy(
-                        beatmapSource = BeatmapSource.valueOf(beatmapSource ?: BeatmapSource.SAYOBOT.name).value
+                        beatmapSource = BeatmapSource.valueOf(beatmapSource ?: BeatmapSource.SAYOBOT.name).value,
+                        showInOriginalLang = showInOriginalLang ?: false
                     )
                 }
             }
@@ -45,6 +52,12 @@ class SettingViewModel(
     fun setBeatmapSource(index: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             settingStorage.putString(Constants.Setting.BEATMAP_SOURCE, BeatmapSource.entries[index].name)
+        }
+    }
+
+    fun setShowInOriginal(boolean: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            settingStorage.putBoolean(Constants.Setting.SHOW_IN_ORIGINAL_LANG, boolean)
         }
     }
 }

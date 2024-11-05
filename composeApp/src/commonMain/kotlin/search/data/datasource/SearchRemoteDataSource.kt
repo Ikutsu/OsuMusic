@@ -41,12 +41,12 @@ class SearchRemoteDataSource(
 
                         DiffBeatmapState(
                             beatmapId = it.sid,
-                            audioUrl = getBeatmapFileUrl(it.sid, audioFile.orEmpty()),
-                            coverUrl = getBeatmapCoverUrl(it.sid),
-                            title = it.titleUnicode.ifBlank { it.title },
-                            artist = it.artistUnicode.ifBlank { it.artist },
                             audioUrl = SayoBot.getBeatmapFileUrl(it.sid, audioFile.orEmpty()),
                             coverUrl = SayoBot.getBeatmapCoverUrl(it.sid),
+                            title = it.title,
+                            titleUnicode = it.titleUnicode.ifBlank { it.title },
+                            artist = it.artist,
+                            artistUnicode = it.artistUnicode.ifBlank { it.artist },
                             creator = it.creator,
                             diff = diffs.orEmpty()
                         )
@@ -73,7 +73,9 @@ class SearchRemoteDataSource(
                             audioUrl = OsuDirect.getAudioUrl(it.beatmaps.first().id.toString()),
                             coverUrl = it.covers.cover,
                             title = it.title,
+                            titleUnicode = it.titleUnicode,
                             artist = it.artist,
+                            artistUnicode = it.artistUnicode,
                             creator = it.creator,
                             diff = it.beatmaps.map { diff -> diff.difficultyRating.toFloat() }
                         )

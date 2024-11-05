@@ -34,6 +34,7 @@ class SearchViewModel(
 
     init {
         fetchSearchHistory()
+        getSettings()
     }
 
     private fun fetchSearchHistory() {
@@ -54,6 +55,18 @@ class SearchViewModel(
                                 audioUrl = it.audioUrl
                             )
                         }.reversed()
+                    )
+                }
+            }
+        }
+    }
+
+    private fun getSettings() {
+        viewModelScope.launch {
+            settingStorage.getBooleanOrNullFlow(Constants.Setting.SHOW_IN_ORIGINAL_LANG).collect { showInOriginalLang ->
+                _uiState.update {
+                    it.copy(
+                        isUnicode = showInOriginalLang ?: false
                     )
                 }
             }
