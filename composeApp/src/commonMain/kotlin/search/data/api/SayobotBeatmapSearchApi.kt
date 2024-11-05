@@ -1,7 +1,6 @@
 package io.ikutsu.osumusic.search.data.api
 
-import io.ikutsu.osumusic.core.data.SAYOBOT_API_DETAIL
-import io.ikutsu.osumusic.core.data.SAYOBOT_API_SEARCH
+import io.ikutsu.osumusic.core.data.SayoBot
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -27,7 +26,7 @@ class SayobotBeatmapSearchApi(
         runCatching {
             withContext(Dispatchers.IO) {
                 httpClient.post {
-                    url(SAYOBOT_API_SEARCH)
+                    url(SayoBot.SAYOBOT_API_SEARCH)
                     contentType(ContentType.Application.Json)
                     setBody(query)
                 }.body<SayobotBeatmapListResponse>()
@@ -38,7 +37,7 @@ class SayobotBeatmapSearchApi(
         runCatching {
             withContext(Dispatchers.IO) {
                 httpClient.get {
-                    url(SAYOBOT_API_DETAIL)
+                    url(SayoBot.SAYOBOT_API_DETAIL)
                     parameter("K", "$beatmapSetId")
                     contentType(ContentType.Application.Json)
                 }.let {

@@ -3,8 +3,7 @@ package io.ikutsu.osumusic.search.data.datasource
 
 import io.ikutsu.osumusic.core.data.BeatmapSource
 import io.ikutsu.osumusic.core.data.OsuDirect
-import io.ikutsu.osumusic.core.data.getBeatmapCoverUrl
-import io.ikutsu.osumusic.core.data.getBeatmapFileUrl
+import io.ikutsu.osumusic.core.data.SayoBot
 import io.ikutsu.osumusic.core.domain.DiffBeatmapState
 import io.ikutsu.osumusic.search.data.api.OsuDirectBeatmapListRequest
 import io.ikutsu.osumusic.search.data.api.OsuDirectBeatmapSearchApi
@@ -46,6 +45,8 @@ class SearchRemoteDataSource(
                             coverUrl = getBeatmapCoverUrl(it.sid),
                             title = it.titleUnicode.ifBlank { it.title },
                             artist = it.artistUnicode.ifBlank { it.artist },
+                            audioUrl = SayoBot.getBeatmapFileUrl(it.sid, audioFile.orEmpty()),
+                            coverUrl = SayoBot.getBeatmapCoverUrl(it.sid),
                             creator = it.creator,
                             diff = diffs.orEmpty()
                         )
