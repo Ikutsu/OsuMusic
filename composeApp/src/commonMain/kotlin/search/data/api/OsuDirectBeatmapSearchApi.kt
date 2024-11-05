@@ -14,10 +14,10 @@ import kotlinx.coroutines.withContext
 
 class OsuDirectBeatmapSearchApi (
     private val httpClient: HttpClient
-): BeatmapSearchApi<OsuDirectBeatmapListRequest, OsuDirectBeatmapListResponse> {
+): BeatmapSearchApi<OsuDirectBeatmapSearchRequest, OsuDirectBeatmapSearchResponse> {
     override suspend fun search(
-        query: OsuDirectBeatmapListRequest
-    ): Result<OsuDirectBeatmapListResponse> =
+        query: OsuDirectBeatmapSearchRequest
+    ): Result<OsuDirectBeatmapSearchResponse> =
         withContext(Dispatchers.IO) {
             runCatching {
                 httpClient.get {
@@ -31,8 +31,8 @@ class OsuDirectBeatmapSearchApi (
                     contentType(ContentType.Application.Json)
                 }.also {
                     println(it.call.request.url)
-                }.body<List<OsuDirectBeatmapListResponse.OsuDirectBeatmapSet>>().let {
-                    OsuDirectBeatmapListResponse(it)
+                }.body<List<OsuDirectBeatmapSearchResponse.OsuDirectBeatmapSet>>().let {
+                    OsuDirectBeatmapSearchResponse(it)
                 }
             }
         }

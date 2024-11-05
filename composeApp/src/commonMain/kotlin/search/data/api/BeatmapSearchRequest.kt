@@ -1,3 +1,3 @@
 package io.ikutsu.osumusic.search.data.api
 
-interface BeatmapListRequest
+interface BeatmapSearchRequest

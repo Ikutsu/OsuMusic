@@ -4,9 +4,9 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class OsuDirectBeatmapListResponse(
+data class OsuDirectBeatmapSearchResponse(
     val beatmapSets: List<OsuDirectBeatmapSet>
-): BeatmapListResponse {
+): BeatmapSearchResponse {
 
     @Serializable
     data class OsuDirectBeatmapSet(

@@ -1,6 +1,6 @@
 package io.ikutsu.osumusic.search.data.api
 
-import io.ikutsu.osumusic.search.data.api.SayobotBeatmapListResponse.SayobotBeatmapSetInfo
+import io.ikutsu.osumusic.search.data.api.SayobotBeatmapSearchResponse.SayobotBeatmapSetInfo
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -19,7 +19,7 @@ import kotlinx.serialization.Serializable
  * @see SayobotBeatmapSetInfo
  */
 @Serializable
-data class SayobotBeatmapListResponse(
+data class SayobotBeatmapSearchResponse(
     @SerialName("data") val data: List<SayobotBeatmapSetInfo>?,
     @SerialName("endid") val endId: Int?,
     @SerialName("match_artist_results") val matchArtistResult: Int?,
@@ -30,7 +30,7 @@ data class SayobotBeatmapListResponse(
     @SerialName("results") val results: Int?,
     @SerialName("status") val status: Int,
     @SerialName("time_cost") val timeCost: Int?,
-): BeatmapListResponse {
+): BeatmapSearchResponse {
     /**
      * Sayobot Beatmap Info
      * @param sid Beatmap set Id

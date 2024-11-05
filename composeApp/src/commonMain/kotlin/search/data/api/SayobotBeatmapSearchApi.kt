@@ -18,18 +18,18 @@ import kotlinx.serialization.json.Json
 
 class SayobotBeatmapSearchApi(
     private val httpClient: HttpClient
-) : BeatmapSearchApi<SayobotBeatmapListRequest, SayobotBeatmapListResponse> {
+) : BeatmapSearchApi<SayobotBeatmapSearchRequest, SayobotBeatmapSearchResponse> {
 
     override suspend fun search(
-        query: SayobotBeatmapListRequest
-    ): Result<SayobotBeatmapListResponse> =
+        query: SayobotBeatmapSearchRequest
+    ): Result<SayobotBeatmapSearchResponse> =
         runCatching {
             withContext(Dispatchers.IO) {
                 httpClient.post {
                     url(SayoBot.SAYOBOT_API_SEARCH)
                     contentType(ContentType.Application.Json)
                     setBody(query)
-                }.body<SayobotBeatmapListResponse>()
+                }.body<SayobotBeatmapSearchResponse>()
             }
         }
 

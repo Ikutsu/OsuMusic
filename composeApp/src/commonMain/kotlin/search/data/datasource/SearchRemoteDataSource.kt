@@ -5,10 +5,10 @@ import io.ikutsu.osumusic.core.data.BeatmapSource
 import io.ikutsu.osumusic.core.data.OsuDirect
 import io.ikutsu.osumusic.core.data.SayoBot
 import io.ikutsu.osumusic.core.domain.DiffBeatmapState
-import io.ikutsu.osumusic.search.data.api.OsuDirectBeatmapListRequest
 import io.ikutsu.osumusic.search.data.api.OsuDirectBeatmapSearchApi
-import io.ikutsu.osumusic.search.data.api.SayobotBeatmapListRequest
+import io.ikutsu.osumusic.search.data.api.OsuDirectBeatmapSearchRequest
 import io.ikutsu.osumusic.search.data.api.SayobotBeatmapSearchApi
+import io.ikutsu.osumusic.search.data.api.SayobotBeatmapSearchRequest
 import io.ktor.serialization.JsonConvertException
 
 class SearchRemoteDataSource(
@@ -22,7 +22,7 @@ class SearchRemoteDataSource(
         when (apiType) {
             BeatmapSource.SAYOBOT -> {
                 val response = sayoApi.search(
-                    SayobotBeatmapListRequest(
+                    SayobotBeatmapSearchRequest(
                         keyword = query
                     )
                 )
@@ -61,7 +61,7 @@ class SearchRemoteDataSource(
             }
             BeatmapSource.OSU_DIRECT -> {
                 val response = osuDirectApi.search(
-                    OsuDirectBeatmapListRequest(
+                    OsuDirectBeatmapSearchRequest(
                         query = query
                     )
                 )

@@ -24,7 +24,7 @@ import kotlinx.serialization.Serializable
  * @param bpm Beats Per Minute Range (0.0 to 1000.0)
  */
 @Serializable
-data class SayobotBeatmapListRequest(
+data class SayobotBeatmapSearchRequest(
     @SerialName("cmd") val cmd: String = "beatmaplist",
     @SerialName("limit") val limit: Int = 25,
     @SerialName("offset") val offset: Int = 0,
@@ -42,7 +42,7 @@ data class SayobotBeatmapListRequest(
     @SerialName("hp") val hp: ClosedFloatingPointRange<Float>? = null,
     @SerialName("length") val length: ClosedFloatingPointRange<Float>? = null,
     @SerialName("bpm") val bpm: ClosedFloatingPointRange<Float>? = null,
-): BeatmapListRequest {
+): BeatmapSearchRequest {
     enum class Type(val value: Int) {
         HOT(1),
         NEW(2),
