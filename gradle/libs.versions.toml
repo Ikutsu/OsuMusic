@@ -20,6 +20,7 @@ media3 = "1.4.1"
 multiplatformSettings = "1.2.0"
 navigation = "2.8.0-alpha10"
 viewmodel = "2.8.3"
+realm = "3.0.0"
 
 [libraries]
 # Testing
@@ -72,6 +73,9 @@ multiplatform-settings = { module = "com.russhwolf:multiplatform-settings", vers
 multiplatform-settings-serialization = { module = "com.russhwolf:multiplatform-settings-serialization", version.ref = "multiplatformSettings" }
 multiplatform-settings-coroutines = { module = "com.russhwolf:multiplatform-settings-coroutines", version.ref = "multiplatformSettings" }
 
+# Realm
+realm-base = { module = "io.realm.kotlin:library-base", version.ref = "realm" }
+
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
@@ -79,3 +83,4 @@ jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+realm = { id = "io.realm.kotlin", version.ref = "realm" }

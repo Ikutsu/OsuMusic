@@ -32,6 +32,34 @@ class SearchViewModel(
 
     private var queryJob: Job? = null
 
+    init {
+        fetchSearchHistory()
+    }
+
+    private fun fetchSearchHistory() {
+        viewModelScope.launch {
+            searchRepository.getSearchHistory().collect { data ->
+                _uiState.update { state ->
+                    state.copy(
+                        searchHistory = data.map {
+                            DiffBeatmapState(
+                                beatmapId = it.beatmapId,
+                                title = it.title,
+                                titleUnicode = it.titleUnicode,
+                                artist = it.artist,
+                                artistUnicode = it.artistUnicode,
+                                creator = it.creator,
+                                diff = it.difficulty.toList(),
+                                coverUrl = it.coverUrl,
+                                audioUrl = it.audioUrl
+                            )
+                        }.reversed()
+                    )
+                }
+            }
+        }
+    }
+
     fun onTextFieldChange(text: String) {
         viewModelScope.launch {
             if (text.isBlank()) {
@@ -100,6 +128,7 @@ class SearchViewModel(
         beatmapState: DiffBeatmapState
     ) {
         viewModelScope.launch {
+            searchRepository.saveSearchHistory(beatmapState)
             playerController.addPlayerItem(
                 listOf(
                     Music(

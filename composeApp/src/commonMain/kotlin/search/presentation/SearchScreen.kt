@@ -126,11 +126,6 @@ fun SearchScreen(
                             modifier = Modifier.fillMaxSize(),
                             verticalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
-                            if (targetState == SearchUiContent.HISTORY) {
-                                item {
-                                    FeatureComingCard()
-                                }
-                            }
                             items(
                                 if (targetState == SearchUiContent.RESULT) {
                                     state.value.searchResult
