@@ -29,8 +29,6 @@ class OsuDirectBeatmapSearchApi (
                     parameter("status", query.status)
                     parameter("mode", query.mode)
                     contentType(ContentType.Application.Json)
-                }.also {
-                    println(it.call.request.url)
                 }.body<List<OsuDirectBeatmapSearchResponse.OsuDirectBeatmapSet>>().let {
                     OsuDirectBeatmapSearchResponse(it)
                 }
