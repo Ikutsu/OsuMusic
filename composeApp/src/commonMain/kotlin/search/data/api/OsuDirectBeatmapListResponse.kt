@@ -20,7 +20,7 @@ data class OsuDirectBeatmapListResponse(
         @SerialName("tags") val tags: String,
         @SerialName("covers") val covers: Covers,
         @SerialName("favourite_count") val favouriteCount: Int,
-        @SerialName("hype") val hype: Int? = null,
+        @SerialName("hype") val hype: Hype? = null,
         @SerialName("nsfw") val nsfw: Boolean,
         @SerialName("offset") val offset: Int,
         @SerialName("play_count") val playCount: Int,
@@ -61,6 +61,12 @@ data class OsuDirectBeatmapListResponse(
         @SerialName("list@2x") val list2x: String,
         @SerialName("slimcover") val slimCover: String,
         @SerialName("slimcover@2x") val slimCover2x: String
+    )
+
+    @Serializable
+    data class Hype(
+        @SerialName("current") val current: Int,
+        @SerialName("required") val required: Int
     )
 
     @Serializable
