@@ -40,7 +40,7 @@ data class OsuDirectBeatmapSearchResponse(
         @SerialName("legacy_thread_url") val legacyThreadUrl: String,
         @SerialName("nominations_summary") val nominationsSummary: NominationsSummary,
         @SerialName("ranked") val ranked: Int,
-        @SerialName("ranked_date") val rankedDate: String,
+        @SerialName("ranked_date") val rankedDate: String? = null,
         @SerialName("storyboard") val storyboard: Boolean,
         @SerialName("submitted_date") val submittedDate: String,
         @SerialName("availability") val availability: Availability,
@@ -72,7 +72,7 @@ data class OsuDirectBeatmapSearchResponse(
     @Serializable
     data class NominationsSummary(
         @SerialName("current") val current: Int,
-        @SerialName("eligible_main_rulesets") val eligibleMainRulesets: List<String>,
+        @SerialName("eligible_main_rulesets") val eligibleMainRulesets: List<String>? = null,
         @SerialName("required_meta") val requiredMeta: RequiredMeta
     )
 
