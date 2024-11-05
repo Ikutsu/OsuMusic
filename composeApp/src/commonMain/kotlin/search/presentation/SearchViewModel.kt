@@ -6,7 +6,7 @@ import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.coroutines.FlowSettings
 import io.ikutsu.osumusic.core.data.BeatmapSource
 import io.ikutsu.osumusic.core.data.Constants
-import io.ikutsu.osumusic.core.data.getBeatmapBackgroundUrl
+import io.ikutsu.osumusic.core.data.Osu
 import io.ikutsu.osumusic.core.domain.DiffBeatmapState
 import io.ikutsu.osumusic.core.domain.Music
 import io.ikutsu.osumusic.player.player.OMPlayerController
@@ -150,7 +150,7 @@ class SearchViewModel(
                         creator = beatmapState.creator,
                         diff = beatmapState.diff.first(),
                         coverUrl = beatmapState.coverUrl,
-                        backgroundUrl = getBeatmapBackgroundUrl(beatmapState.beatmapId),
+                        backgroundUrl = Osu.getBeatmapBackgroundUrl(beatmapState.beatmapId),
                         source = beatmapState.audioUrl
                     )
                 )
