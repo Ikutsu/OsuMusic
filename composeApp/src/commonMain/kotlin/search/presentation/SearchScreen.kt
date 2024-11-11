@@ -11,8 +11,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -21,6 +23,8 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import core.presentation.res.OMIcon
+import core.presentation.res.omicon.History
 import io.ikutsu.osumusic.core.presentation.component.LoadingSpinner
 import io.ikutsu.osumusic.core.presentation.component.SwipeAllDiffBeatmap
 import io.ikutsu.osumusic.core.presentation.component.TitleTopBar
@@ -114,36 +118,59 @@ fun SearchScreen(
                         )
                     }
                 ) { targetState ->
-                    Column{
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
                         Text(
                             text = if (targetState == SearchUiContent.RESULT) state.value.displaySearchText else "Search history",
                             fontFamily = OM_SemiBold,
                             fontSize = 24.dp.sp
                         )
-                        VSpacer(16.dp)
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
-                            verticalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-                            items(
-                                if (targetState == SearchUiContent.RESULT) {
-                                    state.value.searchResult
-                                } else {
-                                    state.value.searchHistory
-                                }
+                        if (targetState == SearchUiContent.HISTORY && state.value.searchHistory.isEmpty()) {
+                            Column(
+                                modifier = Modifier.bottomBarPadding().fillMaxSize(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
                             ) {
-                                SwipeAllDiffBeatmap(
-                                    onClick = { viewmodel.onSearchItemClick(it) },
-                                    onSwipeRelease = { viewmodel.onSwipeRelease(it) },
-                                    beatmapCover = it.coverUrl,
-                                    title = if (state.value.isUnicode) it.titleUnicode else it.title,
-                                    artist = if (state.value.isUnicode) it.artistUnicode else it.artist,
-                                    diffs = it.diff
+                                Icon(
+                                    imageVector = OMIcon.History,
+                                    contentDescription = "History",
+                                    modifier = Modifier.size(36.dp)
+                                )
+                                VSpacer(16.dp)
+                                Text(
+                                    text = "There is no history yet :(",
+                                    fontFamily = OM_SemiBold,
+                                    fontSize = 20.dp.sp
                                 )
                             }
-                            item {
-                                Box(Modifier.bottomBarPadding())
+                        } else {
+                            LazyColumn(
+                                modifier = Modifier.fillMaxSize(),
+                                verticalArrangement = Arrangement.spacedBy(16.dp)
+                            ) {
+                                items(
+                                    if (targetState == SearchUiContent.RESULT) {
+                                        state.value.searchResult
+                                    } else {
+                                        state.value.searchHistory
+                                    }
+                                ) {
+                                    SwipeAllDiffBeatmap(
+                                        onClick = { viewmodel.onSearchItemClick(it) },
+                                        onSwipeRelease = { viewmodel.onSwipeRelease(it) },
+                                        beatmapCover = it.coverUrl,
+                                        title = if (state.value.isUnicode) it.titleUnicode else it.title,
+                                        artist = if (state.value.isUnicode) it.artistUnicode else it.artist,
+                                        diffs = it.diff
+                                    )
+                                }
+                                item {
+                                    Box(Modifier.bottomBarPadding())
+                                }
                             }
+
                         }
                     }
                 }
