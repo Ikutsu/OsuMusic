@@ -42,7 +42,7 @@ class SearchViewModel(
             searchRepository.getSearchHistory().collect { data ->
                 _uiState.update { state ->
                     state.copy(
-                        searchHistory = data.map {
+                        searchHistory = data.sortedByDescending { it.addedAt.epochSeconds }.map {
                             DiffBeatmapState(
                                 beatmapId = it.beatmapId,
                                 title = it.title,
@@ -54,7 +54,7 @@ class SearchViewModel(
                                 coverUrl = it.coverUrl,
                                 audioUrl = it.audioUrl
                             )
-                        }.reversed()
+                        }
                     )
                 }
             }

@@ -2,6 +2,7 @@ package io.ikutsu.osumusic.search.data.datasource
 
 import io.ikutsu.osumusic.search.data.model.SearchHistory
 import io.realm.kotlin.Realm
+import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -15,7 +16,7 @@ class SearchLocalDataSource(
     suspend fun saveSearchHistory(searchHistory: SearchHistory) {
         withContext(Dispatchers.IO) {
             realm.write {
-                copyToRealm(searchHistory)
+                copyToRealm(searchHistory, UpdatePolicy.ALL)
             }
         }
     }
