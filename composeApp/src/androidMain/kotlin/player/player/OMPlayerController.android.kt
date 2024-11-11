@@ -5,7 +5,6 @@ import android.content.Context
 import android.net.Uri
 import android.os.Handler
 import android.os.Looper
-import androidx.annotation.OptIn
 import androidx.core.bundle.bundleOf
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
@@ -14,7 +13,6 @@ import androidx.media3.common.Player
 import androidx.media3.common.Player.STATE_BUFFERING
 import androidx.media3.common.Player.STATE_ENDED
 import androidx.media3.common.Player.STATE_IDLE
-import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import com.google.common.util.concurrent.ListenableFuture
@@ -28,6 +26,9 @@ actual class OMPlayerController(context: Context) {
     private val controller: MediaController?
         get() = if (controllerFuture.isDone) controllerFuture.get() else null
     val handler = Handler(Looper.getMainLooper())
+
+    private val playQueue: MutableList<Music> = mutableListOf()
+    private var currentQueueIndex: Int = 0
 
     init {
         val sessionToken =
@@ -79,11 +80,19 @@ actual class OMPlayerController(context: Context) {
         }, MoreExecutors.directExecutor())
     }
 
-    @OptIn(UnstableApi::class)
-    actual fun addPlayerItem(
+    actual fun setPlayerItem(
         musics: List<Music>
     ) {
-        val mediaItem = musics.map { music ->
+        playQueue.clear()
+        playQueue.addAll(musics)
+        currentQueueIndex = 0
+        updateMediaItems()
+        controller?.playWhenReady = true
+        controller?.prepare()
+    }
+
+    private fun updateMediaItems() {
+        val mediaItems = playQueue.map { music ->
             MediaItem.Builder()
                 .setMediaId(music.source)
                 .setUri(music.source)
@@ -103,10 +112,37 @@ actual class OMPlayerController(context: Context) {
                 .build()
         }
 
-        controller?.setMediaItems(mediaItem)
+        controller?.setMediaItems(mediaItems)
+    }
 
-        controller?.playWhenReady = true
-        controller?.prepare()
+    actual fun addToQueue(music: Music) {
+        val mediaItem = MediaItem.Builder()
+            .setMediaId(music.source)
+            .setUri(music.source)
+            .setMediaMetadata(
+                MediaMetadata.Builder()
+                    .setTitle(music.title)
+                    .setArtist(music.artist)
+                    .setArtworkUri(Uri.parse(music.coverUrl))
+                    .setExtras(
+                        bundleOf(
+                            "diff" to music.diff,
+                            "backgroundUrl" to music.backgroundUrl
+                        )
+                    )
+                    .build()
+            )
+            .build()
+
+        playQueue.add(music)
+        controller?.addMediaItem(mediaItem)
+    }
+
+    actual fun removeFromQueue(index: Int) {
+        if (index in playQueue.indices) {
+            playQueue.removeAt(index)
+            controller?.removeMediaItem(index)
+        }
     }
 
     actual fun onPlayerEvent(

@@ -142,7 +142,7 @@ class SearchViewModel(
     ) {
         viewModelScope.launch {
             searchRepository.saveSearchHistory(beatmapState)
-            playerController.addPlayerItem(
+            playerController.setPlayerItem(
                 listOf(
                     Music(
                         title = beatmapState.title,
@@ -157,6 +157,25 @@ class SearchViewModel(
             )
             playerController.onPlayerEvent(
                 OMPlayerEvent.PlayPause
+            )
+        }
+    }
+
+    fun onSwipeRelease(
+        beatmapState: DiffBeatmapState
+    ) {
+        viewModelScope.launch {
+            searchRepository.saveSearchHistory(beatmapState)
+            playerController.addToQueue(
+                Music(
+                    title = beatmapState.title,
+                    artist = beatmapState.artist,
+                    creator = beatmapState.creator,
+                    diff = beatmapState.diff.first(),
+                    coverUrl = beatmapState.coverUrl,
+                    backgroundUrl = Osu.getBeatmapBackgroundUrl(beatmapState.beatmapId),
+                    source = beatmapState.audioUrl
+                )
             )
         }
     }

@@ -6,7 +6,11 @@ expect class OMPlayerController {
 
     fun registerListener(listener: OMPlayerListener)
 
-    fun addPlayerItem(musics: List<Music>)
+    fun setPlayerItem(musics: List<Music>)
+
+    fun addToQueue(music: Music)
+
+    fun removeFromQueue(index: Int)
 
     fun onPlayerEvent(
         event: OMPlayerEvent,

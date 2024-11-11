@@ -21,8 +21,8 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import io.ikutsu.osumusic.core.presentation.component.AllDiffBeatmap
 import io.ikutsu.osumusic.core.presentation.component.LoadingSpinner
+import io.ikutsu.osumusic.core.presentation.component.SwipeAllDiffBeatmap
 import io.ikutsu.osumusic.core.presentation.component.TitleTopBar
 import io.ikutsu.osumusic.core.presentation.util.OM_SemiBold
 import io.ikutsu.osumusic.core.presentation.util.VSpacer
@@ -132,8 +132,9 @@ fun SearchScreen(
                                     state.value.searchHistory
                                 }
                             ) {
-                                AllDiffBeatmap(
+                                SwipeAllDiffBeatmap(
                                     onClick = { viewmodel.onSearchItemClick(it) },
+                                    onSwipeRelease = { viewmodel.onSwipeRelease(it) },
                                     beatmapCover = it.coverUrl,
                                     title = if (state.value.isUnicode) it.titleUnicode else it.title,
                                     artist = if (state.value.isUnicode) it.artistUnicode else it.artist,

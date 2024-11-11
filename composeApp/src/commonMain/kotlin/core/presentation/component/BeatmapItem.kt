@@ -1,6 +1,7 @@
 package io.ikutsu.osumusic.core.presentation.component
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -33,6 +34,7 @@ import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
 import core.presentation.res.OMIcon
+import core.presentation.res.omicon.ListAdd
 import core.presentation.res.omicon.Waveform
 import io.ikutsu.osumusic.core.presentation.theme.OM_ShapeMedium
 import io.ikutsu.osumusic.core.presentation.util.HSpacer
@@ -221,6 +223,52 @@ fun AllDiffBeatmap(
             }
         }
     }
+}
+
+@Composable
+fun SwipeAllDiffBeatmap(
+    onClick: () -> Unit,
+    onSwipeRelease: () -> Unit,
+    beatmapCover: String,
+    title: String,
+    artist: String,
+    diffs: List<Float>
+) {
+    OMSwipeBox(
+        allowSwipeLeft = true,
+        allowSwipeRight = false,
+        onSwipeRelease = onSwipeRelease,
+        maxOffset = 0.2f,
+        triggerThreshold = 0.15f,
+        backgroundContent = {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(68.dp)
+                    .align(Alignment.CenterVertically)
+                    .clip(OM_ShapeMedium)
+                    .background(Color(0xFFFFCC22)),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.End
+            ) {
+                Icon(
+                    imageVector = OMIcon.ListAdd,
+                    contentDescription = "Add to queue",
+                    modifier = Modifier.size(24.dp)
+                )
+                HSpacer(16.dp)
+            }
+        },
+        upperContent = {
+            AllDiffBeatmap(
+                onClick = onClick,
+                beatmapCover = beatmapCover,
+                title = title,
+                artist = artist,
+                diffs = diffs
+            )
+        }
+    )
 }
 
 @Composable
