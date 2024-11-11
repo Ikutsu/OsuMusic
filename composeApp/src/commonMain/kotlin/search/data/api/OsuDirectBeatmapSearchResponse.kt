@@ -73,7 +73,7 @@ data class OsuDirectBeatmapSearchResponse(
     data class NominationsSummary(
         @SerialName("current") val current: Int,
         @SerialName("eligible_main_rulesets") val eligibleMainRulesets: List<String>? = null,
-        @SerialName("required_meta") val requiredMeta: RequiredMeta
+        @SerialName("required_meta") val requiredMeta: RequiredMeta? = null
     )
 
     @Serializable
@@ -117,6 +117,6 @@ data class OsuDirectBeatmapSearchResponse(
         @SerialName("ranked") val ranked: Int,
         @SerialName("url") val url: String,
         @SerialName("checksum") val checksum: String,
-        @SerialName("max_combo") val maxCombo: Int
+        @SerialName("max_combo") val maxCombo: Int? = null
     )
 }
