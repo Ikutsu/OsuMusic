@@ -35,6 +35,7 @@ import io.ikutsu.osumusic.core.presentation.theme.OM_Background
 import io.ikutsu.osumusic.core.presentation.util.HSpacer
 import io.ikutsu.osumusic.core.presentation.util.debouncedClickable
 import io.ikutsu.osumusic.home.presentation.HomeScreen
+import io.ikutsu.osumusic.home.presentation.HomeViewModel
 import io.ikutsu.osumusic.player.presentation.PlayerViewModel
 import io.ikutsu.osumusic.player.presentation.component.PlayerBar
 import io.ikutsu.osumusic.profile.presentation.ProfileScreen
@@ -80,6 +81,7 @@ fun MainScreen(
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentDestination = navBackStackEntry?.destination
+        val homeViewModel: HomeViewModel = koinViewModel()
         val searchViewModel: SearchViewModel = koinViewModel()
         val playerUiState = playerViewModel.uiState.collectAsStateWithLifecycle()
         val density = LocalDensity.current
@@ -95,7 +97,10 @@ fun MainScreen(
             },
         ) {
             composable("home") {
-                HomeScreen(onSettingClick = onSettingClick)
+                HomeScreen(
+                    viewModel = homeViewModel,
+                    onSettingClick = onSettingClick
+                )
             }
             composable("search") {
                 SearchScreen(

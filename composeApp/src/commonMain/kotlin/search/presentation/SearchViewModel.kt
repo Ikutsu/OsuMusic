@@ -7,6 +7,7 @@ import com.russhwolf.settings.coroutines.FlowSettings
 import io.ikutsu.osumusic.core.data.BeatmapSource
 import io.ikutsu.osumusic.core.data.Constants
 import io.ikutsu.osumusic.core.data.Osu
+import io.ikutsu.osumusic.core.data.repository.PlayHistoryRepository
 import io.ikutsu.osumusic.core.domain.DiffBeatmapState
 import io.ikutsu.osumusic.core.domain.Music
 import io.ikutsu.osumusic.player.player.OMPlayerController
@@ -23,6 +24,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalSettingsApi::class)
 class SearchViewModel(
     private val searchRepository: SearchRepository,
+    private val playHistoryRepository: PlayHistoryRepository,
     private val playerController: OMPlayerController,
     private val settingStorage: FlowSettings
 ) : ViewModel() {
@@ -142,6 +144,7 @@ class SearchViewModel(
     ) {
         viewModelScope.launch {
             searchRepository.saveSearchHistory(beatmapState)
+            playHistoryRepository.savePlayHistory(beatmapState)
             playerController.setPlayerItem(
                 listOf(
                     Music(
@@ -166,6 +169,7 @@ class SearchViewModel(
     ) {
         viewModelScope.launch {
             searchRepository.saveSearchHistory(beatmapState)
+            playHistoryRepository.savePlayHistory(beatmapState)
             playerController.addToQueue(
                 Music(
                     title = beatmapState.title,

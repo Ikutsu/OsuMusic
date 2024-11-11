@@ -10,7 +10,7 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
-val searchModel = module {
+val searchModule = module {
     singleOf(::SayobotBeatmapSearchApi)
     singleOf(::OsuDirectBeatmapSearchApi)
     singleOf(::SearchRemoteDataSource)

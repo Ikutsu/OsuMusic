@@ -55,7 +55,8 @@ fun SingleDiffBeatmap(
     beatmapCover: String,
     title: String,
     artist: String,
-    diff: Float
+    diff: Float,
+    multiDiff: Boolean = false
 ) {
     Box(
         modifier = Modifier
@@ -96,7 +97,11 @@ fun SingleDiffBeatmap(
                 .padding(horizontal = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            DiffCircle(diff , 24)
+            if (multiDiff) {
+                RainbowDiffCircle(24)
+            } else {
+                DiffCircle(diff, 24)
+            }
             HSpacer(8.dp)
             Column(
                 modifier = Modifier.fillMaxHeight(),
@@ -131,7 +136,6 @@ fun SingleDiffBeatmap(
             }
         }
     }
-
 }
 
 @Composable
@@ -382,4 +386,39 @@ fun DiffCircle(
             )
         )
     }
+}
+
+@Composable
+fun RainbowDiffCircle(
+    size: Int
+) {
+    Canvas(
+        modifier = Modifier
+            .size(size.dp)
+    ) {
+        drawCircle(
+            color = Color.White,
+        )
+        drawCircle(
+            brush = Brush.horizontalGradient(
+                colors = listOf(
+                    Color(0xFF4290FB),
+                    Color(0xFF4FC0FF),
+                    Color(0xFF4FFFD5),
+                    Color(0xFF7CFF4F),
+                    Color(0xFFF6F05C),
+                    Color(0xFFFF8068),
+                    Color(0xFFFF4E6F),
+                    Color(0xFFC645B8),
+                    Color(0xFF6563DE),
+                    Color(0xFF18158E)
+                )
+            ),
+            radius = size.toFloat(),
+            style = Stroke(
+                (size/4).toFloat()
+            )
+        )
+    }
+
 }

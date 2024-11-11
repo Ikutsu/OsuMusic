@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import core.presentation.res.OMIcon
+import core.presentation.res.omicon.History
 import core.presentation.res.omicon.Sparkles
 import io.ikutsu.osumusic.core.presentation.theme.OM_ShapeLarge
 import io.ikutsu.osumusic.core.presentation.util.OM_SemiBold
@@ -37,6 +38,29 @@ fun FeatureComingCard(
         VSpacer(16.dp)
         Text(
             text = "Feature coming soon!",
+            fontFamily = OM_SemiBold,
+            fontSize = 20.dp.sp
+        )
+    }
+}
+
+@Composable
+fun NoHistoryCard(
+    modifier: Modifier = Modifier.fillMaxWidth().height(224.dp)
+) {
+    Column(
+        modifier = modifier.background(Color.Gray.copy(alpha = 0.1f), shape = OM_ShapeLarge),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Icon(
+            imageVector = OMIcon.History,
+            contentDescription = "History",
+            modifier = Modifier.size(36.dp)
+        )
+        VSpacer(16.dp)
+        Text(
+            text = "There is no history yet :(",
             fontFamily = OM_SemiBold,
             fontSize = 20.dp.sp
         )
