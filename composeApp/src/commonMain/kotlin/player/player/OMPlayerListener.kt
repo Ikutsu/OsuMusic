@@ -7,5 +7,6 @@ interface OMPlayerListener {
     fun totalDuration(duration: Long)
     fun currentPlayerState(state: OMPlayerState)
     fun currentMusic(music: Music?)
+    fun onQueueChanged(queue: List<Music>)
     fun onError(message: String)
 }

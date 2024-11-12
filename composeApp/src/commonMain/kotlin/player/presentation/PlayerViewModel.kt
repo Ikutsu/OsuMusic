@@ -7,7 +7,6 @@ import io.ikutsu.osumusic.player.player.OMPlayerController
 import io.ikutsu.osumusic.player.player.OMPlayerEvent
 import io.ikutsu.osumusic.player.player.OMPlayerListener
 import io.ikutsu.osumusic.player.player.OMPlayerState
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -84,6 +83,14 @@ class PlayerViewModel(
                         }
                     }
                 }
+
+                override fun onQueueChanged(queue: List<Music>) {
+                    viewModelScope.launch {
+                        _uiState.update {
+                            it.copy(playerQueue = queue)
+                        }
+                    }
+                }
             }
         )
     }
@@ -116,5 +123,9 @@ class PlayerViewModel(
     override fun onCleared() {
         updateProgressJob?.cancel()
         controller.release()
+    }
+
+    fun onQueueItemClick(index: Int) {
+        controller.onPlayerEvent(OMPlayerEvent.SelectedAudioChange, index)
     }
 }

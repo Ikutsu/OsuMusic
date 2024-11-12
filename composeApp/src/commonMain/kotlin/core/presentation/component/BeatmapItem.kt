@@ -323,7 +323,8 @@ fun PlaylistQueueItem(
                 .padding(horizontal = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            DiffCircle(diff , 24)
+//            DiffCircle(diff , 24)
+            RainbowDiffCircle(24)
             HSpacer(8.dp)
             Column(
                 modifier = Modifier.fillMaxHeight().weight(1f),

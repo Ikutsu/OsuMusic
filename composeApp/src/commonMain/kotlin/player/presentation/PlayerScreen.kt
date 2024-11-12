@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -57,13 +58,13 @@ import core.presentation.res.omicon.Heartsolid
 import core.presentation.res.omicon.Pause
 import core.presentation.res.omicon.Play
 import core.presentation.res.omicon.Shuffle
-import io.ikutsu.osumusic.core.presentation.component.FeatureComingCard
 import io.ikutsu.osumusic.core.presentation.component.LoadingSpinner
 import io.ikutsu.osumusic.core.presentation.component.NoBackgroundLoadingSpinner
 import io.ikutsu.osumusic.core.presentation.component.OMIconButton
 import io.ikutsu.osumusic.core.presentation.component.OMSlider
 import io.ikutsu.osumusic.core.presentation.component.OMTab
 import io.ikutsu.osumusic.core.presentation.component.OMTabRow
+import io.ikutsu.osumusic.core.presentation.component.PlaylistQueueItem
 import io.ikutsu.osumusic.core.presentation.theme.OM_Background
 import io.ikutsu.osumusic.core.presentation.theme.OM_Primary
 import io.ikutsu.osumusic.core.presentation.theme.OM_ShapeFull
@@ -157,7 +158,12 @@ fun PlayerScreen(
             }
         },
         sheetContent = {
-            PlayerBottomSheet(sheetState, scope)
+            PlayerBottomSheet(
+                onQueueItemClick = { viewModel.onQueueItemClick(it) },
+                state = uiState,
+                sheetState = sheetState,
+                scope = scope
+            )
         },
         sheetDragHandle = {
             Box(
@@ -191,6 +197,7 @@ fun PlayerScreen(
                 )
                 Spacer(modifier = Modifier.requiredHeight(24.dp))
                 PlayerControl(
+                    state = uiState,
                     onShuffle = { },
                     onBackward = { viewModel.onPreviousClick() },
                     onPlayPause = { viewModel.onPlayPauseClick() },
@@ -313,6 +320,7 @@ fun PlayerInfo(
 
 @Composable
 fun PlayerControl(
+    state: State<PlayerUiState>,
     onShuffle: () -> Unit,
     onBackward: () -> Unit,
     onPlayPause: () -> Unit,
@@ -362,6 +370,7 @@ fun PlayerControl(
         Icon(
             imageVector = OMIcon.Forward,
             contentDescription = "Forward",
+            tint = if (state.value.playerQueue.last() == state.value.currentMusic) Color.Gray else Color.White,
             modifier = Modifier.size(36.dp).noRippleClickable { onForward() }
         )
         Icon(
@@ -376,6 +385,8 @@ fun PlayerControl(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlayerBottomSheet(
+    state: State<PlayerUiState>,
+    onQueueItemClick: (Int) -> Unit,
     sheetState: SheetState,
     scope: CoroutineScope
 ) {
@@ -395,7 +406,7 @@ fun PlayerBottomSheet(
         Column(
             modifier = Modifier
                 .clip(OM_ShapeMedium)
-                .debouncedClickable {
+                .debouncedClickable(ripple = false) {
                     scope.launch {
                         sheetState.expand()
                     }
@@ -404,7 +415,7 @@ fun PlayerBottomSheet(
                 .wrapContentSize()
         ) {
             Text(
-                text = "Playlist",
+                text = "Queue",
                 fontFamily = OM_SemiBold,
                 fontSize = 20.sp
             )
@@ -416,20 +427,16 @@ fun PlayerBottomSheet(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             state = listState
         ) {
-            item {
-                FeatureComingCard()
+            itemsIndexed(state.value.playerQueue) { index, item ->
+                PlaylistQueueItem(
+                    onClick = { onQueueItemClick(index) },
+                    isPlaying = item == state.value.currentMusic,
+                    beatmapCover = item.coverUrl,
+                    title = item.title,
+                    artist = item.artist,
+                    diff = item.diff
+                )
             }
-//            item {
-//                PlaylistQueueItem(
-//                    onClick = {},
-//                    isPlaying = true,
-//                    beatmapCover = "https://assets.ppy.sh/beatmaps/1205919/covers/raw.jpg",
-//                    title = "UNION!!",
-//                    artist = "765 MILLION ALLSTARS",
-//                    diff = 5f
-//                )
-//
-//            }
         }
     }
 }

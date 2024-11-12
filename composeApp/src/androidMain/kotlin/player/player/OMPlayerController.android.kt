@@ -13,6 +13,7 @@ import androidx.media3.common.Player
 import androidx.media3.common.Player.STATE_BUFFERING
 import androidx.media3.common.Player.STATE_ENDED
 import androidx.media3.common.Player.STATE_IDLE
+import androidx.media3.common.Timeline
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import com.google.common.util.concurrent.ListenableFuture
@@ -69,7 +70,10 @@ actual class OMPlayerController(context: Context) {
                     listener.onError(errorMsg)
                 }
 
-
+                override fun onTimelineChanged(timeline: Timeline, reason: Int) {
+                    super.onTimelineChanged(timeline, reason)
+                    listener.onQueueChanged(playQueue)
+                }
             })
             handler.post(object : Runnable {
                 override fun run() {
@@ -103,6 +107,7 @@ actual class OMPlayerController(context: Context) {
                         .setArtworkUri(Uri.parse(music.coverUrl))
                         .setExtras(
                             bundleOf(
+                                "creator" to music.creator,
                                 "diff" to music.diff,
                                 "backgroundUrl" to music.backgroundUrl
                             )
