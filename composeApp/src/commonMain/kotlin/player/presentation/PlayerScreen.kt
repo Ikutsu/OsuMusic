@@ -370,7 +370,7 @@ fun PlayerControl(
         Icon(
             imageVector = OMIcon.Forward,
             contentDescription = "Forward",
-            tint = if (state.value.playerQueue.last() == state.value.currentMusic) Color.Gray else Color.White,
+            tint = if (state.value.playerQueue.lastOrNull() == state.value.currentMusic) Color.Gray else Color.White,
             modifier = Modifier.size(36.dp).noRippleClickable { onForward() }
         )
         Icon(

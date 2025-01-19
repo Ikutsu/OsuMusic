@@ -158,9 +158,9 @@ class SearchViewModel(
                     )
                 )
             )
-            playerController.onPlayerEvent(
-                OMPlayerEvent.PlayPause
-            )
+//            playerController.onPlayerEvent(
+//                OMPlayerEvent.PlayPause
+//            )
         }
     }
 

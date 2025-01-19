@@ -27,7 +27,11 @@ import platform.AVFoundation.AVPlayerStatusReadyToPlay
 import platform.AVFoundation.AVPlayerStatusUnknown
 import platform.AVFoundation.AVPlayerTimeControlStatusPlaying
 import platform.AVFoundation.AVPlayerTimeControlStatusWaitingToPlayAtSpecifiedRate
+import platform.AVFoundation.AVQueuePlayer
+import platform.AVFoundation.AVURLAsset
+import platform.AVFoundation.AVURLAssetOverrideMIMETypeKey
 import platform.AVFoundation.addPeriodicTimeObserverForInterval
+import platform.AVFoundation.asset
 import platform.AVFoundation.currentItem
 import platform.AVFoundation.currentTime
 import platform.AVFoundation.duration
@@ -41,14 +45,17 @@ import platform.AVFoundation.timeControlStatus
 import platform.CoreMedia.CMTimeGetSeconds
 import platform.CoreMedia.CMTimeMakeWithSeconds
 import platform.Foundation.NSData
+import platform.Foundation.NSKeyValueObservingOptionInitial
 import platform.Foundation.NSKeyValueObservingOptionNew
 import platform.Foundation.NSNotificationCenter
 import platform.Foundation.NSOperationQueue
 import platform.Foundation.NSURL
 import platform.Foundation.NSURL.Companion.URLWithString
 import platform.Foundation.NSURLErrorDomain
+import platform.Foundation.NSURLSession
 import platform.Foundation.addObserver
 import platform.Foundation.dataWithContentsOfURL
+import platform.Foundation.downloadTaskWithURL
 import platform.Foundation.removeObserver
 import platform.MediaPlayer.MPChangePlaybackPositionCommandEvent
 import platform.MediaPlayer.MPMediaItemArtwork
@@ -65,13 +72,18 @@ import platform.MediaPlayer.MPRemoteCommandHandlerStatus
 import platform.MediaPlayer.MPRemoteCommandHandlerStatusSuccess
 import platform.UIKit.UIImage
 import platform.darwin.DISPATCH_QUEUE_PRIORITY_DEFAULT
+import platform.darwin.DISPATCH_TIME_FOREVER
 import platform.darwin.NSEC_PER_SEC
 import platform.darwin.NSObject
 import platform.darwin.dispatch_async
 import platform.darwin.dispatch_get_global_queue
 import platform.darwin.dispatch_get_main_queue
+import platform.darwin.dispatch_semaphore_create
+import platform.darwin.dispatch_semaphore_signal
+import platform.darwin.dispatch_semaphore_wait
 import platform.foundation.NSKeyValueObservingProtocol
 import platform.objc.sel_registerName
+import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalForeignApi::class)
 actual class OMPlayerController {
@@ -79,12 +91,20 @@ actual class OMPlayerController {
     private lateinit var audioSession: AVAudioSession
     private lateinit var nowPlayingInfoCenter: MPNowPlayingInfoCenter
     private lateinit var remoteCommandCenter: MPRemoteCommandCenter
+
     private var music: Music? = null
     private var playerItem: AVPlayerItem? = null
     private var listeners: OMPlayerListener? = null
     private var timeObserver: Any? = null
     private var sessionInterruptionObserver: Any? = null
     private var sessionRouteChangeObserver: Any? = null
+
+    private var playQueue: MutableList<Music> = mutableListOf()
+        set(value) {
+            field = value
+            listeners?.onQueueChanged(value)
+        }
+    private var currentQueueIndex: Int = 0
 
     init {
         setUpAudioSession()
@@ -102,16 +122,32 @@ actual class OMPlayerController {
     }
 
     private fun setupPlayer() {
-        player = AVPlayer()
+        player = AVPlayer().apply {
+            addObserver(
+                observer = timeControlObserver,
+                forKeyPath = "timeControlStatus",
+                options = NSKeyValueObservingOptionNew,
+                context = null
+            )
+        }
         timeObserver = player.addPeriodicTimeObserverForInterval(
             CMTimeMakeWithSeconds(1.0, NSEC_PER_SEC.toInt()),
             dispatch_get_main_queue()
         ) { time ->
             listeners?.onProgress(CMTimeGetSeconds(time).times(1000).toLong())
         }
+    }
+
+    private fun setupItemObservers() {
         player.addObserver(
-            observer = timeControlObserver,
-            forKeyPath = "timeControlStatus",
+            observer = playerItemObserver,
+            forKeyPath = "currentItem",
+            options = NSKeyValueObservingOptionNew,
+            context = null
+        )
+        player.currentItem?.addObserver(
+            observer = itemStatusObserver,
+            forKeyPath = "status",
             options = NSKeyValueObservingOptionNew,
             context = null
         )
@@ -194,36 +230,48 @@ actual class OMPlayerController {
     }
 
     // --- Player ---
-    @OptIn(ExperimentalForeignApi::class)
-    actual fun addPlayerItem(musics: List<Music>) {
+    actual fun setPlayerItem(musics: List<Music>) {
+        playQueue = musics.toMutableList()
+        currentQueueIndex = 0
+
         listeners?.onProgress(0L)
         player.pause()
 
+        setCurrentMusic(currentQueueIndex)
+        player.play()
+    }
+
+    private fun setCurrentMusic(index: Int) {
+        currentQueueIndex = index
         listeners?.currentPlayerState(OMPlayerState.Buffering)
-        listeners?.currentMusic(musics.first())
-        music = musics.first()
+        listeners?.currentMusic(playQueue[index])
+        music = playQueue[index]
 
         removeCurrentItemObservers()
-        val url = URLWithString(musics.first().source)
+
+        val sourceUrl = playQueue[index].source
+        val audioUrl = URLWithString(sourceUrl)
+
         player.addObserver(
             observer = playerItemObserver,
             forKeyPath = "currentItem",
             options = NSKeyValueObservingOptionNew,
             context = null
         )
-        AVPlayerItem(url ?: return).apply {
-            player.replaceCurrentItemWithPlayerItem(this)
-            addObserver(
-                observer = itemStatusObserver,
-                forKeyPath = "status",
-                options = NSKeyValueObservingOptionNew,
-                context = null
-            )
-//            asset.loadValuesAsynchronouslyForKeys(listOf("progress")) {
-//                // Skip to the next track when the current one ends
-//                listeners?.totalDuration(CMTimeGetSeconds(asset.progress).toLong())
-//            }
+        if (sourceUrl.startsWith("https://osu.direct/")) {
+            downloadAndPlayAudio(audioUrl ?: return)
+        } else {
+            AVPlayerItem(AVURLAsset(uRL = audioUrl ?: return, options = mapOf(AVURLAssetOverrideMIMETypeKey to "audio/mpeg"))).apply {
+                player.replaceCurrentItemWithPlayerItem(this)
+                addObserver(
+                    observer = itemStatusObserver,
+                    forKeyPath = "status",
+                    options = NSKeyValueObservingOptionNew and NSKeyValueObservingOptionInitial,
+                    context = null
+                )
+            }
         }
+
         NSNotificationCenter.defaultCenter.addObserverForName(
             name = AVPlayerItemDidPlayToEndTimeNotification,
             `object` = player.currentItem,
@@ -231,6 +279,38 @@ actual class OMPlayerController {
         ) {
             listeners?.currentPlayerState(OMPlayerState.Stopped)
         }
+    }
+
+    // Download and play audio (because osu.direct links are not direct audio links)
+    private fun downloadAndPlayAudio(url: NSURL) {
+        val session = NSURLSession.sharedSession()
+        val task = session.downloadTaskWithURL(url) { localURL, _, error ->
+            if (localURL != null) {
+                dispatch_async(dispatch_get_main_queue()) {
+                    val asset = AVURLAsset(uRL = localURL, options = mapOf(AVURLAssetOverrideMIMETypeKey to "audio/mpeg"))
+                    AVPlayerItem(asset).apply {
+                        player.replaceCurrentItemWithPlayerItem(this)
+                        addObserver(
+                            observer = itemStatusObserver,
+                            forKeyPath = "status",
+                            options = NSKeyValueObservingOptionNew and NSKeyValueObservingOptionInitial,
+                            context = null
+                        )
+                    }
+                }
+            } else if (error != null) {
+                println("Failed to download: ${error.localizedDescription}")
+            }
+        }
+        task.resume()
+    }
+
+    actual fun addToQueue(music: Music) {
+        playQueue.add(music)
+    }
+
+    actual fun removeFromQueue(index: Int) {
+        playQueue.removeAt(index)
     }
 
     private fun play() {
@@ -281,15 +361,28 @@ actual class OMPlayerController {
             }
 
             OMPlayerEvent.Previous -> {
-                return // TODO: Implement playlist
+                if (currentQueueIndex > 0) {
+                    currentQueueIndex--
+                    setCurrentMusic(currentQueueIndex)
+                } else {
+                    seekToInitialTime()
+                }
             }
 
             OMPlayerEvent.Next -> {
-                return // TODO: Implement playlist
+                if (currentQueueIndex < playQueue.size - 1) {
+                    currentQueueIndex++
+                    setCurrentMusic(currentQueueIndex)
+                } else {
+                    seekToInitialTime()
+                }
             }
 
             OMPlayerEvent.SelectedAudioChange -> {
-                return // TODO: Implement playlist
+                if (selectedAudioIndex in playQueue.indices) {
+                    currentQueueIndex = selectedAudioIndex
+                    setCurrentMusic(currentQueueIndex)
+                }
             }
 
             is OMPlayerEvent.SeekTo -> {
@@ -323,6 +416,7 @@ actual class OMPlayerController {
         player.removeObserver(playerItemObserver, "currentItem")
         player.removeObserver(timeControlObserver, "timeControlStatus")
         removeAudioSessionObservers()
+        removeCurrentItemObservers()
     }
 
     // --- Audio Session ---
@@ -511,6 +605,7 @@ actual class OMPlayerController {
                 }
 
                 AVPlayerStatusFailed -> {
+                    println("Player error: ${playerItem?.error?.description}")
                     val errorMsg = when (playerItem?.error?.domain) {
                         null -> return
                         NSURLErrorDomain -> "Source unavailable"
