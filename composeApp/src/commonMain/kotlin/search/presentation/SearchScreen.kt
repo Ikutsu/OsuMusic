@@ -161,8 +161,8 @@ fun SearchScreen(
                                         onClick = { viewmodel.onSearchItemClick(it) },
                                         onSwipeRelease = { viewmodel.onSwipeRelease(it) },
                                         beatmapCover = it.coverUrl,
-                                        title = if (state.value.isUnicode) it.titleUnicode else it.title,
-                                        artist = if (state.value.isUnicode) it.artistUnicode else it.artist,
+                                        title = if (state.value.isUnicode) it.titleUnicode.ifEmpty { it.title } else it.title,
+                                        artist = if (state.value.isUnicode) it.artistUnicode.ifEmpty { it.artist } else it.artist,
                                         diffs = it.diff
                                     )
                                 }

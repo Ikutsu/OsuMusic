@@ -31,7 +31,9 @@ class SearchRepository(
             SearchHistory().apply {
                 beatmapId = beatmap.beatmapId
                 title = beatmap.title
+                titleUnicode = beatmap.titleUnicode
                 artist = beatmap.artist
+                artistUnicode = beatmap.artistUnicode
                 creator = beatmap.creator
                 difficulty = beatmap.diff.toRealmList()
                 coverUrl = beatmap.coverUrl
