@@ -84,6 +84,10 @@ class SearchRemoteDataSource(
                         }
                 }
             }
+
+            else -> {
+                return Result.failure(IllegalArgumentException("Invalid beatmap source"))
+            }
         }
     }
 }
