@@ -22,7 +22,7 @@ class OsuDirectBeatmapSearchApi (
             runCatching {
                 httpClient.get {
                     url(OsuDirect.OSUDIRECT_API_SEARCH)
-                    parameter("q", query.query)
+                    parameter("q", "[is_scoreable = true]${query.query}")
                     parameter("sort", query.sort)
                     parameter("amount", query.amount)
                     parameter("offset", query.offset)

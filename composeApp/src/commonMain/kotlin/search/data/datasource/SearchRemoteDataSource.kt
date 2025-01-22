@@ -1,4 +1,3 @@
-
 package io.ikutsu.osumusic.search.data.datasource
 
 import io.ikutsu.osumusic.core.data.BeatmapSource
@@ -59,6 +58,7 @@ class SearchRemoteDataSource(
                     }
                 }
             }
+
             BeatmapSource.OSU_DIRECT -> {
                 val response = osuDirectApi.search(
                     OsuDirectBeatmapSearchRequest(
@@ -67,19 +67,21 @@ class SearchRemoteDataSource(
                 )
 
                 return response.mapCatching { res ->
-                    res.beatmapSets.map {
-                        DiffBeatmapState(
-                            beatmapId = it.id,
-                            audioUrl = OsuDirect.getAudioUrl(it.beatmaps.first().id.toString()),
-                            coverUrl = it.covers.cover,
-                            title = it.title,
-                            titleUnicode = it.titleUnicode,
-                            artist = it.artist,
-                            artistUnicode = it.artistUnicode,
-                            creator = it.creator,
-                            diff = it.beatmaps.map { diff -> diff.difficultyRating.toFloat() }
-                        )
-                    }
+                    res.beatmapSets
+                        .sortedByDescending { it.playCount }
+                        .map {
+                            DiffBeatmapState(
+                                beatmapId = it.id,
+                                audioUrl = OsuDirect.getAudioUrl(it.beatmaps.first().id.toString()),
+                                coverUrl = it.covers.cover,
+                                title = it.title,
+                                titleUnicode = it.titleUnicode,
+                                artist = it.artist,
+                                artistUnicode = it.artistUnicode,
+                                creator = it.creator,
+                                diff = it.beatmaps.map { diff -> diff.difficultyRating.toFloat() }
+                            )
+                        }
                 }
             }
         }
