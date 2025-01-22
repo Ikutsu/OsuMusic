@@ -18,6 +18,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.ikutsu.osumusic.core.presentation.component.ErrorSnackBar
+import io.ikutsu.osumusic.core.presentation.provider.AppearanceSettingProvider
 import io.ikutsu.osumusic.core.presentation.theme.OMTheme
 import io.ikutsu.osumusic.core.presentation.theme.OM_Background
 import io.ikutsu.osumusic.core.presentation.util.bottomBarPadding
@@ -38,93 +39,97 @@ fun App() {
     Box(modifier = Modifier.background(OM_Background)) {
         MaterialTheme {
             OMTheme {
-                Box {
-                    NavHost(
-                        startDestination = "main",
-                        navController = appNavController,
-                    ) {
-                        composable("main") {
-                            MainScreen(
-                                navController = mainNavController,
-                                playerViewModel = playerViewModel,
-                                onPlayerBarClick = {
-                                    appNavController.navigate("player")
+                AppearanceSettingProvider {
+                    Box {
+                        NavHost(
+                            startDestination = "main",
+                            navController = appNavController,
+                        ) {
+                            composable("main") {
+                                MainScreen(
+                                    navController = mainNavController,
+                                    playerViewModel = playerViewModel,
+                                    onPlayerBarClick = {
+                                        appNavController.navigate("player")
+                                    },
+                                    onSettingClick = {
+                                        appNavController.navigate("setting")
+                                    }
+                                )
+                            }
+                            composable(
+                                route = "player",
+                                enterTransition = {
+                                    slideIn(
+                                        animationSpec = tween(300),
+                                        initialOffset = { IntOffset(0, it.height) }
+                                    ) + fadeIn(tween(300))
                                 },
-                                onSettingClick = {
-                                    appNavController.navigate("setting")
+                                popEnterTransition = {
+                                    fadeIn(tween(300))
+                                },
+                                exitTransition = {
+                                    fadeOut(tween(300))
+                                },
+                                popExitTransition = {
+                                    slideOut(
+                                        animationSpec = tween(300),
+                                        targetOffset = { IntOffset(0, it.height) }
+                                    ) + fadeOut(tween(300))
                                 }
-                            )
-                        }
-                        composable(
-                            route = "player",
-                            enterTransition = {
-                                slideIn(
-                                    animationSpec = tween(300),
-                                    initialOffset = { IntOffset(0, it.height) }
-                                ) + fadeIn(tween(300))
-                            },
-                            popEnterTransition = {
-                                fadeIn(tween(300))
-                            },
-                            exitTransition = {
-                                fadeOut(tween(300))
-                            },
-                            popExitTransition = {
-                                slideOut(
-                                    animationSpec = tween(300),
-                                    targetOffset = { IntOffset(0, it.height) }
-                                ) + fadeOut(tween(300))
+                            ) {
+                                PlayerScreen(
+                                    viewModel = playerViewModel,
+                                    onBackClick = {
+                                        appNavController.navigateUp()
+                                    }
+                                )
                             }
-                        ) {
-                            PlayerScreen(
-                                viewModel = playerViewModel,
-                                onBackClick = {
-                                    appNavController.navigateUp()
+                            composable(
+                                route = "setting",
+                                enterTransition = {
+                                    slideIn(
+                                        animationSpec = tween(300),
+                                        initialOffset = { IntOffset(it.width, 0) }
+                                    ) + fadeIn(tween(300))
+                                },
+                                popEnterTransition = {
+                                    slideIn(
+                                        animationSpec = tween(300),
+                                        initialOffset = { IntOffset(it.width, 0) }
+                                    ) + fadeIn(tween(300))
+                                },
+                                exitTransition = {
+                                    slideOut(
+                                        animationSpec = tween(300),
+                                        targetOffset = { IntOffset(it.width, 0) }
+                                    ) + fadeOut(tween(300))
+                                },
+                                popExitTransition = {
+                                    slideOut(
+                                        animationSpec = tween(300),
+                                        targetOffset = { IntOffset(it.width, 0) }
+                                    ) + fadeOut(tween(300))
                                 }
-                            )
-                        }
-                        composable(
-                            route = "setting",
-                            enterTransition = {
-                                slideIn(
-                                    animationSpec = tween(300),
-                                    initialOffset = { IntOffset(it.width, 0) }
-                                ) + fadeIn(tween(300))
-                            },
-                            popEnterTransition = {
-                                slideIn(
-                                    animationSpec = tween(300),
-                                    initialOffset = { IntOffset(it.width, 0) }
-                                ) + fadeIn(tween(300))
-                            },
-                            exitTransition = {
-                                slideOut(
-                                    animationSpec = tween(300),
-                                    targetOffset = { IntOffset(it.width, 0) }
-                                ) + fadeOut(tween(300))
-                            },
-                            popExitTransition = {
-                                slideOut(
-                                    animationSpec = tween(300),
-                                    targetOffset = { IntOffset(it.width, 0) }
-                                ) + fadeOut(tween(300))
+                            ) {
+                                SettingScreen(
+                                    viewModel = settingViewModel,
+                                    onBackClick = {
+                                        appNavController.navigateUp()
+                                    }
+                                )
                             }
+                        }
+                        AnimatedVisibility(
+                            visible = playerUiState.value.isError,
+                            enter = fadeIn(),
+                            exit = fadeOut(),
+                            modifier = Modifier.bottomBarPadding().align(Alignment.BottomCenter)
                         ) {
-                            SettingScreen(
-                                viewModel = settingViewModel,
-                                onBackClick = {
-                                    appNavController.navigateUp()
-                                }
+                            ErrorSnackBar(
+                                errorMessage = playerUiState.value.errorMessage ?: "Unknown error"
                             )
                         }
-                    }
-                    AnimatedVisibility(
-                        visible = playerUiState.value.isError,
-                        enter = fadeIn(),
-                        exit = fadeOut(),
-                        modifier = Modifier.bottomBarPadding().align(Alignment.BottomCenter)
-                    ) {
-                        ErrorSnackBar(errorMessage = playerUiState.value.errorMessage ?: "Unknown error")
                     }
                 }
             }

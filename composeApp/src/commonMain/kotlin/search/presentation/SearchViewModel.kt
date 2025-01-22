@@ -2,16 +2,11 @@ package io.ikutsu.osumusic.search.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.russhwolf.settings.ExperimentalSettingsApi
-import com.russhwolf.settings.coroutines.FlowSettings
-import io.ikutsu.osumusic.core.data.BeatmapSource
-import io.ikutsu.osumusic.core.data.Constants
 import io.ikutsu.osumusic.core.data.Osu
 import io.ikutsu.osumusic.core.data.repository.PlayHistoryRepository
 import io.ikutsu.osumusic.core.domain.DiffBeatmapState
 import io.ikutsu.osumusic.core.domain.Music
 import io.ikutsu.osumusic.player.player.OMPlayerController
-import io.ikutsu.osumusic.player.player.OMPlayerEvent
 import io.ikutsu.osumusic.search.data.repository.SearchRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -21,12 +16,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalSettingsApi::class)
 class SearchViewModel(
     private val searchRepository: SearchRepository,
     private val playHistoryRepository: PlayHistoryRepository,
     private val playerController: OMPlayerController,
-    private val settingStorage: FlowSettings
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SearchUiState())
@@ -36,7 +29,6 @@ class SearchViewModel(
 
     init {
         fetchSearchHistory()
-        getSettings()
     }
 
     private fun fetchSearchHistory() {
@@ -57,18 +49,6 @@ class SearchViewModel(
                                 audioUrl = it.audioUrl
                             )
                         }
-                    )
-                }
-            }
-        }
-    }
-
-    private fun getSettings() {
-        viewModelScope.launch {
-            settingStorage.getBooleanOrNullFlow(Constants.Setting.SHOW_IN_ORIGINAL_LANG).collect { showInOriginalLang ->
-                _uiState.update {
-                    it.copy(
-                        isUnicode = showInOriginalLang ?: false
                     )
                 }
             }
@@ -98,7 +78,6 @@ class SearchViewModel(
                 }
 
                 searchRepository.search(
-                    apiType = BeatmapSource.valueOf(settingStorage.getStringOrNull(Constants.Setting.BEATMAP_SOURCE) ?: BeatmapSource.SAYOBOT.name),
                     query = _uiState.value.searchText
                 ).onSuccess { data ->
                     _uiState.update {

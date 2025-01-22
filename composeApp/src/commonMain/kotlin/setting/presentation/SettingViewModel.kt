@@ -2,22 +2,20 @@ package io.ikutsu.osumusic.setting.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.russhwolf.settings.ExperimentalSettingsApi
-import com.russhwolf.settings.coroutines.FlowSettings
 import io.ikutsu.osumusic.core.data.BeatmapSource
-import io.ikutsu.osumusic.core.data.Constants
+import io.ikutsu.osumusic.setting.data.AppearanceSettings
+import io.ikutsu.osumusic.setting.data.SearchSettings
+import io.ikutsu.osumusic.setting.data.SettingRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalSettingsApi::class)
 class SettingViewModel(
-    private val settingStorage: FlowSettings
+    private val settingRepository: SettingRepository
 ): ViewModel() {
     private val _uiState = MutableStateFlow(SettingUiState())
     val uiState: StateFlow<SettingUiState> = _uiState.asStateFlow()
@@ -28,21 +26,12 @@ class SettingViewModel(
 
     private fun load() {
         viewModelScope.launch(Dispatchers.IO) {
-            _uiState.update {
-                it.copy(
-                    beatmapSourceOptions = BeatmapSource.entries.map { it.value }
-                )
-            }
-            combine(
-                settingStorage.getStringOrNullFlow(Constants.Setting.BEATMAP_SOURCE),
-                settingStorage.getBooleanOrNullFlow(Constants.Setting.SHOW_IN_ORIGINAL_LANG)
-            ) { beatmapSource, showInOriginalLang ->
-                Pair(beatmapSource, showInOriginalLang)
-            }.collect { (beatmapSource, showInOriginalLang) ->
+            settingRepository.getAllSettings().collect { settings ->
                 _uiState.update {
                     it.copy(
-                        beatmapSource = BeatmapSource.valueOf(beatmapSource ?: BeatmapSource.SAYOBOT.name).value,
-                        showInOriginalLang = showInOriginalLang ?: false
+                        beatmapSourceOptions = BeatmapSource.entries.map { it.value },
+                        beatmapSource = BeatmapSource.valueOf(settings.searchSettings.beatmapSource).value,
+                        showInOriginalLang = settings.appearanceSettings.showInOriginalLang
                     )
                 }
             }
@@ -51,13 +40,21 @@ class SettingViewModel(
 
     fun setBeatmapSource(index: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            settingStorage.putString(Constants.Setting.BEATMAP_SOURCE, BeatmapSource.entries[index].name)
+            settingRepository.setSearchSettings(
+                SearchSettings(
+                    beatmapSource = BeatmapSource.entries[index].name
+                )
+            )
         }
     }
 
     fun setShowInOriginal(boolean: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
-            settingStorage.putBoolean(Constants.Setting.SHOW_IN_ORIGINAL_LANG, boolean)
+            settingRepository.setAppearanceSettings(
+                AppearanceSettings(
+                    showInOriginalLang = boolean
+                )
+            )
         }
     }
 }

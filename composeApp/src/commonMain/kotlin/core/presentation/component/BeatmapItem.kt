@@ -36,6 +36,7 @@ import coil3.request.ImageRequest
 import core.presentation.res.OMIcon
 import core.presentation.res.omicon.ListAdd
 import core.presentation.res.omicon.Waveform
+import io.ikutsu.osumusic.core.presentation.provider.LocalAppearanceSetting
 import io.ikutsu.osumusic.core.presentation.theme.OM_ShapeMedium
 import io.ikutsu.osumusic.core.presentation.util.HSpacer
 import io.ikutsu.osumusic.core.presentation.util.OM_Bold
@@ -235,9 +236,12 @@ fun SwipeAllDiffBeatmap(
     onSwipeRelease: () -> Unit,
     beatmapCover: String,
     title: String,
+    titleUnicode: String,
     artist: String,
+    artistUnicode: String,
     diffs: List<Float>
 ) {
+    val appearance = LocalAppearanceSetting.current
     OMSwipeBox(
         allowSwipeLeft = true,
         allowSwipeRight = false,
@@ -267,8 +271,8 @@ fun SwipeAllDiffBeatmap(
             AllDiffBeatmap(
                 onClick = onClick,
                 beatmapCover = beatmapCover,
-                title = title,
-                artist = artist,
+                title = if (appearance.showInOriginalLang) titleUnicode.ifEmpty { title } else title,
+                artist = if (appearance.showInOriginalLang) artistUnicode.ifEmpty { artist } else artist,
                 diffs = diffs
             )
         }

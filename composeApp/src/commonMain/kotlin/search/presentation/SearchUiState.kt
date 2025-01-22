@@ -9,7 +9,6 @@ enum class SearchUiContent {
 
 data class SearchUiState(
     val isLoading: Boolean = false,
-    val isUnicode: Boolean = false,
     val searchText: String = "",
     val displaySearchText: String = "Search history",
     val searchContent: SearchUiContent = SearchUiContent.HISTORY,
