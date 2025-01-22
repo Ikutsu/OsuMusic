@@ -64,7 +64,7 @@ import io.ikutsu.osumusic.core.presentation.component.OMIconButton
 import io.ikutsu.osumusic.core.presentation.component.OMSlider
 import io.ikutsu.osumusic.core.presentation.component.OMTab
 import io.ikutsu.osumusic.core.presentation.component.OMTabRow
-import io.ikutsu.osumusic.core.presentation.component.PlaylistQueueItem
+import io.ikutsu.osumusic.core.presentation.component.PlayerQueueItem
 import io.ikutsu.osumusic.core.presentation.theme.OM_Background
 import io.ikutsu.osumusic.core.presentation.theme.OM_Primary
 import io.ikutsu.osumusic.core.presentation.theme.OM_ShapeFull
@@ -428,13 +428,15 @@ fun PlayerBottomSheet(
             state = listState
         ) {
             itemsIndexed(state.value.playerQueue) { index, item ->
-                PlaylistQueueItem(
+                PlayerQueueItem(
                     onClick = { onQueueItemClick(index) },
                     isPlaying = item == state.value.currentMusic,
                     beatmapCover = item.coverUrl,
                     title = item.title,
+                    unicodeTitle = "",
                     artist = item.artist,
-                    diff = item.diff
+                    unicodeArtist = "",
+                    difficulty = item.diff
                 )
             }
         }

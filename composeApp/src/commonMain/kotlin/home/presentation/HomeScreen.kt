@@ -12,9 +12,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import io.ikutsu.osumusic.core.presentation.component.BeatmapItem
 import io.ikutsu.osumusic.core.presentation.component.FeatureComingCard
 import io.ikutsu.osumusic.core.presentation.component.NoHistoryCard
-import io.ikutsu.osumusic.core.presentation.component.SingleDiffBeatmap
 import io.ikutsu.osumusic.core.presentation.component.TitleTopBar
 import io.ikutsu.osumusic.core.presentation.util.OM_SemiBold
 import io.ikutsu.osumusic.core.presentation.util.VSpacer
@@ -59,14 +59,16 @@ fun HomeScreen(
                 }
             }
             itemsIndexed(state.value.recentPlayedList.take(5)) { index, beatmap ->
-                SingleDiffBeatmap(
+                BeatmapItem(
                     onClick = {
                         viewModel.onPlayHistoryClicked(beatmap)
                     },
                     beatmapCover = beatmap.coverUrl,
                     title = beatmap.title,
+                    unicodeTitle = beatmap.titleUnicode,
                     artist = beatmap.artist,
-                    diff = beatmap.diff.first(),
+                    unicodeArtist = beatmap.artistUnicode,
+                    difficulty = beatmap.diff.first(),
                     multiDiff = true
                 )
                 if (index < state.value.recentPlayedList.size - 1) {
