@@ -1,5 +1,6 @@
 package io.ikutsu.osumusic.setting.data
 
+import androidx.compose.ui.text.intl.Locale
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.coroutines.FlowSettings
 import io.ikutsu.osumusic.core.data.BeatmapSource
@@ -46,7 +47,11 @@ class SettingRepository(
     fun getSearchSettings(): Flow<SearchSettings> =
         settingStorage.getStringOrNullFlow(Constants.Setting.BEATMAP_SOURCE).map {
             SearchSettings(
-                beatmapSource = it ?: BeatmapSource.SAYOBOT.name // Todo: Change the default to region-based
+                beatmapSource = it ?: if (Locale.current.region == "CN") {
+                    BeatmapSource.SAYOBOT.name  // Sayobot server is based in China, so it's the default source for Chinese users
+                } else {
+                    BeatmapSource.OSU_DIRECT.name // OsuDirect is the default source for other regions
+                }
             )
         }
 
