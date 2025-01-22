@@ -16,17 +16,17 @@ class SearchRepository(
 ) {
 
     private var lastQuery: String = ""
+    private var lastUsedSource: BeatmapSource = BeatmapSource.NO_SOURCE
     private var latestSearch: Result<List<DiffBeatmapState>> = Result.success(emptyList())
 
     suspend fun search(query: String): Result<List<DiffBeatmapState>> {
-        return if (query == lastQuery) {
+        val apiType = BeatmapSource.valueOf(settingRepository.getSearchSettings().first().beatmapSource)
+        return if (query == lastQuery && apiType == lastUsedSource) {
             latestSearch
         } else {
-            val result = remote.search(
-                BeatmapSource.valueOf(settingRepository.getSearchSettings().first().beatmapSource),
-                query
-            )
+            val result = remote.search(apiType, query)
             lastQuery = query
+            lastUsedSource = apiType
             latestSearch = result
             result
         }
