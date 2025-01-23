@@ -8,9 +8,9 @@ import io.ikutsu.osumusic.core.domain.Music
 
 fun MediaItem.toMusic(): Music {
     return Music(
-        title = this.mediaMetadata.title.toString(),
+        title = this.mediaMetadata.extras?.getString("title") ?: "",
         unicodeTitle = this.mediaMetadata.extras?.getString("unicodeTitle") ?: "",
-        artist = this.mediaMetadata.artist.toString(),
+        artist = this.mediaMetadata.extras?.getString("artist") ?: "",
         unicodeArtist = this.mediaMetadata.extras?.getString("unicodeArtist") ?: "",
         creator = this.mediaMetadata.extras?.getString("creator") ?: "",
         difficulty = this.mediaMetadata.extras?.getFloat("difficulties") ?: 0f,
@@ -20,18 +20,20 @@ fun MediaItem.toMusic(): Music {
     )
 }
 
-fun Music.toMediaItem(): MediaItem {
+fun Music.toMediaItem(showInOriginal: Boolean): MediaItem {
     return MediaItem.Builder()
         .setMediaId(this.source)
         .setUri(this.source)
         .setMediaMetadata(
             MediaMetadata.Builder()
-                .setTitle(this.title)
-                .setArtist(this.artist)
+                .setTitle(if (showInOriginal) this.unicodeTitle else this.title)
+                .setArtist(if (showInOriginal) this.unicodeArtist else this.artist)
                 .setArtworkUri(this.coverUrl.toUri())
                 .setExtras(
                     bundleOf(
+                        "title" to this.title,
                         "unicodeTitle" to this.unicodeTitle,
+                        "artist" to this.artist,
                         "unicodeArtist" to this.unicodeArtist,
                         "creator" to this.creator,
                         "difficulties" to this.difficulty,
