@@ -1,7 +1,7 @@
 package io.ikutsu.osumusic.home.presentation
 
-import io.ikutsu.osumusic.core.domain.DiffBeatmapState
+import io.ikutsu.osumusic.core.domain.BeatmapMetadata
 
 data class HomeUiState(
-    val recentPlayedList: List<DiffBeatmapState> = listOf()
+    val recentPlayedList: List<BeatmapMetadata> = listOf()
 )

@@ -65,6 +65,7 @@ import io.ikutsu.osumusic.core.presentation.component.OMSlider
 import io.ikutsu.osumusic.core.presentation.component.OMTab
 import io.ikutsu.osumusic.core.presentation.component.OMTabRow
 import io.ikutsu.osumusic.core.presentation.component.PlayerQueueItem
+import io.ikutsu.osumusic.core.presentation.provider.LocalAppearanceSetting
 import io.ikutsu.osumusic.core.presentation.theme.OM_Background
 import io.ikutsu.osumusic.core.presentation.theme.OM_Primary
 import io.ikutsu.osumusic.core.presentation.theme.OM_ShapeFull
@@ -279,15 +280,16 @@ fun PlayerInfo(
     onProgressChange: (Float) -> Unit,
     onProgressChangeFinished: (() -> Unit),
 ) {
+    val appearanceSettings = LocalAppearanceSetting.current
     Text(
-        text = state.value.currentMusic?.title ?: "Unknown",
+        text = if (appearanceSettings.showInOriginalLang) state.value.currentMusic?.unicodeTitle ?: "Unknown" else state.value.currentMusic?.title ?: "Unknown",
         fontFamily = OM_Bold,
         fontSize = 24.sp,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis
     )
     Text(
-        text = state.value.currentMusic?.artist ?: "Unknown",
+        text = if (appearanceSettings.showInOriginalLang) state.value.currentMusic?.unicodeArtist ?: "Unknown" else state.value.currentMusic?.artist ?: "Unknown",
         fontFamily = OM_SemiBold,
         fontSize = 16.sp,
         maxLines = 1,
@@ -433,10 +435,10 @@ fun PlayerBottomSheet(
                     isPlaying = item == state.value.currentMusic,
                     beatmapCover = item.coverUrl,
                     title = item.title,
-                    unicodeTitle = "",
+                    unicodeTitle = item.unicodeTitle,
                     artist = item.artist,
-                    unicodeArtist = "",
-                    difficulty = item.diff
+                    unicodeArtist = item.unicodeArtist,
+                    difficulty = item.difficulty
                 )
             }
         }

@@ -65,10 +65,10 @@ fun HomeScreen(
                     },
                     beatmapCover = beatmap.coverUrl,
                     title = beatmap.title,
-                    unicodeTitle = beatmap.titleUnicode,
+                    unicodeTitle = beatmap.unicodeTitle,
                     artist = beatmap.artist,
-                    unicodeArtist = beatmap.artistUnicode,
-                    difficulty = beatmap.diff.first(),
+                    unicodeArtist = beatmap.unicodeArtist,
+                    difficulty = beatmap.difficulties.first(),
                     multiDiff = true
                 )
                 if (index < state.value.recentPlayedList.size - 1) {

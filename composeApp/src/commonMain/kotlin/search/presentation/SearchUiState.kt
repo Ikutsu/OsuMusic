@@ -1,6 +1,6 @@
 package io.ikutsu.osumusic.search.presentation
 
-import io.ikutsu.osumusic.core.domain.DiffBeatmapState
+import io.ikutsu.osumusic.core.domain.BeatmapMetadata
 
 enum class SearchUiContent {
     HISTORY,
@@ -12,6 +12,6 @@ data class SearchUiState(
     val searchText: String = "",
     val displaySearchText: String = "Search history",
     val searchContent: SearchUiContent = SearchUiContent.HISTORY,
-    val searchHistory: List<DiffBeatmapState> = listOf(),
-    val searchResult: List<DiffBeatmapState> = listOf()
+    val searchHistory: List<BeatmapMetadata> = listOf(),
+    val searchResult: List<BeatmapMetadata> = listOf()
 )

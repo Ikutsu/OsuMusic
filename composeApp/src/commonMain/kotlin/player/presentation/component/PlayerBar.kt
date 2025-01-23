@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
@@ -21,11 +20,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.style.LineHeightStyle
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
@@ -37,9 +32,8 @@ import core.presentation.res.omicon.Pause
 import core.presentation.res.omicon.Play
 import io.ikutsu.osumusic.core.presentation.component.NoBackgroundLoadingSpinner
 import io.ikutsu.osumusic.core.presentation.component.ProgressIndicator
+import io.ikutsu.osumusic.core.presentation.component.SongInfoTexts
 import io.ikutsu.osumusic.core.presentation.theme.OM_ShapeMedium
-import io.ikutsu.osumusic.core.presentation.util.OM_Bold
-import io.ikutsu.osumusic.core.presentation.util.OM_SemiBold
 import io.ikutsu.osumusic.core.presentation.util.noRippleClickable
 import io.ikutsu.osumusic.player.player.OMPlayerState
 import io.ikutsu.osumusic.player.presentation.PlayerUiState
@@ -100,31 +94,11 @@ fun PlayerBar(
             Column(
                 modifier = Modifier.weight(1f)
             ) {
-                Text(
-                    text = state.value.currentMusic?.title ?: "Unknown",
-                    fontFamily = OM_Bold,
-                    fontSize = 16.sp,
-                    style = TextStyle(
-                        lineHeightStyle = LineHeightStyle(
-                            trim = LineHeightStyle.Trim.Both,
-                            alignment = LineHeightStyle.Alignment.Center
-                        )
-                    ),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Text(
-                    text = state.value.currentMusic?.artist ?: "Unknown",
-                    fontFamily = OM_SemiBold,
-                    fontSize = 12.sp,
-                    style = TextStyle(
-                        lineHeightStyle = LineHeightStyle(
-                            trim = LineHeightStyle.Trim.Both,
-                            alignment = LineHeightStyle.Alignment.Center
-                        )
-                    ),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                SongInfoTexts(
+                    title = state.value.currentMusic?.title ?: "Unknown",
+                    unicodeTitle = state.value.currentMusic?.unicodeTitle ?: "Unknown",
+                    artist = state.value.currentMusic?.artist ?: "Unknown",
+                    unicodeArtist = state.value.currentMusic?.unicodeArtist ?: "Unknown",
                 )
             }
             Icon(

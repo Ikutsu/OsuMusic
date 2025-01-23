@@ -1,5 +1,6 @@
 package io.ikutsu.osumusic.search.data.model
 
+import io.ikutsu.osumusic.core.domain.BeatmapMetadata
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmList
@@ -10,12 +11,26 @@ class SearchHistory: RealmObject {
     @PrimaryKey
     var beatmapId: Int = 0
     var title: String = ""
-    var titleUnicode: String = ""
+    var unicodeTitle: String = ""
     var artist: String = ""
-    var artistUnicode: String = ""
+    var unicodeArtist: String = ""
     var creator: String = ""
     var difficulty: RealmList<Float> = realmListOf()
     var coverUrl: String = ""
     var audioUrl: String = ""
     var addedAt: RealmInstant = RealmInstant.now()
+}
+
+fun SearchHistory.toBeatmapMetadata(): BeatmapMetadata {
+    return BeatmapMetadata(
+        beatmapId = this.beatmapId,
+        audioUrl = this.audioUrl,
+        coverUrl = this.coverUrl,
+        title = this.title,
+        unicodeTitle = this.unicodeTitle,
+        artist = this.artist,
+        unicodeArtist = this.unicodeArtist,
+        creator = this.creator,
+        difficulties = this.difficulty.toList()
+    )
 }

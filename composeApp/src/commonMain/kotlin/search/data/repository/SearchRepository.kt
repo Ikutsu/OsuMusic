@@ -1,12 +1,11 @@
 package io.ikutsu.osumusic.search.data.repository
 
 import io.ikutsu.osumusic.core.data.BeatmapSource
-import io.ikutsu.osumusic.core.domain.DiffBeatmapState
+import io.ikutsu.osumusic.core.domain.BeatmapMetadata
+import io.ikutsu.osumusic.core.domain.toSearchHistory
 import io.ikutsu.osumusic.search.data.datasource.SearchLocalDataSource
 import io.ikutsu.osumusic.search.data.datasource.SearchRemoteDataSource
-import io.ikutsu.osumusic.search.data.model.SearchHistory
 import io.ikutsu.osumusic.setting.data.SettingRepository
-import io.realm.kotlin.ext.toRealmList
 import kotlinx.coroutines.flow.first
 
 class SearchRepository(
@@ -17,9 +16,9 @@ class SearchRepository(
 
     private var lastQuery: String = ""
     private var lastUsedSource: BeatmapSource = BeatmapSource.NO_SOURCE
-    private var latestSearch: Result<List<DiffBeatmapState>> = Result.success(emptyList())
+    private var latestSearch: Result<List<BeatmapMetadata>> = Result.success(emptyList())
 
-    suspend fun search(query: String): Result<List<DiffBeatmapState>> {
+    suspend fun search(query: String): Result<List<BeatmapMetadata>> {
         val apiType = BeatmapSource.valueOf(settingRepository.getSearchSettings().first().beatmapSource)
         return if (query == lastQuery && apiType == lastUsedSource) {
             latestSearch
@@ -32,20 +31,8 @@ class SearchRepository(
         }
     }
 
-    suspend fun saveSearchHistory(beatmap: DiffBeatmapState) {
-        local.saveSearchHistory(
-            SearchHistory().apply {
-                beatmapId = beatmap.beatmapId
-                title = beatmap.title
-                titleUnicode = beatmap.titleUnicode
-                artist = beatmap.artist
-                artistUnicode = beatmap.artistUnicode
-                creator = beatmap.creator
-                difficulty = beatmap.diff.toRealmList()
-                coverUrl = beatmap.coverUrl
-                audioUrl = beatmap.audioUrl
-            }
-        )
+    suspend fun saveSearchHistory(beatmap: BeatmapMetadata) {
+        local.saveSearchHistory(beatmap.toSearchHistory())
     }
 
     fun getSearchHistory() = local.getSearchHistory()

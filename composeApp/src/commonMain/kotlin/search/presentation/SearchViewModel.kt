@@ -2,11 +2,11 @@ package io.ikutsu.osumusic.search.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import io.ikutsu.osumusic.core.data.Osu
 import io.ikutsu.osumusic.core.data.repository.PlayHistoryRepository
-import io.ikutsu.osumusic.core.domain.DiffBeatmapState
-import io.ikutsu.osumusic.core.domain.Music
+import io.ikutsu.osumusic.core.domain.BeatmapMetadata
+import io.ikutsu.osumusic.core.domain.toMusic
 import io.ikutsu.osumusic.player.player.OMPlayerController
+import io.ikutsu.osumusic.search.data.model.toBeatmapMetadata
 import io.ikutsu.osumusic.search.data.repository.SearchRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -36,19 +36,9 @@ class SearchViewModel(
             searchRepository.getSearchHistory().collect { data ->
                 _uiState.update { state ->
                     state.copy(
-                        searchHistory = data.sortedByDescending { it.addedAt.epochSeconds }.map {
-                            DiffBeatmapState(
-                                beatmapId = it.beatmapId,
-                                title = it.title,
-                                titleUnicode = it.titleUnicode,
-                                artist = it.artist,
-                                artistUnicode = it.artistUnicode,
-                                creator = it.creator,
-                                diff = it.difficulty.toList(),
-                                coverUrl = it.coverUrl,
-                                audioUrl = it.audioUrl
-                            )
-                        }
+                        searchHistory = data
+                            .sortedByDescending { it.addedAt.epochSeconds }
+                            .map { it.toBeatmapMetadata() }
                     )
                 }
             }
@@ -119,24 +109,12 @@ class SearchViewModel(
     }
 
     fun onSearchItemClick(
-        beatmapState: DiffBeatmapState
+        beatmapMetadata: BeatmapMetadata
     ) {
         viewModelScope.launch {
-            searchRepository.saveSearchHistory(beatmapState)
-            playHistoryRepository.savePlayHistory(beatmapState)
-            playerController.setPlayerItem(
-                listOf(
-                    Music(
-                        title = beatmapState.title,
-                        artist = beatmapState.artist,
-                        creator = beatmapState.creator,
-                        diff = beatmapState.diff.first(),
-                        coverUrl = beatmapState.coverUrl,
-                        backgroundUrl = Osu.getBeatmapBackgroundUrl(beatmapState.beatmapId),
-                        source = beatmapState.audioUrl
-                    )
-                )
-            )
+            searchRepository.saveSearchHistory(beatmapMetadata)
+            playHistoryRepository.savePlayHistory(beatmapMetadata)
+            playerController.setPlayerItem(listOf(beatmapMetadata.toMusic()))
 //            playerController.onPlayerEvent(
 //                OMPlayerEvent.PlayPause
 //            )
@@ -144,22 +122,12 @@ class SearchViewModel(
     }
 
     fun onSwipeRelease(
-        beatmapState: DiffBeatmapState
+        beatmapMetadata: BeatmapMetadata
     ) {
         viewModelScope.launch {
-            searchRepository.saveSearchHistory(beatmapState)
-            playHistoryRepository.savePlayHistory(beatmapState)
-            playerController.addToQueue(
-                Music(
-                    title = beatmapState.title,
-                    artist = beatmapState.artist,
-                    creator = beatmapState.creator,
-                    diff = beatmapState.diff.first(),
-                    coverUrl = beatmapState.coverUrl,
-                    backgroundUrl = Osu.getBeatmapBackgroundUrl(beatmapState.beatmapId),
-                    source = beatmapState.audioUrl
-                )
-            )
+            searchRepository.saveSearchHistory(beatmapMetadata)
+            playHistoryRepository.savePlayHistory(beatmapMetadata)
+            playerController.addToQueue(beatmapMetadata.toMusic())
         }
     }
 }

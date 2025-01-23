@@ -2,10 +2,10 @@ package io.ikutsu.osumusic.home.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import io.ikutsu.osumusic.core.data.Osu
+import io.ikutsu.osumusic.core.data.model.toBeatmapMetadata
+import io.ikutsu.osumusic.core.data.model.toMusic
 import io.ikutsu.osumusic.core.data.repository.PlayHistoryRepository
-import io.ikutsu.osumusic.core.domain.DiffBeatmapState
-import io.ikutsu.osumusic.core.domain.Music
+import io.ikutsu.osumusic.core.domain.BeatmapMetadata
 import io.ikutsu.osumusic.player.player.OMPlayerController
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -30,19 +30,9 @@ class HomeViewModel(
             playHistoryRepository.getPlayHistory().collect { data ->
                 _uiState.update { state ->
                     state.copy(
-                        recentPlayedList = data.sortedByDescending { it.addedAt.epochSeconds }.map {
-                            DiffBeatmapState(
-                                beatmapId = it.beatmapId,
-                                title = it.title,
-                                titleUnicode = it.titleUnicode,
-                                artist = it.artist,
-                                artistUnicode = it.artistUnicode,
-                                creator = it.creator,
-                                diff = it.difficulty.toList(),
-                                coverUrl = it.coverUrl,
-                                audioUrl = it.audioUrl
-                            )
-                        }
+                        recentPlayedList = data
+                            .sortedByDescending { it.addedAt.epochSeconds }
+                            .map { it.toBeatmapMetadata() }
                     )
                 }
             }
@@ -50,22 +40,16 @@ class HomeViewModel(
     }
 
     fun onPlayHistoryClicked(
-        beatmapState: DiffBeatmapState
+        beatmapMetadata: BeatmapMetadata
     ) {
         viewModelScope.launch {
-            playHistoryRepository.savePlayHistory(beatmapState)
+            playHistoryRepository.savePlayHistory(beatmapMetadata)
             playerController.setPlayerItem(
-                playHistoryRepository.getPlayHistory().first().sortedByDescending { it.addedAt }.map {
-                    Music(
-                        title = it.title,
-                        artist = it.artist,
-                        creator = it.creator,
-                        diff = it.difficulty.toList().first(),
-                        coverUrl = it.coverUrl,
-                        backgroundUrl = Osu.getBeatmapBackgroundUrl(it.beatmapId),
-                        source = it.audioUrl
-                    )
-                }
+                playHistoryRepository
+                    .getPlayHistory()
+                    .first()
+                    .sortedByDescending { it.addedAt }
+                    .map { it.toMusic() }
             )
         }
     }

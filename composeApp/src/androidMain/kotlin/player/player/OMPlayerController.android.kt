@@ -2,12 +2,8 @@ package io.ikutsu.osumusic.player.player
 
 import android.content.ComponentName
 import android.content.Context
-import android.net.Uri
 import android.os.Handler
 import android.os.Looper
-import androidx.core.bundle.bundleOf
-import androidx.media3.common.MediaItem
-import androidx.media3.common.MediaMetadata
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.common.Player.STATE_BUFFERING
@@ -96,48 +92,13 @@ actual class OMPlayerController(context: Context) {
     }
 
     private fun updateMediaItems() {
-        val mediaItems = playQueue.map { music ->
-            MediaItem.Builder()
-                .setMediaId(music.source)
-                .setUri(music.source)
-                .setMediaMetadata(
-                    MediaMetadata.Builder()
-                        .setTitle(music.title)
-                        .setArtist(music.artist)
-                        .setArtworkUri(Uri.parse(music.coverUrl))
-                        .setExtras(
-                            bundleOf(
-                                "creator" to music.creator,
-                                "diff" to music.diff,
-                                "backgroundUrl" to music.backgroundUrl
-                            )
-                        )
-                        .build()
-                )
-                .build()
-        }
+        val mediaItems = playQueue.map { it.toMediaItem() }
 
         controller?.setMediaItems(mediaItems)
     }
 
     actual fun addToQueue(music: Music) {
-        val mediaItem = MediaItem.Builder()
-            .setMediaId(music.source)
-            .setUri(music.source)
-            .setMediaMetadata(
-                MediaMetadata.Builder()
-                    .setTitle(music.title)
-                    .setArtist(music.artist)
-                    .setArtworkUri(Uri.parse(music.coverUrl))
-                    .setExtras(
-                        bundleOf(
-                            "diff" to music.diff,
-                            "backgroundUrl" to music.backgroundUrl
-                        )
-                    )
-                    .build()
-            )
-            .build()
+        val mediaItem = music.toMediaItem()
 
         playQueue.add(music)
         controller?.addMediaItem(mediaItem)

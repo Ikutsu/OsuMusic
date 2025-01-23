@@ -162,10 +162,10 @@ fun SearchScreen(
                                         onSwipeRelease = { viewmodel.onSwipeRelease(it) },
                                         beatmapCover = it.coverUrl,
                                         title = it.title,
-                                        unicodeTitle = it.titleUnicode,
+                                        unicodeTitle = it.unicodeTitle,
                                         artist = it.artist,
-                                        unicodeArtist = it.artistUnicode,
-                                        diffs = it.diff
+                                        unicodeArtist = it.unicodeArtist,
+                                        diffs = it.difficulties
                                     )
                                 }
                                 item {
