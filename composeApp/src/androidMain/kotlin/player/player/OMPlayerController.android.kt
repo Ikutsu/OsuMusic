@@ -6,7 +6,9 @@ import android.os.Handler
 import android.os.Looper
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
-import androidx.media3.common.Player.*
+import androidx.media3.common.Player.STATE_BUFFERING
+import androidx.media3.common.Player.STATE_ENDED
+import androidx.media3.common.Player.STATE_IDLE
 import androidx.media3.common.Timeline
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
@@ -46,7 +48,7 @@ actual class OMPlayerController(
             SessionToken(context, ComponentName(context, OMPlayerService::class.java))
         controllerFuture = MediaController.Builder(context, sessionToken).buildAsync()
         controllerScope.launch {
-            settingRepository.getAppearanceSettings().collect { settings ->
+            settingRepository.getAppearanceSettings().collect {
                 appearanceSettings.update { it }
             }
         }
@@ -163,36 +165,34 @@ actual class OMPlayerController(
     private fun updateNotificationMetadata() {
         controllerScope.launch {
             appearanceSettings.collect { settings ->
-                if (controller == null) return@collect
+                val controller = controller ?: return@collect
+                val currentIndex = controller.currentMediaItemIndex
+                val mediaItemCount = controller.mediaItemCount
 
-                val currentMediaItem = controller?.currentMediaItem
-                if (currentMediaItem != null) {
-                    val newMediaItem = currentMediaItem.buildUpon()
-                        .setMediaMetadata(
-                            controller?.mediaMetadata?.buildUpon()
-                                ?.setTitle(
-                                    currentMediaItem.mediaMetadata.extras?.getString(
-                                        if (settings.showInOriginalLang) {
-                                            "unicodeTitle"
-                                        } else {
-                                            "title"
-                                        }
-                                    )
-                                )
-                                ?.setArtist(
-                                    currentMediaItem.mediaMetadata.extras?.getString(
-                                        if (settings.showInOriginalLang) {
-                                            "unicodeArtist"
-                                        } else {
-                                            "artist"
-                                        }
-                                    )
-                                )
-                            !!.build()
-                        )
-                        .build()
-                    controller?.replaceMediaItem(controller?.currentMediaItemIndex!!, newMediaItem)
+                if (mediaItemCount == 0 || currentIndex !in 0 until mediaItemCount) {
+                    return@collect
                 }
+
+                val currentMediaItem = controller.getMediaItemAt(currentIndex)
+
+                val metadataExtras = currentMediaItem.mediaMetadata.extras ?: return@collect
+                val newTitle = metadataExtras.getString(
+                    if (settings.showInOriginalLang) "unicodeTitle" else "title"
+                ) ?: return@collect
+                val newArtist = metadataExtras.getString(
+                    if (settings.showInOriginalLang) "unicodeArtist" else "artist"
+                ) ?: return@collect
+
+                val newMediaItem = currentMediaItem.buildUpon()
+                    .setMediaMetadata(
+                        currentMediaItem.mediaMetadata.buildUpon()
+                            .setTitle(newTitle)
+                            .setArtist(newArtist)
+                            .build()
+                    )
+                    .build()
+
+                controller.replaceMediaItem(currentIndex, newMediaItem)
             }
         }
     }
