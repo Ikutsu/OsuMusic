@@ -8,22 +8,26 @@ import io.ikutsu.osumusic.core.data.repository.PlayHistoryRepository
 import io.ikutsu.osumusic.core.domain.BeatmapMetadata
 import io.ikutsu.osumusic.player.player.OMPlayerController
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
     private val playHistoryRepository: PlayHistoryRepository,
     private val playerController: OMPlayerController
-): ViewModel() {
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
-    val uiState = _uiState.asStateFlow()
-
-    init {
-        fetchPlayHistory()
-    }
+    val uiState = _uiState
+        .onStart { fetchPlayHistory() }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            HomeUiState()
+        )
 
     private fun fetchPlayHistory() {
         viewModelScope.launch {

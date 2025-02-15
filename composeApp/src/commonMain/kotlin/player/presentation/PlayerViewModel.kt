@@ -10,7 +10,8 @@ import io.ikutsu.osumusic.player.player.OMPlayerState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -19,7 +20,12 @@ class PlayerViewModel(
 ): ViewModel() {
 
     private val _uiState: MutableStateFlow<PlayerUiState> = MutableStateFlow(PlayerUiState())
-    val uiState = _uiState.asStateFlow()
+    val uiState = _uiState
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            PlayerUiState()
+        )
 
     private var updateProgressJob: Job? = null
 

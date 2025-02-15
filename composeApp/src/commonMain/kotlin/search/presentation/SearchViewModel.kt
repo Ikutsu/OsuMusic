@@ -12,7 +12,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -23,13 +25,15 @@ class SearchViewModel(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SearchUiState())
-    val uiState = _uiState.asStateFlow()
+    val uiState = _uiState
+        .onStart { fetchSearchHistory() }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            SearchUiState()
+        )
 
     private var queryJob: Job? = null
-
-    init {
-        fetchSearchHistory()
-    }
 
     private fun fetchSearchHistory() {
         viewModelScope.launch {
