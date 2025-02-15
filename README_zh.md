@@ -40,4 +40,4 @@ OsuMusic 是一个基于 Kotlin Multiplatform 打造的铺面音乐播放器。
 使用 AltStore 或其他侧载工具安装 ipa 文件。
 
 ## 许可证
-该项目的许可证为 [MIT](https://github.com/Ikutsu/OsuMusic/blob/master/LICENSE)。
+该项目的许可证为 [GPL 3.0](https://github.com/Ikutsu/OsuMusic/blob/master/LICENSE)。
