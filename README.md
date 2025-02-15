@@ -40,4 +40,4 @@ Just build and run in Android Studio
 Install the ipa file using AltStore or other sideloding tools
 
 ## License
-This project is licensed under the [MIT](https://github.com/Ikutsu/OsuMusic/blob/master/LICENSE) License.  
+This project is licensed under the [GPL 3.0](https://github.com/Ikutsu/OsuMusic/blob/master/LICENSE) License.  
