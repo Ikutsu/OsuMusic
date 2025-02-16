@@ -34,7 +34,7 @@ import io.ikutsu.osumusic.core.presentation.component.NavItem
 import io.ikutsu.osumusic.core.presentation.theme.OM_Background
 import io.ikutsu.osumusic.core.presentation.util.HSpacer
 import io.ikutsu.osumusic.core.presentation.util.debouncedClickable
-import io.ikutsu.osumusic.home.presentation.HomeScreen
+import io.ikutsu.osumusic.home.presentation.HomeScreenRoot
 import io.ikutsu.osumusic.home.presentation.HomeViewModel
 import io.ikutsu.osumusic.player.presentation.PlayerViewModel
 import io.ikutsu.osumusic.player.presentation.component.PlayerBar
@@ -97,7 +97,7 @@ fun MainScreen(
             },
         ) {
             composable("home") {
-                HomeScreen(
+                HomeScreenRoot(
                     viewModel = homeViewModel,
                     onSettingClick = onSettingClick
                 )

@@ -29,6 +29,13 @@ class HomeViewModel(
             HomeUiState()
         )
 
+    fun onAction(action: HomeAction) {
+        when (action) {
+            is HomeAction.OnPlayHistoryClick -> playBeatmapHistory(action.beatmapMetadata)
+            else -> Unit
+        }
+    }
+
     private fun fetchPlayHistory() {
         viewModelScope.launch {
             playHistoryRepository.getPlayHistory().collect { data ->
@@ -43,7 +50,7 @@ class HomeViewModel(
         }
     }
 
-    fun onPlayHistoryClicked(
+    private fun playBeatmapHistory(
         beatmapMetadata: BeatmapMetadata
     ) {
         viewModelScope.launch {

@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -26,24 +27,40 @@ import io.ikutsu.osumusic.core.presentation.util.sp
 //object Home
 
 @Composable
-fun HomeScreen(
+fun HomeScreenRoot(
     viewModel: HomeViewModel,
-    onSettingClick: () -> Unit,
-    modifier: Modifier = Modifier
+    onSettingClick: () -> Unit
 ) {
     val state = viewModel.uiState.collectAsStateWithLifecycle()
 
+    HomeScreen(
+        state = state,
+        onAction = { action ->
+            when (action) {
+                HomeAction.OnSettingClick -> onSettingClick()
+                else -> viewModel.onAction(action)
+            }
+        }
+    )
+}
+
+@Composable
+fun HomeScreen(
+    state: State<HomeUiState>,
+    onAction: (HomeAction) -> Unit,
+) {
+
     Column(
-        modifier = modifier.padding(horizontal = 16.dp).fillMaxSize(),
+        modifier = Modifier.padding(horizontal = 16.dp).fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         TitleTopBar(
             title = "Home",
             showSetting = true,
-            onSettingClick = onSettingClick
+            onSettingClick = { onAction(HomeAction.OnSettingClick) }
         )
         LazyColumn(
-            modifier = modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize()
         ) {
             item {
                 Text(
@@ -61,7 +78,7 @@ fun HomeScreen(
             itemsIndexed(state.value.recentPlayedList.take(5)) { index, beatmap ->
                 BeatmapItem(
                     onClick = {
-                        viewModel.onPlayHistoryClicked(beatmap)
+                        onAction(HomeAction.OnPlayHistoryClick(beatmap))
                     },
                     beatmapCover = beatmap.coverUrl,
                     title = beatmap.title,
