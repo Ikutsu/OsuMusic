@@ -22,7 +22,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 actual class OMPlayerController(
@@ -49,7 +48,7 @@ actual class OMPlayerController(
         controllerFuture = MediaController.Builder(context, sessionToken).buildAsync()
         controllerScope.launch {
             settingRepository.getAppearanceSettings().collect {
-                appearanceSettings.update { it }
+                appearanceSettings.value = it
             }
         }
     }
