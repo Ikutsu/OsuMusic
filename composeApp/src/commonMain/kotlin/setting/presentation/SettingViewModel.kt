@@ -29,8 +29,7 @@ class SettingViewModel(
             settingRepository.getAllSettings().collect { settings ->
                 _uiState.update {
                     it.copy(
-                        beatmapSourceOptions = BeatmapSource.entries.map { it.value }.dropLast(1),
-                        beatmapSource = BeatmapSource.valueOf(settings.searchSettings.beatmapSource).value,
+                        beatmapSource = BeatmapSource.valueOf(settings.searchSettings.beatmapSource),
                         showInOriginalLang = settings.appearanceSettings.showInOriginalLang
                     )
                 }

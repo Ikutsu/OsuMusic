@@ -9,6 +9,5 @@ object Constants {
 
 enum class BeatmapSource(val value: String) {
     SAYOBOT("Sayobot"),
-    OSU_DIRECT("OsuDirect"),
-    NO_SOURCE("No source")
+    OSU_DIRECT("OsuDirect")
 }

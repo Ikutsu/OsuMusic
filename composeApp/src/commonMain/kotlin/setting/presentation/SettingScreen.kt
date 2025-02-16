@@ -56,7 +56,7 @@ fun SettingScreen(
             SettingDropDown(
                 title = "Beatmap source",
                 selectedItem = uiState.value.beatmapSourceOptions.indexOf(uiState.value.beatmapSource),
-                items = uiState.value.beatmapSourceOptions,
+                items = uiState.value.beatmapSourceOptions.map { it.value },
                 onItemSelected = { index ->
                     viewModel.setBeatmapSource(index)
                 }

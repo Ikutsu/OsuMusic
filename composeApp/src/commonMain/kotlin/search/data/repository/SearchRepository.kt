@@ -15,7 +15,7 @@ class SearchRepository(
 ) {
 
     private var lastQuery: String = ""
-    private var lastUsedSource: BeatmapSource = BeatmapSource.NO_SOURCE
+    private var lastUsedSource: BeatmapSource? = null
     private var latestSearch: Result<List<BeatmapMetadata>> = Result.success(emptyList())
 
     suspend fun search(query: String): Result<List<BeatmapMetadata>> {
