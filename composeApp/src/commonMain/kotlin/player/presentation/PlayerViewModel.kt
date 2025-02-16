@@ -29,6 +29,18 @@ class PlayerViewModel(
 
     private var updateProgressJob: Job? = null
 
+    fun onAction(action: PlayerAction) {
+        when (action) {
+            is PlayerAction.onQueueItemClick -> onQueueItemClick(action.index)
+            is PlayerAction.onPlayPauseClick -> onPlayPauseClick()
+            is PlayerAction.onSkipPreviousClick -> onPreviousClick()
+            is PlayerAction.onSkipNextClick -> onNextClick()
+            is PlayerAction.onProgressChange -> onProgressChange(action.position)
+            is PlayerAction.onSeek -> onSeekTo()
+            else -> Unit
+        }
+    }
+
     init {
         registerListener()
     }
@@ -113,7 +125,7 @@ class PlayerViewModel(
         controller.onPlayerEvent(OMPlayerEvent.Next)
     }
 
-    fun onProgressChange(progress: Float) {
+    private fun onProgressChange(progress: Float) {
         _uiState.update {
             it.copy(
                 currentProgress = progress,
@@ -122,16 +134,16 @@ class PlayerViewModel(
         }
     }
 
-    fun onSeekTo() {
+    private fun onSeekTo() {
         controller.onPlayerEvent(OMPlayerEvent.SeekTo(_uiState.value.currentProgress))
+    }
+
+    private fun onQueueItemClick(index: Int) {
+        controller.onPlayerEvent(OMPlayerEvent.SelectedAudioChange, index)
     }
 
     override fun onCleared() {
         updateProgressJob?.cancel()
         controller.release()
-    }
-
-    fun onQueueItemClick(index: Int) {
-        controller.onPlayerEvent(OMPlayerEvent.SelectedAudioChange, index)
     }
 }

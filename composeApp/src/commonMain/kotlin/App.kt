@@ -22,7 +22,7 @@ import io.ikutsu.osumusic.core.presentation.provider.AppearanceSettingProvider
 import io.ikutsu.osumusic.core.presentation.theme.OMTheme
 import io.ikutsu.osumusic.core.presentation.theme.OM_Background
 import io.ikutsu.osumusic.core.presentation.util.bottomBarPadding
-import io.ikutsu.osumusic.player.presentation.PlayerScreen
+import io.ikutsu.osumusic.player.presentation.PlayerScreenRoot
 import io.ikutsu.osumusic.player.presentation.PlayerViewModel
 import io.ikutsu.osumusic.setting.presentation.SettingScreenRoot
 import io.ikutsu.osumusic.setting.presentation.SettingViewModel
@@ -78,7 +78,7 @@ fun App() {
                                     ) + fadeOut(tween(300))
                                 }
                             ) {
-                                PlayerScreen(
+                                PlayerScreenRoot(
                                     viewModel = playerViewModel,
                                     onBackClick = {
                                         appNavController.navigateUp()

@@ -97,13 +97,30 @@ enum class DisplayOptionTab(val title: String) {
 //@Serializable
 //object Player
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PlayerScreen(
+fun PlayerScreenRoot(
     viewModel: PlayerViewModel,
     onBackClick: () -> Unit
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
+
+    PlayerScreen(
+        state = uiState,
+        onAction = {
+            when (it) {
+                PlayerAction.onBackClick -> onBackClick()
+                else -> viewModel.onAction(it)
+            }
+        }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PlayerScreen(
+    state: State<PlayerUiState>,
+    onAction: (PlayerAction) -> Unit
+) {
 
     val sheetState = rememberStandardBottomSheetState()
     val scaffoldState = rememberBottomSheetScaffoldState(
@@ -134,9 +151,7 @@ fun PlayerScreen(
                     verticalArrangement = Arrangement.Center
                 ) {
                     OMIconButton(
-                        onClick = {
-                            onBackClick()
-                        },
+                        onClick = { onAction(PlayerAction.onBackClick) },
                         painter = painterResource(Res.drawable.ic_prevCircle),
                         contentDescription = "Back",
                     )
@@ -160,8 +175,8 @@ fun PlayerScreen(
         },
         sheetContent = {
             PlayerBottomSheet(
-                onQueueItemClick = { viewModel.onQueueItemClick(it) },
-                state = uiState,
+                onQueueItemClick = { onAction(PlayerAction.onQueueItemClick(it)) },
+                state = state,
                 sheetState = sheetState,
                 scope = scope
             )
@@ -189,25 +204,25 @@ fun PlayerScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 PlayerContent(
-                    beatmapBackground = uiState.value.currentMusic?.backgroundUrl ?: ""
+                    beatmapBackground = state.value.currentMusic?.backgroundUrl ?: ""
                 )
                 PlayerInfo(
-                    state = uiState,
-                    onProgressChange = { viewModel.onProgressChange(it) },
-                    onProgressChangeFinished = { viewModel.onSeekTo() }
+                    state = state,
+                    onProgressChange = { onAction(PlayerAction.onProgressChange(it)) },
+                    onProgressChangeFinished = { onAction(PlayerAction.onSeek) }
                 )
                 Spacer(modifier = Modifier.requiredHeight(24.dp))
                 PlayerControl(
-                    state = uiState,
+                    state = state,
                     onShuffle = { },
-                    onBackward = { viewModel.onPreviousClick() },
-                    onPlayPause = { viewModel.onPlayPauseClick() },
-                    onForward = { viewModel.onNextClick() },
+                    onBackward = { onAction(PlayerAction.onSkipPreviousClick) },
+                    onPlayPause = { onAction(PlayerAction.onPlayPauseClick) },
+                    onForward = { onAction(PlayerAction.onSkipNextClick) },
                     onLove = { },
                     isShuffle = false,
-                    isLoading = uiState.value.playerState == OMPlayerState.Buffering,
-                    isError = uiState.value.playerState == OMPlayerState.Error,
-                    isPlaying = uiState.value.playerState == OMPlayerState.Playing,
+                    isLoading = state.value.playerState == OMPlayerState.Buffering,
+                    isError = state.value.playerState == OMPlayerState.Error,
+                    isPlaying = state.value.playerState == OMPlayerState.Playing,
                     isLoved = true
                 )
                 Spacer(modifier = Modifier.requiredHeight(24.dp))
