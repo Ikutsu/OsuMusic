@@ -39,7 +39,7 @@ import io.ikutsu.osumusic.home.presentation.HomeViewModel
 import io.ikutsu.osumusic.player.presentation.PlayerViewModel
 import io.ikutsu.osumusic.player.presentation.component.PlayerBar
 import io.ikutsu.osumusic.profile.presentation.ProfileScreen
-import io.ikutsu.osumusic.search.presentation.SearchScreen
+import io.ikutsu.osumusic.search.presentation.SearchScreenRoot
 import io.ikutsu.osumusic.search.presentation.SearchViewModel
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
@@ -103,8 +103,8 @@ fun MainScreen(
                 )
             }
             composable("search") {
-                SearchScreen(
-                    viewmodel = searchViewModel,
+                SearchScreenRoot(
+                    viewModel = searchViewModel,
                     onSettingClick = onSettingClick
                 )
             }

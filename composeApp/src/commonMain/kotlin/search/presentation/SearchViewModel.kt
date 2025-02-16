@@ -35,6 +35,17 @@ class SearchViewModel(
 
     private var queryJob: Job? = null
 
+    fun onAction(action: SearchAction) {
+        when (action) {
+            is SearchAction.OnSearchClick -> searchBeatmaps()
+            is SearchAction.OnSearchQueryClear -> clearSearchQuery()
+            is SearchAction.OnSearchQueryChange -> onSearchQueryChange(action.query)
+            is SearchAction.OnSearchResultClick -> playSelectedBeatmap(action.beatmapMetadata)
+            is SearchAction.OnSearchResultSwipe -> addBeatmapToQueue(action.beatmapMetadata)
+            else -> Unit
+        }
+    }
+
     private fun fetchSearchHistory() {
         viewModelScope.launch {
             searchRepository.getSearchHistory().collect { data ->
@@ -49,21 +60,21 @@ class SearchViewModel(
         }
     }
 
-    fun onTextFieldChange(text: String) {
+    private fun onSearchQueryChange(query: String) {
         viewModelScope.launch {
-            if (text.isBlank()) {
-                onClearSearch()
+            if (query.isBlank()) {
+                clearSearchQuery()
             }
             _uiState.update {
-                it.copy(searchText = text)
+                it.copy(searchQuery = query)
             }
         }
     }
 
-    fun onSearch() {
+    private fun searchBeatmaps() {
         cancelQueryJob()
         queryJob = viewModelScope.launch(Dispatchers.IO) {
-            if (_uiState.value.searchText.isNotBlank()) {
+            if (_uiState.value.searchQuery.isNotBlank()) {
                 _uiState.update {
                     it.copy(
                         isLoading = true,
@@ -72,13 +83,13 @@ class SearchViewModel(
                 }
 
                 searchRepository.search(
-                    query = _uiState.value.searchText
+                    query = _uiState.value.searchQuery
                 ).onSuccess { data ->
                     _uiState.update {
                         it.copy(
                             isLoading = false,
                             searchResult = data,
-                            displaySearchText = if (data.isEmpty()) "No result found" else "Search result for \"${it.searchText}\""
+                            displayContentTitle = if (data.isEmpty()) "No result found" else "Search result for \"${it.searchQuery}\""
                         )
                     }
                 }.onFailure { error ->
@@ -86,7 +97,7 @@ class SearchViewModel(
                         it.copy(
                             isLoading = false,
                             searchResult = emptyList(),
-                            displaySearchText = "Error: ${error.message}"
+                            displayContentTitle = "Error: ${error.message}"
                         )
                     }
                 }
@@ -94,13 +105,13 @@ class SearchViewModel(
         }
     }
 
-    fun onClearSearch() {
+    private fun clearSearchQuery() {
         viewModelScope.launch {
             cancelQueryJob()
             _uiState.update {
                 it.copy(
                     isLoading = false,
-                    searchText = "",
+                    searchQuery = "",
                     searchContent = SearchUiContent.HISTORY
                 )
             }
@@ -112,7 +123,7 @@ class SearchViewModel(
         queryJob = null
     }
 
-    fun onSearchItemClick(
+    private fun playSelectedBeatmap(
         beatmapMetadata: BeatmapMetadata
     ) {
         viewModelScope.launch {
@@ -125,7 +136,7 @@ class SearchViewModel(
         }
     }
 
-    fun onSwipeRelease(
+    private fun addBeatmapToQueue(
         beatmapMetadata: BeatmapMetadata
     ) {
         viewModelScope.launch {

@@ -9,8 +9,8 @@ enum class SearchUiContent {
 
 data class SearchUiState(
     val isLoading: Boolean = false,
-    val searchText: String = "",
-    val displaySearchText: String = "Search history",
+    val searchQuery: String = "",
+    val displayContentTitle: String = "Search history",
     val searchContent: SearchUiContent = SearchUiContent.HISTORY,
     val searchHistory: List<BeatmapMetadata> = listOf(),
     val searchResult: List<BeatmapMetadata> = listOf()

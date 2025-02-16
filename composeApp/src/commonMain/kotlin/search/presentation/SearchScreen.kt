@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
@@ -39,16 +40,32 @@ import io.ikutsu.osumusic.search.presentation.component.SearchBar
 //object Search
 
 @Composable
-fun SearchScreen(
-    viewmodel: SearchViewModel,
-    onSettingClick: () -> Unit,
-    modifier: Modifier = Modifier
+fun SearchScreenRoot(
+    viewModel: SearchViewModel,
+    onSettingClick: () -> Unit
 ) {
-    val state = viewmodel.uiState.collectAsStateWithLifecycle()
+    val state = viewModel.uiState.collectAsStateWithLifecycle()
+
+    SearchScreen(
+        state = state,
+        onAction = { action ->
+            when (action) {
+                SearchAction.OnSettingClick -> onSettingClick()
+                else -> viewModel.onAction(action)
+            }
+        }
+    )
+}
+
+@Composable
+fun SearchScreen(
+    state: State<SearchUiState>,
+    onAction: (SearchAction) -> Unit
+) {
     val focusManager = LocalFocusManager.current
 
     Column(
-        modifier = modifier
+        modifier = Modifier
             .padding(horizontal = 16.dp)
             .pointerInput(Unit) {
                 detectTapGestures(onTap = {
@@ -60,21 +77,21 @@ fun SearchScreen(
         TitleTopBar(
             title = "Search",
             showSetting = true,
-            onSettingClick = onSettingClick
+            onSettingClick = { onAction(SearchAction.OnSettingClick) }
         )
         SearchBar(
-            textFieldValue = state.value.searchText,
+            textFieldValue = state.value.searchQuery,
             onTextFieldValueChange = {
-                viewmodel.onTextFieldChange(it)
+                onAction(SearchAction.OnSearchQueryChange(it))
             },
             hintText = "type in keywords...",
             enableClearButton = true,
             onClearClick = {
-                viewmodel.onClearSearch()
+                onAction(SearchAction.OnSearchQueryClear)
             },
             onSearchClick = {
                 focusManager.clearFocus()
-                viewmodel.onSearch()
+                onAction(SearchAction.OnSearchClick)
             }
         )
         AnimatedContent(
@@ -123,7 +140,7 @@ fun SearchScreen(
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         Text(
-                            text = if (targetState == SearchUiContent.RESULT) state.value.displaySearchText else "Search history",
+                            text = if (targetState == SearchUiContent.RESULT) state.value.displayContentTitle else "Search history",
                             fontFamily = OM_SemiBold,
                             fontSize = 24.dp.sp
                         )
@@ -158,8 +175,8 @@ fun SearchScreen(
                                     }
                                 ) {
                                     SwipeAllDiffBeatmap(
-                                        onClick = { viewmodel.onSearchItemClick(it) },
-                                        onSwipeRelease = { viewmodel.onSwipeRelease(it) },
+                                        onClick = { onAction(SearchAction.OnSearchResultClick(it)) },
+                                        onSwipeRelease = { onAction(SearchAction.OnSearchResultSwipe(it)) },
                                         beatmapCover = it.coverUrl,
                                         title = it.title,
                                         unicodeTitle = it.unicodeTitle,
