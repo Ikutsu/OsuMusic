@@ -24,7 +24,7 @@ import io.ikutsu.osumusic.core.presentation.theme.OM_Background
 import io.ikutsu.osumusic.core.presentation.util.bottomBarPadding
 import io.ikutsu.osumusic.player.presentation.PlayerScreen
 import io.ikutsu.osumusic.player.presentation.PlayerViewModel
-import io.ikutsu.osumusic.setting.presentation.SettingScreen
+import io.ikutsu.osumusic.setting.presentation.SettingScreenRoot
 import io.ikutsu.osumusic.setting.presentation.SettingViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -112,7 +112,7 @@ fun App() {
                                     ) + fadeOut(tween(300))
                                 }
                             ) {
-                                SettingScreen(
+                                SettingScreenRoot(
                                     viewModel = settingViewModel,
                                     onBackClick = {
                                         appNavController.navigateUp()

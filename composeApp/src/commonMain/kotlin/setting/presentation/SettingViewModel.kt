@@ -37,7 +37,15 @@ class SettingViewModel(
         }
     }
 
-    fun setBeatmapSource(index: Int) {
+    fun onAction(action: SettingAction) {
+        when (action) {
+            is SettingAction.SetBeatmapSource -> setBeatmapSource(action.index)
+            is SettingAction.SetShowInOriginal -> setShowInOriginal(action.boolean)
+            else -> Unit
+        }
+    }
+
+    private fun setBeatmapSource(index: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             settingRepository.setSearchSettings(
                 SearchSettings(
@@ -47,7 +55,7 @@ class SettingViewModel(
         }
     }
 
-    fun setShowInOriginal(boolean: Boolean) {
+    private fun setShowInOriginal(boolean: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             settingRepository.setAppearanceSettings(
                 AppearanceSettings(

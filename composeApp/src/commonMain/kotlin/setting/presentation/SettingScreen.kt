@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -24,11 +25,28 @@ import io.ikutsu.osumusic.core.presentation.util.WSpacer
 import io.ikutsu.osumusic.core.presentation.util.sp
 
 @Composable
-fun SettingScreen(
+fun SettingScreenRoot(
     viewModel: SettingViewModel,
     onBackClick: () -> Unit
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
+
+    SettingScreen(
+        state = uiState,
+        onAction = { action ->
+            when (action) {
+                SettingAction.OnBackClick -> onBackClick()
+                else -> viewModel.onAction(action)
+            }
+        }
+    )
+}
+
+@Composable
+fun SettingScreen(
+    state: State<SettingUiState>,
+    onAction: (SettingAction) -> Unit
+) {
 
     Column(
         modifier = Modifier
@@ -39,15 +57,15 @@ fun SettingScreen(
     ) {
         TitleBackTopBar(
             title = "Setting",
-            onBackClick = { onBackClick() }
+            onBackClick = { onAction(SettingAction.OnBackClick) }
         )
         SettingGroup(
             title = "Appreance"
         ) {
             SettingSwitch(
                 title = "Show metadata in original language",
-                checked = uiState.value.showInOriginalLang,
-                onCheckedChange = { viewModel.setShowInOriginal(it) }
+                checked = state.value.showInOriginalLang,
+                onCheckedChange = { onAction(SettingAction.SetShowInOriginal(it)) }
             )
         }
         SettingGroup(
@@ -55,10 +73,10 @@ fun SettingScreen(
         ) {
             SettingDropDown(
                 title = "Beatmap source",
-                selectedItem = uiState.value.beatmapSourceOptions.indexOf(uiState.value.beatmapSource),
-                items = uiState.value.beatmapSourceOptions.map { it.value },
+                selectedItem = state.value.beatmapSourceOptions.indexOf(state.value.beatmapSource),
+                items = state.value.beatmapSourceOptions.map { it.value },
                 onItemSelected = { index ->
-                    viewModel.setBeatmapSource(index)
+                    onAction(SettingAction.SetBeatmapSource(index))
                 }
             )
         }
