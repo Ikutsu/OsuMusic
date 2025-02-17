@@ -24,6 +24,8 @@ class PlayerViewModel(
         updateProgressJob?.cancel()
         if (it.playerState == OMPlayerState.Playing) {
             updateProgressRequest()
+        } else if (it.playerState == OMPlayerState.Error) {
+            showError(it.errorMessage ?: "Unknown error")
         }
     }
 
@@ -65,6 +67,24 @@ class PlayerViewModel(
         updateProgressJob = viewModelScope.launch {
             delay(50)
             controller.updateProgress()
+        }
+    }
+
+    private fun showError(errorMessage: String) {
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    isError = true,
+                    errorMessage = errorMessage
+                )
+            }
+            delay(5000)
+            _uiState.update {
+                it.copy(
+                    isError = false,
+                    errorMessage = ""
+                )
+            }
         }
     }
 
