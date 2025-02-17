@@ -1,9 +1,9 @@
 package io.ikutsu.osumusic.search.data.remote
 
-import io.ikutsu.osumusic.core.data.BeatmapSource
-import io.ikutsu.osumusic.core.data.OsuDirect
-import io.ikutsu.osumusic.core.data.SayoBot
+import io.ikutsu.osumusic.core.data.remote.api.OsuDirect
+import io.ikutsu.osumusic.core.data.remote.api.SayoBot
 import io.ikutsu.osumusic.core.domain.BeatmapMetadata
+import io.ikutsu.osumusic.core.domain.BeatmapSource
 import io.ikutsu.osumusic.search.data.remote.api.osu_direct.OsuDirectBeatmapSearchApi
 import io.ikutsu.osumusic.search.data.remote.api.osu_direct.OsuDirectBeatmapSearchRequest
 import io.ikutsu.osumusic.search.data.remote.api.sayobot.SayobotBeatmapSearchApi

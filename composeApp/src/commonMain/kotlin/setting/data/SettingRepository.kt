@@ -3,8 +3,7 @@ package io.ikutsu.osumusic.setting.data
 import androidx.compose.ui.text.intl.Locale
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.coroutines.FlowSettings
-import io.ikutsu.osumusic.core.data.BeatmapSource
-import io.ikutsu.osumusic.core.data.Constants
+import io.ikutsu.osumusic.core.domain.BeatmapSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
@@ -31,7 +30,7 @@ class SettingRepository(
     }
 
     fun getAppearanceSettings(): Flow<AppearanceSettings> =
-        settingStorage.getBooleanOrNullFlow(Constants.Setting.SHOW_IN_ORIGINAL_LANG).map {
+        settingStorage.getBooleanOrNullFlow(SettingKeys.SHOW_IN_ORIGINAL_LANG).map {
             AppearanceSettings(
                 showInOriginalLang = it ?: false
             )
@@ -39,13 +38,13 @@ class SettingRepository(
 
     suspend fun setAppearanceSettings(appearanceSettings: AppearanceSettings) {
         settingStorage.putBoolean(
-            Constants.Setting.SHOW_IN_ORIGINAL_LANG,
+            SettingKeys.SHOW_IN_ORIGINAL_LANG,
             appearanceSettings.showInOriginalLang
         )
     }
 
     fun getSearchSettings(): Flow<SearchSettings> =
-        settingStorage.getStringOrNullFlow(Constants.Setting.BEATMAP_SOURCE).map {
+        settingStorage.getStringOrNullFlow(SettingKeys.BEATMAP_SOURCE).map {
             SearchSettings(
                 beatmapSource = it ?: if (Locale.current.region == "CN") {
                     BeatmapSource.SAYOBOT.name  // Sayobot server is based in China, so it's the default source for Chinese users
@@ -56,7 +55,7 @@ class SettingRepository(
         }
 
     suspend fun setSearchSettings(searchSettings: SearchSettings) {
-        settingStorage.putString(Constants.Setting.BEATMAP_SOURCE, searchSettings.beatmapSource)
+        settingStorage.putString(SettingKeys.BEATMAP_SOURCE, searchSettings.beatmapSource)
     }
 }
 

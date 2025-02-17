@@ -3,9 +3,9 @@ package io.ikutsu.osumusic.core.di
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.ObservableSettings
 import com.russhwolf.settings.coroutines.toFlowSettings
-import io.ikutsu.osumusic.core.data.datasource.PlayHistoryDataSource
-import io.ikutsu.osumusic.core.data.model.PlayHistory
-import io.ikutsu.osumusic.core.data.repository.PlayHistoryRepository
+import io.ikutsu.osumusic.core.data.local.datasource.PlayHistoryDataSource
+import io.ikutsu.osumusic.core.data.local.repository.PlayHistoryRepository
+import io.ikutsu.osumusic.core.data.model.PlayHistoryEntity
 import io.ikutsu.osumusic.search.data.local.SearchHistoryEntity
 import io.ikutsu.osumusic.setting.data.SettingRepository
 import io.realm.kotlin.Realm
@@ -22,7 +22,7 @@ val storageModule = module {
             RealmConfiguration.create(
                 schema = setOf(
                     SearchHistoryEntity::class,
-                    PlayHistory::class
+                    PlayHistoryEntity::class
                 )
             )
         )

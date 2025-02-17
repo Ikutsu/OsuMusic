@@ -1,7 +1,7 @@
 package io.ikutsu.osumusic.core.domain
 
-import io.ikutsu.osumusic.core.data.Osu
-import io.ikutsu.osumusic.core.data.model.PlayHistory
+import io.ikutsu.osumusic.core.data.model.PlayHistoryEntity
+import io.ikutsu.osumusic.core.data.remote.api.Osu
 import io.ikutsu.osumusic.search.data.local.SearchHistoryEntity
 import io.realm.kotlin.ext.toRealmList
 
@@ -47,9 +47,9 @@ fun BeatmapMetadata.toSearchHistory(): SearchHistoryEntity {
     }
 }
 
-fun BeatmapMetadata.toPlayHistory(): PlayHistory {
+fun BeatmapMetadata.toPlayHistory(): PlayHistoryEntity {
     this.let {
-        return PlayHistory().apply {
+        return PlayHistoryEntity().apply {
             beatmapId = it.beatmapId
             title = it.title
             titleUnicode = it.unicodeTitle

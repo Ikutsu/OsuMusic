@@ -1,4 +1,4 @@
-package io.ikutsu.osumusic.core.data
+package io.ikutsu.osumusic.core.data.remote.api
 
 object SayoBot {
     const val SAYOBOT_API_BASE_URL = "https://api.sayobot.cn"

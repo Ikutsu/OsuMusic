@@ -2,7 +2,7 @@ package io.ikutsu.osumusic.setting.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import io.ikutsu.osumusic.core.data.BeatmapSource
+import io.ikutsu.osumusic.core.domain.BeatmapSource
 import io.ikutsu.osumusic.setting.data.AppearanceSettings
 import io.ikutsu.osumusic.setting.data.SearchSettings
 import io.ikutsu.osumusic.setting.data.SettingRepository

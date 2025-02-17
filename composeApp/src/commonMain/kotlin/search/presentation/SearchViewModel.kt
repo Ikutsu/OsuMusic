@@ -2,7 +2,7 @@ package io.ikutsu.osumusic.search.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import io.ikutsu.osumusic.core.data.repository.PlayHistoryRepository
+import io.ikutsu.osumusic.core.data.local.repository.PlayHistoryRepository
 import io.ikutsu.osumusic.core.domain.BeatmapMetadata
 import io.ikutsu.osumusic.core.domain.toMusic
 import io.ikutsu.osumusic.core.player.OMPlayerController

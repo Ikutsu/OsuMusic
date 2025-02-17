@@ -2,9 +2,9 @@ package io.ikutsu.osumusic.home.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import io.ikutsu.osumusic.core.data.local.repository.PlayHistoryRepository
 import io.ikutsu.osumusic.core.data.model.toBeatmapMetadata
 import io.ikutsu.osumusic.core.data.model.toMusic
-import io.ikutsu.osumusic.core.data.repository.PlayHistoryRepository
 import io.ikutsu.osumusic.core.domain.BeatmapMetadata
 import io.ikutsu.osumusic.core.player.OMPlayerController
 import kotlinx.coroutines.flow.MutableStateFlow

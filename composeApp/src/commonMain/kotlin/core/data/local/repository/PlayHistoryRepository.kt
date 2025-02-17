@@ -1,6 +1,6 @@
-package io.ikutsu.osumusic.core.data.repository
+package io.ikutsu.osumusic.core.data.local.repository
 
-import io.ikutsu.osumusic.core.data.datasource.PlayHistoryDataSource
+import io.ikutsu.osumusic.core.data.local.datasource.PlayHistoryDataSource
 import io.ikutsu.osumusic.core.domain.BeatmapMetadata
 import io.ikutsu.osumusic.core.domain.toPlayHistory
 

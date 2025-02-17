@@ -1,4 +1,4 @@
-package io.ikutsu.osumusic.core.data
+package io.ikutsu.osumusic.core.data.remote.api
 
 object OsuDirect {
     const val OSUDIRECT_API_BASE_URL = "https://osu.direct"

@@ -1,6 +1,6 @@
 package io.ikutsu.osumusic.setting.presentation
 
-import io.ikutsu.osumusic.core.data.BeatmapSource
+import io.ikutsu.osumusic.core.domain.BeatmapSource
 
 data class SettingUiState(
     val beatmapSource: BeatmapSource? = null,

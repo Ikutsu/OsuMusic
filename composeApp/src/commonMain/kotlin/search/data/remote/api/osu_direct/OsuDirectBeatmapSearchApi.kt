@@ -1,6 +1,6 @@
 package io.ikutsu.osumusic.search.data.remote.api.osu_direct
 
-import io.ikutsu.osumusic.core.data.OsuDirect
+import io.ikutsu.osumusic.core.data.remote.api.OsuDirect
 import io.ikutsu.osumusic.search.data.remote.api.BeatmapSearchApi
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body

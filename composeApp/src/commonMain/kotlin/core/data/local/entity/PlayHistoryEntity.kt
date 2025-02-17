@@ -1,6 +1,6 @@
 package io.ikutsu.osumusic.core.data.model
 
-import io.ikutsu.osumusic.core.data.Osu
+import io.ikutsu.osumusic.core.data.remote.api.Osu
 import io.ikutsu.osumusic.core.domain.BeatmapMetadata
 import io.ikutsu.osumusic.core.domain.Music
 import io.realm.kotlin.ext.realmListOf
@@ -9,7 +9,7 @@ import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 
-class PlayHistory: RealmObject {
+class PlayHistoryEntity: RealmObject {
     @PrimaryKey
     var beatmapId: Int = 0
     var title: String = ""
@@ -23,7 +23,7 @@ class PlayHistory: RealmObject {
     var addedAt: RealmInstant = RealmInstant.now()
 }
 
-fun PlayHistory.toBeatmapMetadata(): BeatmapMetadata {
+fun PlayHistoryEntity.toBeatmapMetadata(): BeatmapMetadata {
     return BeatmapMetadata(
         beatmapId = this.beatmapId,
         audioUrl = this.audioUrl,
@@ -37,7 +37,7 @@ fun PlayHistory.toBeatmapMetadata(): BeatmapMetadata {
     )
 }
 
-fun PlayHistory.toMusic(): Music {
+fun PlayHistoryEntity.toMusic(): Music {
     return Music(
         title = this.title,
         unicodeTitle = this.titleUnicode,
