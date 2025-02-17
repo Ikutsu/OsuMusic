@@ -2,30 +2,46 @@ package io.ikutsu.osumusic.player.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import io.ikutsu.osumusic.core.domain.Music
 import io.ikutsu.osumusic.core.player.OMPlayerController
 import io.ikutsu.osumusic.core.player.OMPlayerEvent
-import io.ikutsu.osumusic.core.player.OMPlayerListener
 import io.ikutsu.osumusic.core.player.OMPlayerState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class PlayerViewModel(
     private val controller: OMPlayerController
-): ViewModel() {
+) : ViewModel() {
+    private val queueState = controller.queueState
+
+    private val playbackState = controller.playbackState.onEach {
+        updateProgressJob?.cancel()
+        if (it.playerState == OMPlayerState.Playing) {
+            updateProgressRequest()
+        }
+    }
 
     private val _uiState: MutableStateFlow<PlayerUiState> = MutableStateFlow(PlayerUiState())
-    val uiState = _uiState
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            PlayerUiState()
+    val uiState = combine(queueState, playbackState, _uiState) { queue, playback, uiState ->
+        uiState.copy(
+            currentProgress = playback.progress.progress,
+            currentProgressInLong = playback.progress.time.inWholeMilliseconds,
+            duration = playback.duration.inWholeMilliseconds,
+            currentMusic = queue.currentMusic,
+            playerQueue = queue.playerQueue,
+            playerState = playback.playerState
         )
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        PlayerUiState()
+    )
 
     private var updateProgressJob: Job? = null
 
@@ -42,75 +58,14 @@ class PlayerViewModel(
     }
 
     init {
-        registerListener()
+        controller.initializePlayer()
     }
 
-    private fun registerListener() {
-        controller.registerListener(
-            object : OMPlayerListener {
-                override fun onError(message: String) {
-                    viewModelScope.launch {
-                        _uiState.update {
-                            it.copy(
-                                isError = true,
-                                errorMessage = message
-                            )
-                        }
-                        delay(3000)
-                        _uiState.update {
-                            it.copy(isError = false)
-                        }
-                    }
-                }
-
-                override fun onProgress(progress: Long) {
-                    if (_uiState.value.playerState == OMPlayerState.Playing || _uiState.value.playerState == OMPlayerState.Buffering) {
-                        updateProgressJob = viewModelScope.launch {
-                            _uiState.update {
-                                it.copy(
-                                    currentProgressInLong = progress,
-                                    currentProgress = if (progress == 0L) 0f else progress.toFloat() / it.duration.toFloat()
-                                )
-                            }
-                        }
-                    }
-                }
-
-                override fun totalDuration(duration: Long) {
-                    viewModelScope.launch {
-                        _uiState.update {
-                            it.copy(duration = duration)
-                        }
-                    }
-                }
-
-                override fun currentPlayerState(state: OMPlayerState) {
-                    viewModelScope.launch {
-                        println("currentPlayerState: $state")
-                        _uiState.update {
-                            it.copy(playerState = state)
-                        }
-                        updateProgressJob?.cancel()
-                    }
-                }
-
-                override fun currentMusic(music: Music?) {
-                    viewModelScope.launch {
-                        _uiState.update {
-                            it.copy(currentMusic = music)
-                        }
-                    }
-                }
-
-                override fun onQueueChanged(queue: List<Music>) {
-                    viewModelScope.launch {
-                        _uiState.update {
-                            it.copy(playerQueue = queue)
-                        }
-                    }
-                }
-            }
-        )
+    private fun updateProgressRequest() {
+        updateProgressJob = viewModelScope.launch {
+            delay(50)
+            controller.updateProgress()
+        }
     }
 
     fun onPlayPauseClick() {
@@ -144,6 +99,6 @@ class PlayerViewModel(
 
     override fun onCleared() {
         updateProgressJob?.cancel()
-        controller.release()
+        controller.releasePlayer()
     }
 }

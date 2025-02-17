@@ -2,14 +2,12 @@ package io.ikutsu.osumusic.core.player
 
 import android.content.ComponentName
 import android.content.Context
-import android.os.Handler
-import android.os.Looper
+import androidx.media3.common.C
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.common.Player.STATE_BUFFERING
 import androidx.media3.common.Player.STATE_ENDED
 import androidx.media3.common.Player.STATE_IDLE
-import androidx.media3.common.Timeline
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import com.google.common.util.concurrent.ListenableFuture
@@ -22,7 +20,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 actual class OMPlayerController(
     context: Context,
@@ -32,12 +34,15 @@ actual class OMPlayerController(
     private var controllerFuture: ListenableFuture<MediaController>
     private val controller: MediaController?
         get() = if (controllerFuture.isDone) controllerFuture.get() else null
-    val handler = Handler(Looper.getMainLooper())
 
-    private val playQueue: MutableList<Music> = mutableListOf()
-    private var currentQueueIndex: Int = 0
+    private val _queueState = MutableStateFlow(OMPlayerQueueState())
+    actual val queueState: StateFlow<OMPlayerQueueState> = _queueState.asStateFlow()
 
-    private val appearanceSettings: MutableStateFlow<AppearanceSettings> = MutableStateFlow(AppearanceSettings(false))
+    private val _playbackState = MutableStateFlow(OMPlayerPlaybackState())
+    actual val playbackState: StateFlow<OMPlayerPlaybackState> = _playbackState.asStateFlow()
+
+    private val appearanceSettings: MutableStateFlow<AppearanceSettings> =
+        MutableStateFlow(AppearanceSettings(false))
 
     private val controllerJob = SupervisorJob()
     private val controllerScope = CoroutineScope(Dispatchers.Main + controllerJob)
@@ -53,23 +58,31 @@ actual class OMPlayerController(
         }
     }
 
-    actual fun registerListener(listener: OMPlayerListener) {
+    actual fun initializePlayer() {
         controllerFuture.addListener({
             controller?.addListener(object : Player.Listener {
+
                 override fun onEvents(player: Player, events: Player.Events) {
                     super.onEvents(player, events)
+                    println(events)
                     with(player) {
-                        listener.currentPlayerState(
-                            when (playbackState) {
-                                STATE_IDLE -> return
-                                STATE_BUFFERING -> OMPlayerState.Buffering
-                                STATE_ENDED -> OMPlayerState.Stopped
-                                else -> if (isPlaying) OMPlayerState.Playing else OMPlayerState.Paused
-                            }
-                        )
-
-                        listener.currentMusic(currentMediaItem?.toMusic())
-                        listener.totalDuration(duration.coerceAtLeast(0L))
+                        _playbackState.update {
+                            it.copy(
+                                playerState = when (playbackState) {
+                                    STATE_IDLE -> return
+                                    STATE_BUFFERING -> OMPlayerState.Buffering
+                                    STATE_ENDED -> OMPlayerState.Stopped
+                                    else -> if (isPlaying) OMPlayerState.Playing else OMPlayerState.Paused
+                                },
+                                duration = if (duration == C.TIME_UNSET) (0).milliseconds else duration.milliseconds
+                            )
+                        }
+                        _queueState.update {
+                            it.copy(
+                                currentMusic = _queueState.value.playerQueue.getOrNull(currentMediaItemIndex)
+                            )
+                        }
+                        updateProgress()
                     }
                 }
 
@@ -82,20 +95,15 @@ actual class OMPlayerController(
                         PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_TIMEOUT -> "Network connection timeout"
                         else -> "Player error"
                     }
-                    listener.currentPlayerState(OMPlayerState.Error)
-                    listener.onError(errorMsg)
+                    _playbackState.update {
+                        it.copy(
+                            playerState = OMPlayerState.Error,
+                            errorMessage = errorMsg
+                        )
+                    }
                 }
 
-                override fun onTimelineChanged(timeline: Timeline, reason: Int) {
-                    super.onTimelineChanged(timeline, reason)
-                    listener.onQueueChanged(playQueue)
-                }
-            })
-            handler.post(object : Runnable {
-                override fun run() {
-                    listener.onProgress(controller?.currentPosition ?: 0)
-                    handler.postDelayed(this, 1000)
-                }
+
             })
         }, MoreExecutors.directExecutor())
     }
@@ -103,32 +111,29 @@ actual class OMPlayerController(
     actual fun setPlayerItem(
         musics: List<Music>
     ) {
-        playQueue.clear()
-        playQueue.addAll(musics)
-        currentQueueIndex = 0
-        updateMediaItems()
+        _queueState.update { it.copy(playerQueue = musics) }
+        val mediaItems = musics.map { it.toMediaItem(appearanceSettings.value.showInOriginalLang) }
+        controller?.setMediaItems(mediaItems)
+
         controller?.playWhenReady = true
         controller?.prepare()
         updateNotificationMetadata()
     }
 
-    private fun updateMediaItems() {
-        val mediaItems = playQueue.map {
-            it.toMediaItem(appearanceSettings.value.showInOriginalLang)
-        }
-        controller?.setMediaItems(mediaItems)
-    }
-
     actual fun addToQueue(music: Music) {
         val mediaItem = music.toMediaItem(appearanceSettings.value.showInOriginalLang)
 
-        playQueue.add(music)
+        _queueState.update { it.copy(playerQueue = it.playerQueue + music) }
         controller?.addMediaItem(mediaItem)
     }
 
     actual fun removeFromQueue(index: Int) {
-        if (index in playQueue.indices) {
-            playQueue.removeAt(index)
+        if (index in _queueState.value.playerQueue.indices) {
+            _queueState.update {
+                it.copy(
+                    playerQueue = it.playerQueue.toMutableList().apply { removeAt(index) }
+                )
+            }
             controller?.removeMediaItem(index)
         }
     }
@@ -158,6 +163,18 @@ actual class OMPlayerController(
                     controller?.duration?.times(event.progress)?.toLong() ?: 0
                 )
             }
+        }
+    }
+
+    actual fun updateProgress() {
+        _playbackState.update {
+            it.copy(
+                progress = OMPlayerPlaybackState.Progress(
+                    progress = ((controller?.currentPosition ?: 0) / (controller?.duration?.toFloat() ?: 0f)).coerceIn(0f, 1f),
+                    time = controller?.currentPosition?.milliseconds ?: (0).milliseconds,
+                    timestamp = System.currentTimeMillis()
+                ),
+            )
         }
     }
 
@@ -196,8 +213,7 @@ actual class OMPlayerController(
         }
     }
 
-    actual fun release() {
+    actual fun releasePlayer() {
         MediaController.releaseFuture(controllerFuture)
     }
-
 }

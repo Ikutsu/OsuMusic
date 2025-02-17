@@ -213,7 +213,7 @@ actual class OMPlayerController {
         }
     }
 
-    actual fun registerListener(listener: OMPlayerListener) {
+    actual fun initializePlayer() {
         setupPlayer()
         setupNotificationObservers()
         nowPlayingInfoCenter = MPNowPlayingInfoCenter.defaultCenter()
@@ -398,7 +398,7 @@ actual class OMPlayerController {
     private val isPlaying: Boolean
         get() = player.timeControlStatus == AVPlayerTimeControlStatusPlaying
 
-    actual fun release() {
+    actual fun releasePlayer() {
         player.pause()
         if (timeObserver != null) {
             player.removeTimeObserver(timeObserver!!)

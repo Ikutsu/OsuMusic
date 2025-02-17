@@ -1,10 +1,14 @@
 package io.ikutsu.osumusic.core.player
 
 import io.ikutsu.osumusic.core.domain.Music
+import kotlinx.coroutines.flow.StateFlow
 
 expect class OMPlayerController {
 
-    fun registerListener(listener: OMPlayerListener)
+    val queueState: StateFlow<OMPlayerQueueState>
+    val playbackState: StateFlow<OMPlayerPlaybackState>
+
+    fun initializePlayer()
 
     fun setPlayerItem(musics: List<Music>)
 
@@ -17,5 +21,8 @@ expect class OMPlayerController {
         selectedAudioIndex: Int = -1
     )
 
-    fun release()
+    fun updateProgress()
+
+    fun releasePlayer()
+
 }
