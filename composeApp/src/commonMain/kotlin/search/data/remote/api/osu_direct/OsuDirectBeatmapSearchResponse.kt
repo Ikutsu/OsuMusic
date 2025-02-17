@@ -1,5 +1,6 @@
-package io.ikutsu.osumusic.search.data.api
+package io.ikutsu.osumusic.search.data.remote.api.osu_direct
 
+import io.ikutsu.osumusic.search.data.remote.api.BeatmapSearchResponse
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

@@ -1,6 +1,5 @@
-package io.ikutsu.osumusic.search.data.datasource
+package io.ikutsu.osumusic.search.data.local
 
-import io.ikutsu.osumusic.search.data.model.SearchHistory
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
@@ -13,15 +12,15 @@ import kotlinx.coroutines.withContext
 class SearchLocalDataSource(
     private val realm: Realm
 ) {
-    suspend fun saveSearchHistory(searchHistory: SearchHistory) {
+    suspend fun saveSearchHistory(searchHistoryEntity: SearchHistoryEntity) {
         withContext(Dispatchers.IO) {
             realm.write {
-                copyToRealm(searchHistory, UpdatePolicy.ALL)
+                copyToRealm(searchHistoryEntity, UpdatePolicy.ALL)
             }
         }
     }
 
-    fun getSearchHistory(): Flow<List<SearchHistory>> {
-        return realm.query<SearchHistory>().asFlow().map { it.list }
+    fun getSearchHistory(): Flow<List<SearchHistoryEntity>> {
+        return realm.query<SearchHistoryEntity>().asFlow().map { it.list }
     }
 }

@@ -1,4 +1,6 @@
-package io.ikutsu.osumusic.search.data.api
+package io.ikutsu.osumusic.search.data.remote.api.osu_direct
+
+import io.ikutsu.osumusic.search.data.remote.api.BeatmapSearchRequest
 
 data class OsuDirectBeatmapSearchRequest(
     val query: String,

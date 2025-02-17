@@ -1,6 +1,7 @@
-package io.ikutsu.osumusic.search.data.api
+package io.ikutsu.osumusic.search.data.remote.api.sayobot
 
 import io.ikutsu.osumusic.core.data.SayoBot
+import io.ikutsu.osumusic.search.data.remote.api.BeatmapSearchApi
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get

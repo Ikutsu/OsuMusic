@@ -1,5 +1,6 @@
-package io.ikutsu.osumusic.search.data.api
+package io.ikutsu.osumusic.search.data.remote.api.sayobot
 
+import io.ikutsu.osumusic.search.data.remote.api.BeatmapSearchRequest
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

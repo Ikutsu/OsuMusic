@@ -6,7 +6,7 @@ import com.russhwolf.settings.coroutines.toFlowSettings
 import io.ikutsu.osumusic.core.data.datasource.PlayHistoryDataSource
 import io.ikutsu.osumusic.core.data.model.PlayHistory
 import io.ikutsu.osumusic.core.data.repository.PlayHistoryRepository
-import io.ikutsu.osumusic.search.data.model.SearchHistory
+import io.ikutsu.osumusic.search.data.local.SearchHistoryEntity
 import io.ikutsu.osumusic.setting.data.SettingRepository
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
@@ -21,7 +21,7 @@ val storageModule = module {
         Realm.open(
             RealmConfiguration.create(
                 schema = setOf(
-                    SearchHistory::class,
+                    SearchHistoryEntity::class,
                     PlayHistory::class
                 )
             )

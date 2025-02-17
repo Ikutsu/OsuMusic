@@ -6,7 +6,7 @@ import io.ikutsu.osumusic.core.data.repository.PlayHistoryRepository
 import io.ikutsu.osumusic.core.domain.BeatmapMetadata
 import io.ikutsu.osumusic.core.domain.toMusic
 import io.ikutsu.osumusic.core.player.OMPlayerController
-import io.ikutsu.osumusic.search.data.model.toBeatmapMetadata
+import io.ikutsu.osumusic.search.data.local.toBeatmapMetadata
 import io.ikutsu.osumusic.search.data.repository.SearchRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO

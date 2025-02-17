@@ -1,4 +1,4 @@
-package io.ikutsu.osumusic.search.data.model
+package io.ikutsu.osumusic.search.data.local
 
 import io.ikutsu.osumusic.core.domain.BeatmapMetadata
 import io.realm.kotlin.ext.realmListOf
@@ -7,7 +7,7 @@ import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 
-class SearchHistory: RealmObject {
+class SearchHistoryEntity: RealmObject {
     @PrimaryKey
     var beatmapId: Int = 0
     var title: String = ""
@@ -21,7 +21,7 @@ class SearchHistory: RealmObject {
     var addedAt: RealmInstant = RealmInstant.now()
 }
 
-fun SearchHistory.toBeatmapMetadata(): BeatmapMetadata {
+fun SearchHistoryEntity.toBeatmapMetadata(): BeatmapMetadata {
     return BeatmapMetadata(
         beatmapId = this.beatmapId,
         audioUrl = this.audioUrl,

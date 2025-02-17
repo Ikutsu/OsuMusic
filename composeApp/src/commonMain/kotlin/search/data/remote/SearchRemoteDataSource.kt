@@ -1,13 +1,13 @@
-package io.ikutsu.osumusic.search.data.datasource
+package io.ikutsu.osumusic.search.data.remote
 
 import io.ikutsu.osumusic.core.data.BeatmapSource
 import io.ikutsu.osumusic.core.data.OsuDirect
 import io.ikutsu.osumusic.core.data.SayoBot
 import io.ikutsu.osumusic.core.domain.BeatmapMetadata
-import io.ikutsu.osumusic.search.data.api.OsuDirectBeatmapSearchApi
-import io.ikutsu.osumusic.search.data.api.OsuDirectBeatmapSearchRequest
-import io.ikutsu.osumusic.search.data.api.SayobotBeatmapSearchApi
-import io.ikutsu.osumusic.search.data.api.SayobotBeatmapSearchRequest
+import io.ikutsu.osumusic.search.data.remote.api.osu_direct.OsuDirectBeatmapSearchApi
+import io.ikutsu.osumusic.search.data.remote.api.osu_direct.OsuDirectBeatmapSearchRequest
+import io.ikutsu.osumusic.search.data.remote.api.sayobot.SayobotBeatmapSearchApi
+import io.ikutsu.osumusic.search.data.remote.api.sayobot.SayobotBeatmapSearchRequest
 import io.ktor.serialization.JsonConvertException
 
 class SearchRemoteDataSource(

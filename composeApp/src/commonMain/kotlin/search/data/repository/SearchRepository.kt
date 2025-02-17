@@ -3,8 +3,8 @@ package io.ikutsu.osumusic.search.data.repository
 import io.ikutsu.osumusic.core.data.BeatmapSource
 import io.ikutsu.osumusic.core.domain.BeatmapMetadata
 import io.ikutsu.osumusic.core.domain.toSearchHistory
-import io.ikutsu.osumusic.search.data.datasource.SearchLocalDataSource
-import io.ikutsu.osumusic.search.data.datasource.SearchRemoteDataSource
+import io.ikutsu.osumusic.search.data.local.SearchLocalDataSource
+import io.ikutsu.osumusic.search.data.remote.SearchRemoteDataSource
 import io.ikutsu.osumusic.setting.data.SettingRepository
 import kotlinx.coroutines.flow.first
 
