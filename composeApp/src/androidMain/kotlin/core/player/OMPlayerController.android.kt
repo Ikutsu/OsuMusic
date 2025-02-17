@@ -1,4 +1,4 @@
-package io.ikutsu.osumusic.player.player
+package io.ikutsu.osumusic.core.player
 
 import android.content.ComponentName
 import android.content.Context
@@ -15,7 +15,7 @@ import androidx.media3.session.SessionToken
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.MoreExecutors
 import io.ikutsu.osumusic.core.domain.Music
-import io.ikutsu.osumusic.player.service.OMPlayerService
+import io.ikutsu.osumusic.service.OMPlayerService
 import io.ikutsu.osumusic.setting.data.AppearanceSettings
 import io.ikutsu.osumusic.setting.data.SettingRepository
 import kotlinx.coroutines.CoroutineScope

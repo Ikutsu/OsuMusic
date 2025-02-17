@@ -58,6 +58,7 @@ import core.presentation.res.omicon.Heartsolid
 import core.presentation.res.omicon.Pause
 import core.presentation.res.omicon.Play
 import core.presentation.res.omicon.Shuffle
+import io.ikutsu.osumusic.core.player.OMPlayerState
 import io.ikutsu.osumusic.core.presentation.component.LoadingSpinner
 import io.ikutsu.osumusic.core.presentation.component.NoBackgroundLoadingSpinner
 import io.ikutsu.osumusic.core.presentation.component.OMIconButton
@@ -78,7 +79,6 @@ import io.ikutsu.osumusic.core.presentation.util.WSpacer
 import io.ikutsu.osumusic.core.presentation.util.debouncedClickable
 import io.ikutsu.osumusic.core.presentation.util.formatMilliseconds
 import io.ikutsu.osumusic.core.presentation.util.noRippleClickable
-import io.ikutsu.osumusic.player.player.OMPlayerState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource

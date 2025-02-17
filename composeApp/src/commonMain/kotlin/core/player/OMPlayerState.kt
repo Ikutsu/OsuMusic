@@ -1,4 +1,4 @@
-package io.ikutsu.osumusic.player.player
+package io.ikutsu.osumusic.core.player
 
 sealed class OMPlayerState {
     data object Buffering : OMPlayerState()

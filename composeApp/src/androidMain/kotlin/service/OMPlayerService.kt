@@ -1,4 +1,4 @@
-package io.ikutsu.osumusic.player.service
+package io.ikutsu.osumusic.service
 
 import android.Manifest
 import android.content.Intent

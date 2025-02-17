@@ -3,10 +3,10 @@ package io.ikutsu.osumusic.player.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.ikutsu.osumusic.core.domain.Music
-import io.ikutsu.osumusic.player.player.OMPlayerController
-import io.ikutsu.osumusic.player.player.OMPlayerEvent
-import io.ikutsu.osumusic.player.player.OMPlayerListener
-import io.ikutsu.osumusic.player.player.OMPlayerState
+import io.ikutsu.osumusic.core.player.OMPlayerController
+import io.ikutsu.osumusic.core.player.OMPlayerEvent
+import io.ikutsu.osumusic.core.player.OMPlayerListener
+import io.ikutsu.osumusic.core.player.OMPlayerState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow

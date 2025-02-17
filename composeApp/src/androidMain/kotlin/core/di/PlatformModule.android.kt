@@ -10,7 +10,7 @@ import androidx.media3.session.MediaSession
 import com.russhwolf.settings.ObservableSettings
 import com.russhwolf.settings.SharedPreferencesSettings
 import io.ikutsu.osumusic.MainActivity
-import io.ikutsu.osumusic.player.player.OMPlayerController
+import io.ikutsu.osumusic.core.player.OMPlayerController
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf

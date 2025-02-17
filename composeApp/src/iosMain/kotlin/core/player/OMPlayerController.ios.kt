@@ -1,4 +1,4 @@
-package io.ikutsu.osumusic.player.player
+package io.ikutsu.osumusic.core.player
 
 import io.ikutsu.osumusic.core.domain.Music
 import kotlinx.cinterop.COpaquePointer
@@ -27,11 +27,9 @@ import platform.AVFoundation.AVPlayerStatusReadyToPlay
 import platform.AVFoundation.AVPlayerStatusUnknown
 import platform.AVFoundation.AVPlayerTimeControlStatusPlaying
 import platform.AVFoundation.AVPlayerTimeControlStatusWaitingToPlayAtSpecifiedRate
-import platform.AVFoundation.AVQueuePlayer
 import platform.AVFoundation.AVURLAsset
 import platform.AVFoundation.AVURLAssetOverrideMIMETypeKey
 import platform.AVFoundation.addPeriodicTimeObserverForInterval
-import platform.AVFoundation.asset
 import platform.AVFoundation.currentItem
 import platform.AVFoundation.currentTime
 import platform.AVFoundation.duration
@@ -72,15 +70,11 @@ import platform.MediaPlayer.MPRemoteCommandHandlerStatus
 import platform.MediaPlayer.MPRemoteCommandHandlerStatusSuccess
 import platform.UIKit.UIImage
 import platform.darwin.DISPATCH_QUEUE_PRIORITY_DEFAULT
-import platform.darwin.DISPATCH_TIME_FOREVER
 import platform.darwin.NSEC_PER_SEC
 import platform.darwin.NSObject
 import platform.darwin.dispatch_async
 import platform.darwin.dispatch_get_global_queue
 import platform.darwin.dispatch_get_main_queue
-import platform.darwin.dispatch_semaphore_create
-import platform.darwin.dispatch_semaphore_signal
-import platform.darwin.dispatch_semaphore_wait
 import platform.foundation.NSKeyValueObservingProtocol
 import platform.objc.sel_registerName
 import kotlin.time.Duration.Companion.seconds

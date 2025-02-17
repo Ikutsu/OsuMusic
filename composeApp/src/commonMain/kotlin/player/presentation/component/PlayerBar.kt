@@ -30,12 +30,12 @@ import core.presentation.res.omicon.Error
 import core.presentation.res.omicon.Forward
 import core.presentation.res.omicon.Pause
 import core.presentation.res.omicon.Play
+import io.ikutsu.osumusic.core.player.OMPlayerState
 import io.ikutsu.osumusic.core.presentation.component.NoBackgroundLoadingSpinner
 import io.ikutsu.osumusic.core.presentation.component.ProgressIndicator
 import io.ikutsu.osumusic.core.presentation.component.SongInfoTexts
 import io.ikutsu.osumusic.core.presentation.theme.OM_ShapeMedium
 import io.ikutsu.osumusic.core.presentation.util.noRippleClickable
-import io.ikutsu.osumusic.player.player.OMPlayerState
 import io.ikutsu.osumusic.player.presentation.PlayerUiState
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject

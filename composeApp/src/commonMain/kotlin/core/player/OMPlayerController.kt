@@ -1,4 +1,4 @@
-package io.ikutsu.osumusic.player.player
+package io.ikutsu.osumusic.core.player
 
 import io.ikutsu.osumusic.core.domain.Music
 

@@ -1,7 +1,7 @@
 package io.ikutsu.osumusic.player.presentation
 
 import io.ikutsu.osumusic.core.domain.Music
-import io.ikutsu.osumusic.player.player.OMPlayerState
+import io.ikutsu.osumusic.core.player.OMPlayerState
 
 data class PlayerUiState(
     val playerState: OMPlayerState? = null,
