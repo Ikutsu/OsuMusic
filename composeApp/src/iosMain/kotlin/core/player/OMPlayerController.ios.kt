@@ -1,62 +1,37 @@
 package io.ikutsu.osumusic.core.player
 
 import io.ikutsu.osumusic.core.domain.Music
-import kotlinx.cinterop.COpaquePointer
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.datetime.Clock
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import platform.AVFAudio.AVAudioSession
 import platform.AVFAudio.AVAudioSessionCategoryPlayback
 import platform.AVFAudio.AVAudioSessionInterruptionNotification
-import platform.AVFAudio.AVAudioSessionInterruptionOptionShouldResume
-import platform.AVFAudio.AVAudioSessionInterruptionOptions
 import platform.AVFAudio.AVAudioSessionInterruptionType
 import platform.AVFAudio.AVAudioSessionInterruptionTypeBegan
 import platform.AVFAudio.AVAudioSessionInterruptionTypeEnded
 import platform.AVFAudio.AVAudioSessionInterruptionTypeKey
-import platform.AVFAudio.AVAudioSessionRouteChangeNotification
-import platform.AVFAudio.AVAudioSessionRouteChangeReason
-import platform.AVFAudio.AVAudioSessionRouteChangeReasonKey
-import platform.AVFAudio.AVAudioSessionRouteChangeReasonNewDeviceAvailable
-import platform.AVFAudio.AVAudioSessionRouteChangeReasonOldDeviceUnavailable
+import platform.AVFAudio.AVAudioSessionModeDefault
+import platform.AVFAudio.AVAudioSessionRouteSharingPolicyLongFormAudio
 import platform.AVFAudio.AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation
 import platform.AVFAudio.setActive
-import platform.AVFoundation.AVPlayer
 import platform.AVFoundation.AVPlayerItem
-import platform.AVFoundation.AVPlayerItemDidPlayToEndTimeNotification
-import platform.AVFoundation.AVPlayerStatusFailed
-import platform.AVFoundation.AVPlayerStatusReadyToPlay
-import platform.AVFoundation.AVPlayerStatusUnknown
-import platform.AVFoundation.AVPlayerTimeControlStatusPlaying
-import platform.AVFoundation.AVPlayerTimeControlStatusWaitingToPlayAtSpecifiedRate
-import platform.AVFoundation.AVURLAsset
-import platform.AVFoundation.AVURLAssetOverrideMIMETypeKey
-import platform.AVFoundation.addPeriodicTimeObserverForInterval
-import platform.AVFoundation.currentItem
-import platform.AVFoundation.currentTime
-import platform.AVFoundation.duration
-import platform.AVFoundation.pause
-import platform.AVFoundation.play
-import platform.AVFoundation.rate
-import platform.AVFoundation.removeTimeObserver
-import platform.AVFoundation.replaceCurrentItemWithPlayerItem
-import platform.AVFoundation.seekToTime
-import platform.AVFoundation.timeControlStatus
 import platform.CoreMedia.CMTimeGetSeconds
+import platform.CoreMedia.CMTimeMake
 import platform.CoreMedia.CMTimeMakeWithSeconds
 import platform.Foundation.NSData
-import platform.Foundation.NSKeyValueObservingOptionInitial
-import platform.Foundation.NSKeyValueObservingOptionNew
 import platform.Foundation.NSNotificationCenter
 import platform.Foundation.NSOperationQueue
-import platform.Foundation.NSURL
 import platform.Foundation.NSURL.Companion.URLWithString
-import platform.Foundation.NSURLErrorDomain
-import platform.Foundation.NSURLSession
-import platform.Foundation.addObserver
 import platform.Foundation.dataWithContentsOfURL
-import platform.Foundation.downloadTaskWithURL
-import platform.Foundation.removeObserver
-import platform.MediaPlayer.MPChangePlaybackPositionCommandEvent
 import platform.MediaPlayer.MPMediaItemArtwork
+import platform.MediaPlayer.MPMediaItemPropertyAlbumTitle
 import platform.MediaPlayer.MPMediaItemPropertyArtist
 import platform.MediaPlayer.MPMediaItemPropertyArtwork
 import platform.MediaPlayer.MPMediaItemPropertyPlaybackDuration
@@ -71,255 +46,202 @@ import platform.MediaPlayer.MPRemoteCommandHandlerStatusSuccess
 import platform.UIKit.UIImage
 import platform.darwin.DISPATCH_QUEUE_PRIORITY_DEFAULT
 import platform.darwin.NSEC_PER_SEC
-import platform.darwin.NSObject
 import platform.darwin.dispatch_async
 import platform.darwin.dispatch_get_global_queue
 import platform.darwin.dispatch_get_main_queue
-import platform.foundation.NSKeyValueObservingProtocol
-import platform.objc.sel_registerName
+import platform.darwin.sel_registerName
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
 
 @OptIn(ExperimentalForeignApi::class)
-actual class OMPlayerController {
-    private lateinit var player: AVPlayer
+actual class OMPlayerController : KoinComponent {
     private lateinit var audioSession: AVAudioSession
     private lateinit var nowPlayingInfoCenter: MPNowPlayingInfoCenter
     private lateinit var remoteCommandCenter: MPRemoteCommandCenter
 
-    private var music: Music? = null
-    private var playerItem: AVPlayerItem? = null
-    private var listeners: OMPlayerListener? = null
-    private var timeObserver: Any? = null
+    private val player: NativePlayerBridge by inject()
     private var sessionInterruptionObserver: Any? = null
     private var sessionRouteChangeObserver: Any? = null
 
-    private var playQueue: MutableList<Music> = mutableListOf()
-        set(value) {
-            field = value
-            listeners?.onQueueChanged(value)
-        }
-    private var currentQueueIndex: Int = 0
+    private val nowPlayingInfo: MutableMap<Any?, Any?> = mutableMapOf()
 
-    init {
-        setUpAudioSession()
-    }
+    private val _playbackState: MutableStateFlow<OMPlayerPlaybackState> =
+        MutableStateFlow(OMPlayerPlaybackState())
+    actual val playbackState: StateFlow<OMPlayerPlaybackState> = _playbackState.asStateFlow()
+
+    private val _queueState: MutableStateFlow<OMPlayerQueueState> =
+        MutableStateFlow(OMPlayerQueueState())
+    actual val queueState: StateFlow<OMPlayerQueueState> = _queueState.asStateFlow()
 
     // --- Setup ---
     @OptIn(ExperimentalForeignApi::class)
     private fun setUpAudioSession() {
         try {
             audioSession = AVAudioSession.sharedInstance()
-            audioSession.setCategory(AVAudioSessionCategoryPlayback, null)
+            audioSession.setCategory(
+                AVAudioSessionCategoryPlayback,
+                AVAudioSessionModeDefault,
+                AVAudioSessionRouteSharingPolicyLongFormAudio,
+                null)
         } catch (e: Exception) {
             println("Error setting up audio session: ${e.message}")
         }
     }
 
-    private fun setupPlayer() {
-        player = AVPlayer().apply {
-            addObserver(
-                observer = timeControlObserver,
-                forKeyPath = "timeControlStatus",
-                options = NSKeyValueObservingOptionNew,
-                context = null
-            )
-        }
-        timeObserver = player.addPeriodicTimeObserverForInterval(
-            CMTimeMakeWithSeconds(1.0, NSEC_PER_SEC.toInt()),
-            dispatch_get_main_queue()
-        ) { time ->
-            listeners?.onProgress(CMTimeGetSeconds(time).times(1000).toLong())
-        }
-    }
+//    private fun setupNotificationObservers() {
+//        sessionInterruptionObserver()
+//        sessionRouteChangeObserver()
+//    }
+//
+//    private fun sessionInterruptionObserver() {
+//        sessionInterruptionObserver = NSNotificationCenter.defaultCenter.addObserverForName(
+//            name = AVAudioSessionInterruptionNotification,
+//            `object` = audioSession,
+//            queue = NSOperationQueue.mainQueue
+//        ) { notification ->
+//            if (notification?.userInfo == null) return@addObserverForName
+//            val interruptionType =
+//                notification.userInfo!![AVAudioSessionInterruptionTypeKey] as? AVAudioSessionInterruptionType
+//            when (interruptionType) {
+//                AVAudioSessionInterruptionTypeBegan -> {
+//                    pause()
+//                }
+//
+//                AVAudioSessionInterruptionTypeEnded -> {
+//                    val options =
+//                        notification.userInfo!![AVAudioSessionInterruptionTypeKey] as? AVAudioSessionInterruptionOptions
+//                    if (options == AVAudioSessionInterruptionOptionShouldResume) {
+//                        play()
+//                    }
+//                }
+//
+//                else -> return@addObserverForName
+//            }
+//        }
+//    }
+//
+//    private fun sessionRouteChangeObserver() {
+//        sessionRouteChangeObserver = NSNotificationCenter.defaultCenter.addObserverForName(
+//            name = AVAudioSessionRouteChangeNotification,
+//            `object` = audioSession,
+//            queue = NSOperationQueue.mainQueue
+//        ) { notification ->
+//            if (notification?.userInfo == null) return@addObserverForName
+//            val changeReason =
+//                notification.userInfo!![AVAudioSessionRouteChangeReasonKey] as? AVAudioSessionRouteChangeReason
+//            when (changeReason) {
+//                AVAudioSessionRouteChangeReasonNewDeviceAvailable -> {
+//                    play()
+//                }
+//
+//                AVAudioSessionRouteChangeReasonOldDeviceUnavailable -> {
+//                    pause()
+//                }
+//
+//                else -> return@addObserverForName
+//            }
+//        }
+//    }
 
-    private fun setupItemObservers() {
-        player.addObserver(
-            observer = playerItemObserver,
-            forKeyPath = "currentItem",
-            options = NSKeyValueObservingOptionNew,
-            context = null
-        )
-        player.currentItem?.addObserver(
-            observer = itemStatusObserver,
-            forKeyPath = "status",
-            options = NSKeyValueObservingOptionNew,
-            context = null
-        )
-    }
-
-    private fun setupNotificationObservers() {
-        sessionInterruptionObserver()
-        sessionRouteChangeObserver()
-    }
-
-    private fun sessionInterruptionObserver() {
-        sessionInterruptionObserver = NSNotificationCenter.defaultCenter.addObserverForName(
-            name = AVAudioSessionInterruptionNotification,
-            `object` = audioSession,
-            queue = NSOperationQueue.mainQueue
-        ) { notification ->
-            if (notification?.userInfo == null) return@addObserverForName
-            val interruptionType =
-                notification.userInfo!![AVAudioSessionInterruptionTypeKey] as? AVAudioSessionInterruptionType
-            when (interruptionType) {
-                AVAudioSessionInterruptionTypeBegan -> {
-                    pause()
-                }
-
-                AVAudioSessionInterruptionTypeEnded -> {
-                    val options =
-                        notification.userInfo!![AVAudioSessionInterruptionTypeKey] as? AVAudioSessionInterruptionOptions
-                    if (options == AVAudioSessionInterruptionOptionShouldResume) {
-                        play()
-                    }
-                }
-
-                else -> return@addObserverForName
-            }
-        }
-    }
-
-    private fun sessionRouteChangeObserver() {
-        sessionRouteChangeObserver = NSNotificationCenter.defaultCenter.addObserverForName(
-            name = AVAudioSessionRouteChangeNotification,
-            `object` = audioSession,
-            queue = NSOperationQueue.mainQueue
-        ) { notification ->
-            if (notification?.userInfo == null) return@addObserverForName
-            val changeReason =
-                notification.userInfo!![AVAudioSessionRouteChangeReasonKey] as? AVAudioSessionRouteChangeReason
-            when (changeReason) {
-                AVAudioSessionRouteChangeReasonNewDeviceAvailable -> {
-                    play()
-                }
-
-                AVAudioSessionRouteChangeReasonOldDeviceUnavailable -> {
-                    pause()
-                }
-
-                else -> return@addObserverForName
-            }
-        }
-    }
-
-    private fun removeAudioSessionObservers() {
-        if (sessionInterruptionObserver != null) {
-            NSNotificationCenter.defaultCenter.removeObserver(sessionInterruptionObserver!!)
-            sessionInterruptionObserver = null
-        }
-        if (sessionRouteChangeObserver != null) {
-            NSNotificationCenter.defaultCenter.removeObserver(sessionRouteChangeObserver!!)
-            sessionRouteChangeObserver = null
-        }
-    }
+//    private fun removeAudioSessionObservers() {
+//        if (sessionInterruptionObserver != null) {
+//            NSNotificationCenter.defaultCenter.removeObserver(sessionInterruptionObserver!!)
+//            sessionInterruptionObserver = null
+//        }
+//        if (sessionRouteChangeObserver != null) {
+//            NSNotificationCenter.defaultCenter.removeObserver(sessionRouteChangeObserver!!)
+//            sessionRouteChangeObserver = null
+//        }
+//    }
 
     actual fun initializePlayer() {
-        setupPlayer()
-        setupNotificationObservers()
+        setUpAudioSession()
+        player.setOnStateChangeListener { state ->
+            _playbackState.update {
+                it.copy(playerState = state)
+            }
+        }
+        player.setOnFinishListener {
+            onPlayerEvent(OMPlayerEvent.Next)
+        }
+        player.setOnErrorListener { errorMsg ->
+            _playbackState.update {
+                it.copy(errorMessage = errorMsg)
+            }
+        }
+//        setupNotificationObservers()
         nowPlayingInfoCenter = MPNowPlayingInfoCenter.defaultCenter()
         remoteCommandCenter = MPRemoteCommandCenter.sharedCommandCenter()
-//        activatePlaybackCommands(true)
-//        activateChangePlaybackPositionCommand(true)
-        this.listeners = listener
+
+        observeAudioSession()
+        setupRemoteCommands()
     }
 
     // --- Player ---
     actual fun setPlayerItem(musics: List<Music>) {
-        playQueue = musics.toMutableList()
-        currentQueueIndex = 0
+        _queueState.update { it.copy(playerQueue = musics) }
+        pause()
 
-        listeners?.onProgress(0L)
-        player.pause()
-
-        setCurrentMusic(currentQueueIndex)
-        player.play()
+        setCurrentMusic(musics[0])
+        play()
     }
 
-    private fun setCurrentMusic(index: Int) {
-        currentQueueIndex = index
-        listeners?.currentPlayerState(OMPlayerState.Buffering)
-        listeners?.currentMusic(playQueue[index])
-        music = playQueue[index]
 
-        removeCurrentItemObservers()
+    private fun setCurrentMusic(music: Music) {
+        clearProgress()
+        _queueState.update { it.copy(currentMusic = music) }
 
-        val sourceUrl = playQueue[index].source
-        val audioUrl = URLWithString(sourceUrl)
+        val sourceUrl = music.source
 
-        player.addObserver(
-            observer = playerItemObserver,
-            forKeyPath = "currentItem",
-            options = NSKeyValueObservingOptionNew,
-            context = null
-        )
-        if (sourceUrl.startsWith("https://osu.direct/")) {
-            downloadAndPlayAudio(audioUrl ?: return)
-        } else {
-            AVPlayerItem(AVURLAsset(uRL = audioUrl ?: return, options = mapOf(AVURLAssetOverrideMIMETypeKey to "audio/mpeg"))).apply {
-                player.replaceCurrentItemWithPlayerItem(this)
-                addObserver(
-                    observer = itemStatusObserver,
-                    forKeyPath = "status",
-                    options = NSKeyValueObservingOptionNew and NSKeyValueObservingOptionInitial,
-                    context = null
+        player.setSource(sourceUrl)
+        setNowPlayingInfo()
+        if (sourceUrl.endsWith(".ogg")) {
+            _playbackState.update {
+                it.copy(
+                    playerState = OMPlayerState.Error,
+                    errorMessage = "Unsupported audio format"
                 )
             }
         }
-
-        NSNotificationCenter.defaultCenter.addObserverForName(
-            name = AVPlayerItemDidPlayToEndTimeNotification,
-            `object` = player.currentItem,
-            queue = NSOperationQueue.mainQueue,
-        ) {
-            listeners?.currentPlayerState(OMPlayerState.Stopped)
-        }
-    }
-
-    // Download and play audio (because osu.direct links are not direct audio links)
-    private fun downloadAndPlayAudio(url: NSURL) {
-        val session = NSURLSession.sharedSession()
-        val task = session.downloadTaskWithURL(url) { localURL, _, error ->
-            if (localURL != null) {
-                dispatch_async(dispatch_get_main_queue()) {
-                    val asset = AVURLAsset(uRL = localURL, options = mapOf(AVURLAssetOverrideMIMETypeKey to "audio/mpeg"))
-                    AVPlayerItem(asset).apply {
-                        player.replaceCurrentItemWithPlayerItem(this)
-                        addObserver(
-                            observer = itemStatusObserver,
-                            forKeyPath = "status",
-                            options = NSKeyValueObservingOptionNew and NSKeyValueObservingOptionInitial,
-                            context = null
-                        )
-                    }
-                }
-            } else if (error != null) {
-                println("Failed to download: ${error.localizedDescription}")
-            }
-        }
-        task.resume()
     }
 
     actual fun addToQueue(music: Music) {
-        playQueue.add(music)
+        _queueState.update { it.copy(playerQueue = it.playerQueue + music) }
     }
 
     actual fun removeFromQueue(index: Int) {
-        playQueue.removeAt(index)
+        if (index in _queueState.value.playerQueue.indices) {
+            _queueState.update {
+                it.copy(
+                    playerQueue = it.playerQueue.toMutableList().apply { removeAt(index) }
+                )
+            }
+        }
     }
 
     private fun play() {
         activateAudioSession()
         player.play()
+
+        nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = 1.0
+        nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] =
+            player.getCurrentPosition()
+        nowPlayingInfoCenter.nowPlayingInfo = nowPlayingInfo
     }
 
     private fun pause() {
         player.pause()
-        listeners?.currentPlayerState(OMPlayerState.Paused)
         deactivateAudioSession()
+
+        nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = 0.0
+        nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] =
+            player.getCurrentPosition()
+        nowPlayingInfoCenter.nowPlayingInfo = nowPlayingInfo
     }
 
     private fun togglePlayPause() {
-        if (isPlaying) {
+        if (player.isPlaying()) {
             pause()
         } else {
             play()
@@ -327,55 +249,53 @@ actual class OMPlayerController {
     }
 
     private fun seekToPosition(progress: Float) {
-        val duration = CMTimeGetSeconds(
-            player.currentItem?.duration ?: CMTimeMakeWithSeconds(
-                0.0,
-                NSEC_PER_SEC.toInt()
+        player.seekTo(progress * player.getDuration())
+    }
+
+    actual fun updateProgress() {
+        _playbackState.update {
+            val currentTime = player.getCurrentPosition()
+            val currentTimeInSeconds = if (currentTime.isNaN()) 0.0.seconds else currentTime.seconds
+            val duration = player.getDuration()
+            val durationInSeconds = if (duration.isNaN()) 0.0.seconds else duration.seconds
+            updatePlayBackMetadata(duration, currentTime)
+            it.copy(
+                duration = durationInSeconds,
+                progress = OMPlayerPlaybackState.Progress(
+                    progress = (currentTimeInSeconds / durationInSeconds).toFloat(),
+                    time = currentTimeInSeconds,
+                    timestamp = Clock.System.now().toEpochMilliseconds(),
+                ),
             )
-        )
-        val position = duration * progress
-        pause()
-        player.currentItem?.seekToTime(
-            CMTimeMakeWithSeconds(
-                position,
-                NSEC_PER_SEC.toInt()
-            )
-        )
-        updatePlayBackMetadata()
-        play()
+        }
     }
 
     actual fun onPlayerEvent(
         event: OMPlayerEvent,
         selectedAudioIndex: Int
     ) {
+        val playQueue = _queueState.value.playerQueue
+        val currentMusicIndex = playQueue.indexOf(_queueState.value.currentMusic)
         when (event) {
             OMPlayerEvent.PlayPause -> {
                 togglePlayPause()
             }
 
             OMPlayerEvent.Previous -> {
-                if (currentQueueIndex > 0) {
-                    currentQueueIndex--
-                    setCurrentMusic(currentQueueIndex)
-                } else {
-                    seekToInitialTime()
+                if (playQueue.isNotEmpty() && currentMusicIndex > 0) {
+                    setCurrentMusic(playQueue[currentMusicIndex - 1])
                 }
             }
 
             OMPlayerEvent.Next -> {
-                if (currentQueueIndex < playQueue.size - 1) {
-                    currentQueueIndex++
-                    setCurrentMusic(currentQueueIndex)
-                } else {
-                    seekToInitialTime()
+                if (playQueue.isNotEmpty() && currentMusicIndex < playQueue.size - 1) {
+                    setCurrentMusic(playQueue[currentMusicIndex + 1])
                 }
             }
 
             OMPlayerEvent.SelectedAudioChange -> {
                 if (selectedAudioIndex in playQueue.indices) {
-                    currentQueueIndex = selectedAudioIndex
-                    setCurrentMusic(currentQueueIndex)
+                    setCurrentMusic(playQueue[selectedAudioIndex])
                 }
             }
 
@@ -385,32 +305,17 @@ actual class OMPlayerController {
         }
     }
 
-    @OptIn(ExperimentalForeignApi::class)
     private fun seekToInitialTime() {
-        player.seekToTime(
-            CMTimeMakeWithSeconds(
-                seconds = 0.0,
-                preferredTimescale = 1
-            )
-        )
+        player.seekTo(0.0)
     }
 
-    private val isPlaying: Boolean
-        get() = player.timeControlStatus == AVPlayerTimeControlStatusPlaying
-
     actual fun releasePlayer() {
-        player.pause()
-        if (timeObserver != null) {
-            player.removeTimeObserver(timeObserver!!)
-            timeObserver = null
-        }
+        player.release()
         seekToInitialTime()
         deactivateAudioSession()
         deactivateAllRemoteCommands()
-        player.removeObserver(playerItemObserver, "currentItem")
-        player.removeObserver(timeControlObserver, "timeControlStatus")
-        removeAudioSessionObservers()
-        removeCurrentItemObservers()
+//        removeAudioSessionObservers()
+//        removeCurrentItemObservers()
     }
 
     // --- Audio Session ---
@@ -430,209 +335,154 @@ actual class OMPlayerController {
                 withOptions = AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation,
                 error = null
             )
+            println("Audio session set to active: $active")
         } catch (e: Exception) {
             println("Failed to update the audio session active to $active")
         }
     }
 
-    // --- Now Playing Info ---
-    private fun setNowPlayingInfo() {
-        if (music == null) return
-        val nowPlayingInfo = nowPlayingInfoCenter.nowPlayingInfo?.toMutableMap() ?: mutableMapOf()
-        nowPlayingInfo[MPMediaItemPropertyTitle] = music!!.title
-        nowPlayingInfo[MPMediaItemPropertyArtist] = music!!.artist
-        nowPlayingInfoCenter.nowPlayingInfo = nowPlayingInfo
-
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT.toLong(), 0u)) {
-            val imageData = NSData.dataWithContentsOfURL(URLWithString(music!!.coverUrl)!!)
-            val image = imageData?.let { UIImage(data = it) }
-            dispatch_async(dispatch_get_main_queue()) {
-                if (image is UIImage) {
-                    val artwork = MPMediaItemArtwork(boundsSize = image.size) { _ -> image }
-                    nowPlayingInfo[MPMediaItemPropertyArtwork] = artwork
-                    nowPlayingInfoCenter.nowPlayingInfo = nowPlayingInfo
+    private fun observeAudioSession() {
+        NSNotificationCenter.defaultCenter.addObserverForName(
+            name = AVAudioSessionInterruptionNotification,
+            `object` = audioSession,
+            queue = NSOperationQueue.mainQueue
+        ) { notification ->
+            if (notification?.userInfo == null) return@addObserverForName
+            val interruptionType =
+                notification.userInfo!![AVAudioSessionInterruptionTypeKey] as? AVAudioSessionInterruptionType
+            when (interruptionType) {
+                AVAudioSessionInterruptionTypeBegan -> {
+                    pause()
+                }
+                AVAudioSessionInterruptionTypeEnded -> {
+                    play()
                 }
             }
         }
     }
 
-    private fun updatePlayBackMetadata() {
-        if (playerItem == null) return
-        val nowPlayingInfo = nowPlayingInfoCenter.nowPlayingInfo?.toMutableMap() ?: mutableMapOf()
-        nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = CMTimeGetSeconds(playerItem!!.duration)
-        nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = CMTimeGetSeconds(playerItem!!.currentTime())
-        nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = player.rate
-        nowPlayingInfo[MPNowPlayingInfoPropertyDefaultPlaybackRate] = player.rate
-        nowPlayingInfoCenter.nowPlayingInfo = nowPlayingInfo
+    // --- Now Playing Info ---
+    private fun setNowPlayingInfo() {
+        val music = _queueState.value.currentMusic ?: return
+
+        nowPlayingInfo.clear()
+
+        nowPlayingInfo[MPMediaItemPropertyTitle] = music.title
+        nowPlayingInfo[MPMediaItemPropertyArtist] = music.artist
+        nowPlayingInfo[MPMediaItemPropertyAlbumTitle] = music.creator
+
+        // Set initial playback rate
+        nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] =
+            if (player.isPlaying()) 1.0 else 0.0
+
+        nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = player.getDuration()
+        nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = player.getCurrentPosition()
+
+        MPNowPlayingInfoCenter.defaultCenter().nowPlayingInfo = nowPlayingInfo.toMap()
+
+
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT.toLong(), 0u)) {
+            try {
+                val url = URLWithString(music.coverUrl)
+                if (url != null) {
+                    val imageData = NSData.dataWithContentsOfURL(url)
+                    if (imageData != null) {
+                        val image = UIImage(data = imageData)
+                        dispatch_async(dispatch_get_main_queue()) {
+                            val artwork = MPMediaItemArtwork(boundsSize = image.size) { _ -> image }
+                            nowPlayingInfo[MPMediaItemPropertyArtwork] = artwork
+                            nowPlayingInfoCenter.nowPlayingInfo = nowPlayingInfo.toMap()
+                            println("Artwork updated successfully")
+                        }
+                    } else {
+                        println("Failed to load NSData from URL")
+                    }
+                } else {
+                    println("Invalid URL: ${music.coverUrl}")
+                }
+            } catch (e: Exception) {
+                println("Error loading artwork: ${e.message}")
+            }
+        }
+
+        println("Setting Now Playing Info: ${nowPlayingInfo}")
+        println("Music: ${music.title}, ${music.artist}, ${music.coverUrl}")
+    }
+
+    private fun updatePlayBackMetadata(duration: Double, progress: Double) {
+        if (_queueState.value.currentMusic == null) return
+        println("$duration $progress")
+        val updatedNowPlayingInfo = nowPlayingInfoCenter.nowPlayingInfo?.toMutableMap() ?: mutableMapOf()
+
+        // Set or update basic metadata
+        updatedNowPlayingInfo[MPMediaItemPropertyTitle] = _queueState.value.currentMusic?.title ?: "Unknown Title"
+        updatedNowPlayingInfo[MPMediaItemPropertyArtist] = _queueState.value.currentMusic?.artist ?: "Unknown Artist"
+
+        updatedNowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = duration
+        updatedNowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = progress
+
+        // Update playback rate
+        updatedNowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] =
+            if (player.isPlaying()) 1.0 else 0.0
+
+        MPNowPlayingInfoCenter.defaultCenter().nowPlayingInfo = updatedNowPlayingInfo.toMap()
+        println("Setting Now Playing Info: ${updatedNowPlayingInfo}")
     }
 
     // --- Remote Control ---
-    private fun activatePlaybackCommands(enabled: Boolean) {
-        if (enabled) {
-            remoteCommandCenter.playCommand.addTarget(this, sel_registerName("handlePlayCommandEvent"))
-            remoteCommandCenter.pauseCommand.addTarget(this, sel_registerName("handlePauseCommandEvent"))
-            remoteCommandCenter.togglePlayPauseCommand.addTarget(this, sel_registerName("handleTogglePlayPauseCommandEvent"))
-        } else {
-            remoteCommandCenter.playCommand.removeTarget(this, sel_registerName("handlePlayCommandEvent"))
-            remoteCommandCenter.pauseCommand.removeTarget(this, sel_registerName("handlePauseCommandEvent"))
-            remoteCommandCenter.togglePlayPauseCommand.removeTarget(this, sel_registerName("handleTogglePlayPauseCommandEvent"))
+    private fun setupRemoteCommands() {
+        // Play command
+        remoteCommandCenter.playCommand.enabled = true
+        remoteCommandCenter.playCommand.addTargetWithHandler { _ ->
+            play()
+            MPRemoteCommandHandlerStatusSuccess
         }
-        remoteCommandCenter.playCommand.enabled = enabled
-        remoteCommandCenter.pauseCommand.enabled = enabled
-        remoteCommandCenter.stopCommand.enabled = enabled
-        remoteCommandCenter.togglePlayPauseCommand.enabled = enabled
-    }
 
-//    fun activateNextTrackCommand(enabled: Boolean) {
-//        if (enabled) {
-//            remoteCommandCenter.nextTrackCommand.addTarget(this, sel_registerName(::handleNextTrackCommandEvent))
-//        } else {
-//            remoteCommandCenter.nextTrackCommand.removeTarget(this, sel_registerName(::handleNextTrackCommandEvent))
-//        }
-//        remoteCommandCenter.nextTrackCommand.enabled = enabled
-//    }
-//
-//    fun activatePreviousTrackCommand(enabled: Boolean) {
-//        if (enabled) {
-//            remoteCommandCenter.previousTrackCommand.addTarget(this, sel_registerName(::handlePreviousTrackCommandEvent))
-//        } else {
-//            remoteCommandCenter.previousTrackCommand.removeTarget(this, sel_registerName(::handlePreviousTrackCommandEvent))
-//        }
-//        remoteCommandCenter.previousTrackCommand.enabled = enabled
-//    }
-
-    fun activateChangePlaybackPositionCommand(enabled: Boolean) {
-        if (enabled) {
-            remoteCommandCenter.changePlaybackPositionCommand.addTarget(this, sel_registerName("handleChangePlaybackPositionCommandEvent"))
-        } else {
-            remoteCommandCenter.changePlaybackPositionCommand.removeTarget(this, sel_registerName("handleChangePlaybackPositionCommandEvent"))
+        // Pause command
+        remoteCommandCenter.pauseCommand.enabled = true
+        remoteCommandCenter.pauseCommand.addTargetWithHandler { _ ->
+            pause()
+            MPRemoteCommandHandlerStatusSuccess
         }
-        remoteCommandCenter.changePlaybackPositionCommand.enabled = enabled
-    }
 
-    fun deactivateAllRemoteCommands() {
-        activatePlaybackCommands(false)
-//        activateNextTrackCommand(false)
-//        activatePreviousTrackCommand(false)
-        activateChangePlaybackPositionCommand(false)
-    }
+        // Toggle Play/Pause command
+        remoteCommandCenter.togglePlayPauseCommand.enabled = true
+        remoteCommandCenter.togglePlayPauseCommand.addTargetWithHandler { _ ->
+            togglePlayPause()
+            MPRemoteCommandHandlerStatusSuccess
+        }
 
-    private fun handlePlayCommandEvent(): MPRemoteCommandHandlerStatus {
-        play()
-        return MPRemoteCommandHandlerStatusSuccess
-    }
+        // Next track command
+        remoteCommandCenter.nextTrackCommand.enabled = true
+        remoteCommandCenter.nextTrackCommand.addTargetWithHandler { _ ->
+            onPlayerEvent(OMPlayerEvent.Next)
+            MPRemoteCommandHandlerStatusSuccess
+        }
 
-    private fun handlePauseCommandEvent(): MPRemoteCommandHandlerStatus {
-        pause()
-        return MPRemoteCommandHandlerStatusSuccess
-    }
-
-    private fun handleTogglePlayPauseCommandEvent(): MPRemoteCommandHandlerStatus {
-        togglePlayPause()
-        return MPRemoteCommandHandlerStatusSuccess
-    }
-
-//    private fun handleNextTrackCommandEvent(): MPRemoteCommandHandlerStatus {
-//        return if (playerItem != null) {
-//            switchNext()
-//            MPRemoteCommandHandlerStatusSuccess
-//        } else {
-//            MPRemoteCommandHandlerStatusNoSuchContent
-//        }
-//    }
-
-//    private fun handlePreviousTrackCommandEvent(): MPRemoteCommandHandlerStatus {
-//        return if (playerItem != null) {
-//            switchPrevious()
-//            MPRemoteCommandHandlerStatusSuccess
-//        } else {
-//            MPRemoteCommandHandlerStatusNoSuchContent
-//        }
-//    }
-
-    private fun handleChangePlaybackPositionCommandEvent(event: MPChangePlaybackPositionCommandEvent): MPRemoteCommandHandlerStatus {
-        seekToPosition(event.positionTime.toFloat())
-        return MPRemoteCommandHandlerStatusSuccess
-    }
-
-    // --- Observers ---
-    private fun removeCurrentItemObservers() {
-        player.currentItem?.removeObserver(itemStatusObserver, "status")
-        NSNotificationCenter.defaultCenter.removeObserver(
-            this,
-            AVPlayerItemDidPlayToEndTimeNotification,
-            player.currentItem
-        )
-    }
-
-    private val playerItemObserver: NSObject = object : NSObject(), NSKeyValueObservingProtocol {
-        override fun observeValueForKeyPath(
-            keyPath: String?,
-            ofObject: Any?,
-            change: Map<Any?, *>?,
-            context: COpaquePointer?
-        ) {
-            playerItem = player.currentItem
-
-            setNowPlayingInfo()
+        // Previous track command
+        remoteCommandCenter.previousTrackCommand.enabled = true
+        remoteCommandCenter.previousTrackCommand.addTargetWithHandler { _ ->
+            onPlayerEvent(OMPlayerEvent.Previous)
+            MPRemoteCommandHandlerStatusSuccess
         }
     }
 
-    @OptIn(ExperimentalForeignApi::class)
-    private val itemStatusObserver: NSObject = object : NSObject(), NSKeyValueObservingProtocol {
-
-        override fun observeValueForKeyPath(
-            keyPath: String?,
-            ofObject: Any?,
-            change: Map<Any?, *>?,
-            context: COpaquePointer?
-        ) {
-            if (playerItem == null) return
-
-            when (player.currentItem?.status) {
-                AVPlayerStatusUnknown -> return
-                AVPlayerStatusReadyToPlay -> {
-                    listeners?.totalDuration(
-                        CMTimeGetSeconds(playerItem!!.duration).toLong().times(1000)
-                    )
-                    seekToInitialTime()
-                }
-
-                AVPlayerStatusFailed -> {
-                    println("Player error: ${playerItem?.error?.description}")
-                    val errorMsg = when (playerItem?.error?.domain) {
-                        null -> return
-                        NSURLErrorDomain -> "Source unavailable"
-                        else -> playerItem?.error?.localizedFailureReason
-                    }
-                    listeners?.onError(errorMsg ?: "Player error")
-                    listeners?.currentPlayerState(OMPlayerState.Error)
-                }
-
-                else -> return
-            }
-        }
+    private fun deactivateAllRemoteCommands() {
+        remoteCommandCenter.playCommand.removeTarget(null)
+        remoteCommandCenter.pauseCommand.removeTarget(null)
+        remoteCommandCenter.togglePlayPauseCommand.removeTarget(null)
+        remoteCommandCenter.nextTrackCommand.removeTarget(null)
+        remoteCommandCenter.previousTrackCommand.removeTarget(null)
     }
 
-    @ExperimentalForeignApi
-    private val timeControlObserver: NSObject = object : NSObject(), NSKeyValueObservingProtocol {
-
-        override fun observeValueForKeyPath(
-            keyPath: String?,
-            ofObject: Any?,
-            change: Map<Any?, *>?,
-            context: COpaquePointer?
-        ) {
-            when (player.timeControlStatus) {
-                AVPlayerTimeControlStatusPlaying -> listeners?.currentPlayerState(OMPlayerState.Playing)
-                AVPlayerTimeControlStatusWaitingToPlayAtSpecifiedRate -> {
-                    if (player.currentItem?.error == null) {
-                        listeners?.currentPlayerState(OMPlayerState.Buffering)
-                    }
-                }
-
-                else -> return
-            }
+    private fun clearProgress() {
+        _playbackState.update {
+            it.copy(
+                progress = OMPlayerPlaybackState.Progress(
+                    timestamp = Clock.System.now().toEpochMilliseconds()
+                ),
+                duration = Duration.ZERO,
+            )
         }
     }
 }

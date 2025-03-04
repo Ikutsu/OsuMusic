@@ -6,4 +6,5 @@ sealed class OMPlayerState {
     data object Paused : OMPlayerState()
     data object Stopped : OMPlayerState()
     data object Error : OMPlayerState()
+    data object Idle : OMPlayerState()
 }

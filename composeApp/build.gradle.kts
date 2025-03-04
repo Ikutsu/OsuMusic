@@ -27,6 +27,7 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
             isStatic = true
+            binaryOption("bundleId", "io.ikutsu.osumusic")
         }
         iosTarget.compilations.getByName("main") {
             // https://kotlinlang.org/docs/multiplatform-dsl-reference.html#cinterops
