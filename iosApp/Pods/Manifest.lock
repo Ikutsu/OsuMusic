@@ -1,0 +1,29 @@
+PODS:
+  - AudioPlaybackManager (0.2.0):
+    - VIMediaCache (~> 0.4)
+  - VIMediaCache (0.4)
+
+DEPENDENCIES:
+  - AudioPlaybackManager
+  - VIMediaCache (from `https://github.com/vitoziv/VIMediaCache.git`)
+
+SPEC REPOS:
+  trunk:
+    - AudioPlaybackManager
+
+EXTERNAL SOURCES:
+  VIMediaCache:
+    :git: https://github.com/vitoziv/VIMediaCache.git
+
+CHECKOUT OPTIONS:
+  VIMediaCache:
+    :commit: ae24addc1b4423a264bc92a7332e4189e2f654f4
+    :git: https://github.com/vitoziv/VIMediaCache.git
+
+SPEC CHECKSUMS:
+  AudioPlaybackManager: a8298beac24e56efb275e1bf4b78be1ecf685a54
+  VIMediaCache: aa650f82cb114c68a343beb4e67416cf5eb2f3a2
+
+PODFILE CHECKSUM: 564bae11dd66e64fccf75930fabe3789adebc354
+
+COCOAPODS: 1.16.2

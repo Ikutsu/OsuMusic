@@ -1,0 +1,2 @@
+${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AudioPlaybackManager.framework
+${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VIMediaCache.framework
