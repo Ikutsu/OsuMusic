@@ -52,11 +52,11 @@ fun BeatmapMetadata.toPlayHistory(): PlayHistoryEntity {
         return PlayHistoryEntity().apply {
             beatmapId = it.beatmapId
             title = it.title
-            titleUnicode = it.unicodeTitle
+            unicodeTitle = it.unicodeTitle
             artist = it.artist
-            artistUnicode = it.unicodeArtist
+            unicodeArtist = it.unicodeArtist
             creator = it.creator
-            difficulty = it.difficulties.toRealmList()
+            difficulty = it.difficulties.first()
             coverUrl = it.coverUrl
             audioUrl = it.audioUrl
         }
