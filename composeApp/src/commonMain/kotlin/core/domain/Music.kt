@@ -14,3 +14,17 @@ data class Music(
     // storyboard
     // hitsound
 )
+
+fun Music.toBeatmapMetadata(): BeatmapMetadata {
+    return BeatmapMetadata(
+        beatmapId = 0,
+        audioUrl = this.source,
+        coverUrl = this.coverUrl,
+        title = this.title,
+        unicodeTitle = this.unicodeTitle,
+        artist = this.artist,
+        unicodeArtist = this.unicodeArtist,
+        creator = this.creator,
+        difficulties = listOf(this.difficulty)
+    )
+}

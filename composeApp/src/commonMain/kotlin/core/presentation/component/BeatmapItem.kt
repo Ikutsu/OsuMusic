@@ -35,6 +35,7 @@ import coil3.request.ImageRequest
 import core.presentation.res.OMIcon
 import core.presentation.res.omicon.ListAdd
 import core.presentation.res.omicon.Waveform
+import io.ikutsu.osumusic.core.domain.BeatmapMetadata
 import io.ikutsu.osumusic.core.presentation.theme.OM_ShapeMedium
 import io.ikutsu.osumusic.core.presentation.util.HSpacer
 import io.ikutsu.osumusic.core.presentation.util.VSpacer
@@ -47,19 +48,14 @@ import osumusic.composeapp.generated.resources.loginBackground
 
 @Composable
 fun BeatmapItem(
-    beatmapCover: String,
-    title: String,
-    unicodeTitle: String,
-    artist: String,
-    unicodeArtist: String,
-    difficulty: Float,
+    beatmapMetadata: BeatmapMetadata,
     multiDiff: Boolean = false,
     trailingContent: @Composable (() -> Unit) = {},
     onClick: () -> Unit
 ) {
     BeatmapItemContainer(
         onClick = onClick,
-        coverUrl = beatmapCover,
+        beatmapMetadata = beatmapMetadata,
         height = 48.dp
     ) {
         Row(
@@ -71,7 +67,7 @@ fun BeatmapItem(
             if (multiDiff) {
                 RainbowDiffCircle(24)
             } else {
-                DiffCircle(difficulty, 24)
+                DiffCircle(beatmapMetadata.difficulties.first(), 24)
             }
             HSpacer(8.dp)
             Column(
@@ -79,10 +75,10 @@ fun BeatmapItem(
                 verticalArrangement = Arrangement.Center
             ) {
                 SongInfoTexts(
-                    title = title,
-                    unicodeTitle = unicodeTitle,
-                    artist = artist,
-                    unicodeArtist = unicodeArtist
+                    title = beatmapMetadata.title,
+                    unicodeTitle = beatmapMetadata.unicodeTitle,
+                    artist = beatmapMetadata.artist,
+                    unicodeArtist = beatmapMetadata.unicodeArtist
                 )
             }
             trailingContent()
@@ -92,17 +88,12 @@ fun BeatmapItem(
 
 @Composable
 fun BeatmapSetItem(
-    beatmapCover: String,
-    title: String,
-    unicodeTitle: String,
-    artist: String,
-    unicodeArtist: String,
-    difficulties: List<Float>,
+    beatmapMetadata: BeatmapMetadata,
     onClick: () -> Unit
 ) {
     BeatmapItemContainer(
         onClick = onClick,
-        coverUrl = beatmapCover,
+        beatmapMetadata = beatmapMetadata,
         height = 72.dp
     ) {
         Column(
@@ -112,10 +103,10 @@ fun BeatmapSetItem(
             verticalArrangement = Arrangement.Center
         ) {
             SongInfoTexts(
-                title = title,
-                unicodeTitle = unicodeTitle,
-                artist = artist,
-                unicodeArtist = unicodeArtist
+                title = beatmapMetadata.title,
+                unicodeTitle = beatmapMetadata.unicodeTitle,
+                artist = beatmapMetadata.artist,
+                unicodeArtist = beatmapMetadata.unicodeArtist
             )
             VSpacer(4.dp)
             LazyRow(
@@ -124,7 +115,7 @@ fun BeatmapSetItem(
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                 userScrollEnabled = false
             ) {
-                items(difficulties) {
+                items(beatmapMetadata.difficulties) {
                     DiffCircle(it, 18)
                 }
             }
@@ -136,12 +127,7 @@ fun BeatmapSetItem(
 fun SwipeAllDiffBeatmap(
     onClick: () -> Unit,
     onSwipeRelease: () -> Unit,
-    beatmapCover: String,
-    title: String,
-    unicodeTitle: String,
-    artist: String,
-    unicodeArtist: String,
-    diffs: List<Float>
+    beatmapMetadata: BeatmapMetadata
 ) {
     OMSwipeBox(
         allowSwipeLeft = true,
@@ -171,12 +157,7 @@ fun SwipeAllDiffBeatmap(
         upperContent = {
             BeatmapSetItem(
                 onClick = onClick,
-                beatmapCover = beatmapCover,
-                title = title,
-                unicodeTitle = unicodeTitle,
-                artist = artist,
-                unicodeArtist = unicodeArtist,
-                difficulties = diffs
+                beatmapMetadata = beatmapMetadata
             )
         }
     )
@@ -184,22 +165,12 @@ fun SwipeAllDiffBeatmap(
 
 @Composable
 fun PlayerQueueItem(
-    beatmapCover: String,
-    title: String,
-    unicodeTitle: String,
-    artist: String,
-    unicodeArtist: String,
-    difficulty: Float,
+    beatmapMetadata: BeatmapMetadata,
     isPlaying: Boolean,
     onClick: () -> Unit
 ) {
     BeatmapItem(
-        beatmapCover = beatmapCover,
-        title = title,
-        unicodeTitle = unicodeTitle,
-        artist = artist,
-        unicodeArtist = unicodeArtist,
-        difficulty = difficulty,
+        beatmapMetadata = beatmapMetadata,
         onClick = onClick,
         trailingContent = {
             if (isPlaying) {
@@ -217,7 +188,7 @@ fun PlayerQueueItem(
 fun BeatmapItemContainer(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
-    coverUrl: String,
+    beatmapMetadata: BeatmapMetadata,
     height: Dp,
     shape: Shape = OM_ShapeMedium,
     content: @Composable BoxScope.() -> Unit
@@ -229,7 +200,7 @@ fun BeatmapItemContainer(
             .clip(shape)
             .clickable { onClick() }
     ) {
-        BeatmapBackgroundImage(coverUrl = coverUrl)
+        BeatmapBackgroundImage(coverUrl = beatmapMetadata.coverUrl)
         BeatmapGradientOverlay()
 
         content()

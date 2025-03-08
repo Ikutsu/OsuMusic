@@ -80,12 +80,7 @@ fun HomeScreen(
                     onClick = {
                         onAction(HomeAction.OnPlayHistoryClick(beatmap))
                     },
-                    beatmapCover = beatmap.coverUrl,
-                    title = beatmap.title,
-                    unicodeTitle = beatmap.unicodeTitle,
-                    artist = beatmap.artist,
-                    unicodeArtist = beatmap.unicodeArtist,
-                    difficulty = beatmap.difficulties.first(),
+                    beatmapMetadata = beatmap,
                     multiDiff = true
                 )
                 if (index < state.value.recentPlayedList.size - 1) {

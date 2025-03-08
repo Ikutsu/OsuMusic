@@ -177,12 +177,7 @@ fun SearchScreen(
                                     SwipeAllDiffBeatmap(
                                         onClick = { onAction(SearchAction.OnSearchResultClick(it)) },
                                         onSwipeRelease = { onAction(SearchAction.OnSearchResultSwipe(it)) },
-                                        beatmapCover = it.coverUrl,
-                                        title = it.title,
-                                        unicodeTitle = it.unicodeTitle,
-                                        artist = it.artist,
-                                        unicodeArtist = it.unicodeArtist,
-                                        diffs = it.difficulties
+                                        beatmapMetadata = it
                                     )
                                 }
                                 item {

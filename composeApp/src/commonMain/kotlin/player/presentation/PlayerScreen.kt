@@ -58,6 +58,7 @@ import core.presentation.res.omicon.Heartsolid
 import core.presentation.res.omicon.Pause
 import core.presentation.res.omicon.Play
 import core.presentation.res.omicon.Shuffle
+import io.ikutsu.osumusic.core.domain.toBeatmapMetadata
 import io.ikutsu.osumusic.core.player.OMPlayerState
 import io.ikutsu.osumusic.core.presentation.component.LoadingSpinner
 import io.ikutsu.osumusic.core.presentation.component.NoBackgroundLoadingSpinner
@@ -448,12 +449,7 @@ fun PlayerBottomSheet(
                 PlayerQueueItem(
                     onClick = { onQueueItemClick(index) },
                     isPlaying = item == state.value.currentMusic,
-                    beatmapCover = item.coverUrl,
-                    title = item.title,
-                    unicodeTitle = item.unicodeTitle,
-                    artist = item.artist,
-                    unicodeArtist = item.unicodeArtist,
-                    difficulty = item.difficulty
+                    beatmapMetadata = item.toBeatmapMetadata()
                 )
             }
         }
