@@ -2,7 +2,6 @@ package io.ikutsu.osumusic.search.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import io.ikutsu.osumusic.core.data.local.repository.PlayHistoryRepository
 import io.ikutsu.osumusic.core.domain.BeatmapMetadata
 import io.ikutsu.osumusic.core.domain.toMusic
 import io.ikutsu.osumusic.core.player.OMPlayerController
@@ -20,8 +19,7 @@ import kotlinx.coroutines.launch
 
 class SearchViewModel(
     private val searchRepository: SearchRepository,
-    private val playHistoryRepository: PlayHistoryRepository,
-    private val playerController: OMPlayerController,
+    private val playerController: OMPlayerController
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SearchUiState())
@@ -128,11 +126,7 @@ class SearchViewModel(
     ) {
         viewModelScope.launch {
             searchRepository.saveSearchHistory(beatmapMetadata)
-            playHistoryRepository.savePlayHistory(beatmapMetadata)
             playerController.setPlayerItem(listOf(beatmapMetadata.toMusic()))
-//            playerController.onPlayerEvent(
-//                OMPlayerEvent.PlayPause
-//            )
         }
     }
 
@@ -141,7 +135,6 @@ class SearchViewModel(
     ) {
         viewModelScope.launch {
             searchRepository.saveSearchHistory(beatmapMetadata)
-            playHistoryRepository.savePlayHistory(beatmapMetadata)
             playerController.addToQueue(beatmapMetadata.toMusic())
         }
     }

@@ -2,6 +2,8 @@ package io.ikutsu.osumusic.player.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import io.ikutsu.osumusic.core.data.local.repository.PlayHistoryRepository
+import io.ikutsu.osumusic.core.domain.toBeatmapMetadata
 import io.ikutsu.osumusic.core.player.OMPlayerController
 import io.ikutsu.osumusic.core.player.OMPlayerEvent
 import io.ikutsu.osumusic.core.player.OMPlayerState
@@ -16,7 +18,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class PlayerViewModel(
-    private val controller: OMPlayerController
+    private val controller: OMPlayerController,
+    private val playHistory: PlayHistoryRepository
 ) : ViewModel() {
     private val queueState = controller.queueState
 
@@ -24,6 +27,7 @@ class PlayerViewModel(
         updateProgressJob?.cancel()
         if (it.playerState == OMPlayerState.Playing) {
             updateProgressRequest()
+            playHistory.savePlayHistory(queueState.value.currentMusic?.toBeatmapMetadata() ?: return@onEach)
         } else if (it.playerState == OMPlayerState.Error) {
             showError(it.errorMessage ?: "Unknown error")
         }

@@ -78,7 +78,7 @@ fun HomeScreen(
             itemsIndexed(state.value.recentPlayedList.take(5)) { index, beatmap ->
                 BeatmapItem(
                     onClick = {
-                        onAction(HomeAction.OnPlayHistoryClick(beatmap))
+                        onAction(HomeAction.OnPlayHistoryClick)
                     },
                     beatmapMetadata = beatmap,
                     multiDiff = true
