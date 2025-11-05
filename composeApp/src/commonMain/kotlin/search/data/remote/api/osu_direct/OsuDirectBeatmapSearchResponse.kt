@@ -49,7 +49,11 @@ data class OsuDirectBeatmapSearchResponse(
         @SerialName("beatmaps") val beatmaps: List<Beatmap>,
         @SerialName("pack_tags") val packTags: List<String>,
         @SerialName("modes") val modes: List<Int>,
-        @SerialName("last_checked") val lastChecked: String
+        @SerialName("last_checked") val lastChecked: String,
+        @SerialName("rating") val rating: Double,
+        @SerialName("genre_id") val genreId: Int,
+        @SerialName("language_id") val languageId: Int,
+        @SerialName("anime_cover") val animeCover: Boolean? = null
     )
 
     @Serializable
